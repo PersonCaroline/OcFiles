@@ -7,20 +7,20 @@ export const THEMES = [
   { id: "asylum", name: "Asylum" },
 ];
 
-export const getTheme = () => {
+export function getTheme() {
   try {
     return localStorage.getItem("oc-theme") || "goth";
   } catch {
     return "goth";
   }
-};
+}
 
-export const applyTheme = (id) => {
-  document.documentElement.dataset.theme = id;
+export function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
 
   try {
-    localStorage.setItem("oc-theme", id);
+    localStorage.setItem("oc-theme", theme);
   } catch {
-    /* ignore */
+    // localStorage unavailable
   }
-};
+}
