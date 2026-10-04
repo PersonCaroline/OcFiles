@@ -1,163 +1,2111 @@
 /* =========================================================
-   OLD BASE44-STYLE COLORS
+   OC ARCHIVE
+   COMPLETE STYLE
    ========================================================= */
 
-:root,
-html[data-theme="goth"] {
-  --bg-1: #0d0a10;
-  --bg-2: #17111b;
-  --bg-3: #241827;
+:root {
+  --bg: #0d0a10;
+  --bg-soft: #151019;
 
-  --page-bg: #0d0a10;
+  --surface: #1b1420;
+  --surface-2: #251b2b;
+  --surface-3: #302239;
 
-  --surface: rgba(27, 21, 32, 0.94);
-  --surface-2: rgba(37, 27, 43, 0.94);
-  --surface-3: rgba(51, 36, 58, 0.92);
+  --text: #f1e9f3;
+  --muted: #aa9dad;
+  --dim: #766878;
 
-  --text: #eee7f1;
-  --muted: #a99eae;
+  --accent: #b984ca;
+  --accent-2: #7b4d91;
+  --accent-soft: rgba(185, 132, 202, 0.15);
 
-  --accent: #b58ac7;
-  --accent-2: #815294;
-  --accent-soft: rgba(181, 138, 199, 0.16);
+  --border: rgba(185, 132, 202, 0.28);
+  --border-strong: rgba(201, 153, 218, 0.58);
 
-  --border: rgba(181, 138, 199, 0.30);
-  --border-strong: rgba(196, 151, 215, 0.58);
+  --glow: rgba(175, 110, 201, 0.24);
+  --shadow: rgba(0, 0, 0, 0.5);
 
-  --glow: rgba(171, 112, 201, 0.25);
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 25px;
+
+  --max-width: 1400px;
 }
 
 
 /* =========================================================
-   CIRCUS — OLD DARK RED
+   GOTH
+   DARK PURPLE / BLACK + CIRCLES
+   ========================================================= */
+
+html[data-theme="goth"] {
+  --bg: #0b080e;
+  --bg-soft: #130e18;
+
+  --surface: #18111e;
+  --surface-2: #231729;
+  --surface-3: #302039;
+
+  --text: #eee5f1;
+  --muted: #ad9eb2;
+  --dim: #76677c;
+
+  --accent: #b883ca;
+  --accent-2: #71458b;
+  --accent-soft: rgba(184, 131, 202, 0.15);
+
+  --border: rgba(184, 131, 202, 0.27);
+  --border-strong: rgba(200, 153, 218, 0.58);
+
+  --glow: rgba(173, 105, 201, 0.25);
+}
+
+
+/* =========================================================
+   CIRCUS
+   OLD DARK RED / BURGUNDY / GOLD
    ========================================================= */
 
 html[data-theme="circus"] {
-  --bg-1: #210608;
-  --bg-2: #35090c;
-  --bg-3: #4a1014;
+  --bg: #220608;
+  --bg-soft: #31090d;
 
-  --surface: rgba(48, 10, 13, 0.95);
-  --surface-2: rgba(61, 12, 16, 0.95);
-  --surface-3: rgba(77, 17, 21, 0.93);
+  --surface: #3a0d12;
+  --surface-2: #4b1117;
+  --surface-3: #601920;
 
-  --text: #f1dfc2;
-  --muted: #c5a98c;
+  --text: #f5e5ca;
+  --muted: #c7aa8b;
+  --dim: #94755c;
 
-  --accent: #c58b45;
-  --accent-2: #8d2529;
-  --accent-soft: rgba(197, 139, 69, 0.15);
+  --accent: #d09a52;
+  --accent-2: #8e252b;
+  --accent-soft: rgba(208, 154, 82, 0.15);
 
-  --border: rgba(197, 139, 69, 0.34);
-  --border-strong: rgba(218, 164, 87, 0.62);
+  --border: rgba(208, 154, 82, 0.30);
+  --border-strong: rgba(225, 176, 96, 0.62);
 
-  --glow: rgba(181, 105, 47, 0.25);
+  --glow: rgba(204, 139, 57, 0.25);
 }
 
 
 /* =========================================================
-   ASYLUM — OLD DARK ASYLUM COLORS
-   ========================================================= */
-
-html[data-theme="asylum"] {
-  --bg-1: #081417;
-  --bg-2: #0c1d20;
-  --bg-3: #132a2d;
-
-  --surface: rgba(11, 28, 31, 0.95);
-  --surface-2: rgba(15, 38, 41, 0.95);
-  --surface-3: rgba(21, 51, 54, 0.93);
-
-  --text: #d8e5e4;
-  --muted: #8da4a5;
-
-  --accent: #6fa7a7;
-  --accent-2: #416f72;
-  --accent-soft: rgba(111, 167, 167, 0.14);
-
-  --border: rgba(111, 167, 167, 0.30);
-  --border-strong: rgba(126, 190, 188, 0.55);
-
-  --glow: rgba(75, 154, 156, 0.23);
-}
-
-
-/* =========================================================
-   FOREST — OLD DARK GREEN
+   FOREST
+   DARK GREEN / OLIVE
    ========================================================= */
 
 html[data-theme="forest"] {
-  --bg-1: #081108;
-  --bg-2: #101d10;
-  --bg-3: #19291a;
+  --bg: #071008;
+  --bg-soft: #0d1a0e;
 
-  --surface: rgba(13, 29, 15, 0.95);
-  --surface-2: rgba(19, 40, 21, 0.94);
-  --surface-3: rgba(27, 51, 28, 0.93);
+  --surface: #122316;
+  --surface-2: #19301d;
+  --surface-3: #244125;
 
-  --text: #dfe8d5;
-  --muted: #9baa8f;
+  --text: #e5ebdc;
+  --muted: #a6b399;
+  --dim: #71806b;
 
-  --accent: #91aa68;
-  --accent-2: #557449;
-  --accent-soft: rgba(145, 170, 104, 0.14);
+  --accent: #9db76e;
+  --accent-2: #55764b;
+  --accent-soft: rgba(157, 183, 110, 0.14);
 
-  --border: rgba(145, 170, 104, 0.29);
-  --border-strong: rgba(166, 194, 119, 0.54);
+  --border: rgba(157, 183, 110, 0.28);
+  --border-strong: rgba(174, 202, 125, 0.56);
 
-  --glow: rgba(105, 153, 76, 0.23);
+  --glow: rgba(119, 169, 85, 0.23);
 }
 
 
 /* =========================================================
-   DETECTIVE — OLD SOFT BROWN
+   DETECTIVE
+   SOFT DARK BROWN / SEPIA
    ========================================================= */
 
 html[data-theme="detective"] {
-  --bg-1: #15100c;
-  --bg-2: #211811;
-  --bg-3: #2c2117;
+  --bg: #15100b;
+  --bg-soft: #1d160f;
 
-  --surface: rgba(31, 24, 18, 0.95);
-  --surface-2: rgba(43, 32, 23, 0.94);
-  --surface-3: rgba(57, 42, 29, 0.93);
+  --surface: #272016;
+  --surface-2: #33281b;
+  --surface-3: #443521;
 
-  --text: #e8ddc9;
-  --muted: #ad9c84;
+  --text: #eee2ca;
+  --muted: #b5a287;
+  --dim: #7f6d58;
 
-  --accent: #b99363;
-  --accent-2: #76593a;
-  --accent-soft: rgba(185, 147, 99, 0.14);
+  --accent: #bf9965;
+  --accent-2: #80603d;
+  --accent-soft: rgba(191, 153, 101, 0.14);
 
-  --border: rgba(185, 147, 99, 0.30);
-  --border-strong: rgba(205, 169, 116, 0.55);
+  --border: rgba(191, 153, 101, 0.29);
+  --border-strong: rgba(211, 174, 119, 0.58);
 
-  --glow: rgba(181, 133, 73, 0.21);
+  --glow: rgba(187, 137, 74, 0.22);
 }
 
 
 /* =========================================================
-   MAFIA — OLD DARK BURGUNDY
+   MAFIA
+   BURGUNDY / BLACK / GOLD
    ========================================================= */
 
 html[data-theme="mafia"] {
-  --bg-1: #100708;
-  --bg-2: #1d0d10;
-  --bg-3: #2c1418;
+  --bg: #0e0809;
+  --bg-soft: #190c0e;
 
-  --surface: rgba(29, 13, 16, 0.95);
-  --surface-2: rgba(43, 18, 22, 0.94);
-  --surface-3: rgba(59, 25, 29, 0.93);
+  --surface: #251114;
+  --surface-2: #35171b;
+  --surface-3: #481e23;
 
-  --text: #eadfd1;
-  --muted: #b5a296;
+  --text: #eee1d2;
+  --muted: #b8a295;
+  --dim: #806c61;
 
-  --accent: #b99a5e;
-  --accent-2: #722b32;
-  --accent-soft: rgba(185, 154, 94, 0.14);
+  --accent: #c4a15d;
+  --accent-2: #7b2933;
+  --accent-soft: rgba(196, 161, 93, 0.14);
 
-  --border: rgba(185, 154, 94, 0.30);
-  --border-strong: rgba(207, 174, 108, 0.55);
+  --border: rgba(196, 161, 93, 0.29);
+  --border-strong: rgba(215, 180, 107, 0.58);
 
-  --glow: rgba(176, 125, 60, 0.22);
+  --glow: rgba(190, 142, 60, 0.22);
 }
+
+
+/* =========================================================
+   ASYLUM
+   DARK TEAL / COLD GREEN
+   ========================================================= */
+
+html[data-theme="asylum"] {
+  --bg: #071316;
+  --bg-soft: #0b1c20;
+
+  --surface: #102529;
+  --surface-2: #163238;
+  --surface-3: #1d4147;
+
+  --text: #dce9e7;
+  --muted: #91aaa9;
+  --dim: #627d7d;
+
+  --accent: #70aaa9;
+  --accent-2: #3e7073;
+  --accent-soft: rgba(112, 170, 169, 0.14);
+
+  --border: rgba(112, 170, 169, 0.30);
+  --border-strong: rgba(127, 192, 189, 0.58);
+
+  --glow: rgba(68, 159, 160, 0.23);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  color: var(--text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  line-height: 1.5;
+
+  background: var(--bg);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+
+/* =========================================================
+   THEMED PAGE BACKGROUND
+   ========================================================= */
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+
+  z-index: -10;
+
+  background: var(--bg);
+}
+
+
+/* =========================================================
+   GOTH BACKGROUND
+   CIRCLES
+   ========================================================= */
+
+html[data-theme="goth"] body::before {
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      transparent 0 28px,
+      rgba(184, 131, 202, 0.10) 29px 31px,
+      transparent 32px
+    ),
+    radial-gradient(
+      circle at 83% 72%,
+      transparent 0 42px,
+      rgba(184, 131, 202, 0.075) 43px 45px,
+      transparent 46px
+    ),
+    radial-gradient(
+      circle at 52% 35%,
+      transparent 0 16px,
+      rgba(184, 131, 202, 0.055) 17px 18px,
+      transparent 19px
+    ),
+    var(--bg);
+
+  background-size:
+    150px 150px,
+    210px 210px,
+    100px 100px,
+    auto;
+}
+
+
+/* =========================================================
+   CIRCUS BACKGROUND
+   DIAGONAL STRIPES + VERY CLEAR LOSANGES
+   ========================================================= */
+
+html[data-theme="circus"] body::before {
+  background:
+
+    /* LARGE GOLD DIAMONDS */
+
+    linear-gradient(
+      45deg,
+      transparent 40%,
+      rgba(218, 169, 88, 0.15) 41%,
+      rgba(218, 169, 88, 0.15) 45%,
+      transparent 46%
+    ),
+
+    linear-gradient(
+      -45deg,
+      transparent 40%,
+      rgba(218, 169, 88, 0.15) 41%,
+      rgba(218, 169, 88, 0.15) 45%,
+      transparent 46%
+    ),
+
+    /* DARK RED DIAMONDS */
+
+    linear-gradient(
+      45deg,
+      transparent 44%,
+      rgba(126, 27, 34, 0.55) 45%,
+      rgba(126, 27, 34, 0.55) 49%,
+      transparent 50%
+    ),
+
+    linear-gradient(
+      -45deg,
+      transparent 44%,
+      rgba(126, 27, 34, 0.55) 45%,
+      rgba(126, 27, 34, 0.55) 49%,
+      transparent 50%
+    ),
+
+    /* CIRCUS STRIPES */
+
+    repeating-linear-gradient(
+      135deg,
+      #240608 0,
+      #240608 42px,
+      #420b10 42px,
+      #420b10 84px
+    );
+
+  background-size:
+    72px 72px,
+    72px 72px,
+    72px 72px,
+    72px 72px,
+    auto;
+
+  background-position:
+    0 0,
+    36px 36px,
+    0 0,
+    36px 36px,
+    0 0;
+}
+
+
+/* =========================================================
+   FOREST BACKGROUND
+   ORGANIC / LEAF-LIKE LINES
+   ========================================================= */
+
+html[data-theme="forest"] body::before {
+  background:
+    repeating-linear-gradient(
+      118deg,
+      transparent 0,
+      transparent 58px,
+      rgba(144, 177, 101, 0.09) 59px,
+      rgba(144, 177, 101, 0.09) 61px,
+      transparent 62px,
+      transparent 105px
+    ),
+    repeating-linear-gradient(
+      62deg,
+      transparent 0,
+      transparent 95px,
+      rgba(102, 143, 81, 0.075) 96px,
+      rgba(102, 143, 81, 0.075) 98px,
+      transparent 99px,
+      transparent 150px
+    ),
+    var(--bg);
+}
+
+
+/* =========================================================
+   DETECTIVE BACKGROUND
+   NOTICEABLE PAPER GRID
+   ========================================================= */
+
+html[data-theme="detective"] body::before {
+  background:
+    linear-gradient(
+      rgba(191, 153, 101, 0.11) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(191, 153, 101, 0.11) 1px,
+      transparent 1px
+    ),
+    var(--bg);
+
+  background-size: 38px 38px;
+}
+
+
+/* =========================================================
+   ASYLUM BACKGROUND
+   NOTICEABLE INSTITUTIONAL GRID
+   ========================================================= */
+
+html[data-theme="asylum"] body::before {
+  background:
+    linear-gradient(
+      rgba(112, 170, 169, 0.13) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(112, 170, 169, 0.13) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      rgba(112, 170, 169, 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(112, 170, 169, 0.045) 1px,
+      transparent 1px
+    ),
+    var(--bg);
+
+  background-size:
+    42px 42px,
+    42px 42px,
+    10px 10px,
+    10px 10px,
+    auto;
+}
+
+
+/* =========================================================
+   MAFIA BACKGROUND
+   PINSTRIPES
+   ========================================================= */
+
+html[data-theme="mafia"] body::before {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 27px,
+      rgba(196, 161, 93, 0.065) 28px,
+      transparent 29px
+    ),
+    linear-gradient(
+      135deg,
+      rgba(123, 41, 51, 0.22),
+      transparent 45%
+    ),
+    var(--bg);
+}
+
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+
+.site-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+main,
+footer,
+.topbar {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  min-height: 74px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 12px 24px;
+
+  background: rgba(15, 12, 18, 0.86);
+
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 10px 35px var(--shadow);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 220px;
+
+  font-weight: 800;
+}
+
+.brand-symbol {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 13px;
+
+  color: var(--text);
+
+  background:
+    radial-gradient(
+      circle at 30% 25%,
+      var(--accent-2),
+      transparent 35%
+    ),
+    var(--accent-soft);
+
+  border: 1px solid var(--border-strong);
+
+  box-shadow:
+    0 0 25px var(--glow),
+    inset 0 0 18px var(--accent-soft);
+}
+
+.archive-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.archive-nav button {
+  border: 1px solid transparent;
+
+  background: transparent;
+  color: var(--muted);
+
+  padding: 9px 12px;
+
+  border-radius: 11px;
+
+  font-weight: 700;
+  font-size: 13px;
+
+  transition: 0.2s ease;
+}
+
+.archive-nav button:hover {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: var(--border);
+}
+
+.archive-nav .nav-active {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: var(--border-strong);
+
+  box-shadow: 0 0 18px var(--glow);
+}
+
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-left: auto;
+}
+
+.theme-picker label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.theme-picker select {
+  width: auto;
+  min-width: 125px;
+}
+
+
+/* =========================================================
+   GENERAL PAGES
+   ========================================================= */
+
+.home-page,
+.archive-page,
+.creator-page,
+.profile-page,
+.editor-page,
+.import-export-page {
+  width: min(calc(100% - 40px), var(--max-width));
+
+  margin: 0 auto;
+
+  padding: 55px 0 80px;
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text);
+}
+
+h1 {
+  letter-spacing: -0.045em;
+}
+
+h2,
+h3 {
+  letter-spacing: -0.025em;
+}
+
+p {
+  color: var(--muted);
+}
+
+.muted,
+.section-description {
+  color: var(--muted);
+}
+
+.eyebrow {
+  color: var(--accent);
+
+  font-size: 11px;
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  gap: 40px;
+  align-items: center;
+
+  min-height: 440px;
+
+  padding: 58px;
+
+  border: 1px solid var(--border);
+  border-radius: 32px;
+
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      var(--accent-soft),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      var(--surface),
+      var(--bg-soft)
+    );
+
+  box-shadow:
+    0 25px 80px var(--shadow),
+    inset 0 0 50px var(--accent-soft);
+
+  overflow: hidden;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+
+  max-width: 720px;
+}
+
+.hero-copy h1 {
+  margin: 10px 0 20px;
+
+  font-size: clamp(42px, 6vw, 76px);
+  line-height: 0.98;
+}
+
+.hero-copy p {
+  max-width: 650px;
+
+  font-size: 18px;
+}
+
+.hero-symbol {
+  width: 180px;
+  height: 180px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  border: 1px solid var(--border-strong);
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      var(--accent-2),
+      transparent 22%
+    ),
+    var(--accent-soft);
+
+  box-shadow:
+    0 0 70px var(--glow),
+    inset 0 0 60px var(--accent-soft);
+
+  font-size: 70px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  margin-top: 28px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 44px;
+
+  padding: 10px 18px;
+
+  border-radius: 13px;
+
+  border: 1px solid var(--border);
+
+  color: var(--text);
+  background: var(--surface-2);
+
+  font-weight: 800;
+  font-size: 14px;
+
+  transition: 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 8px 25px var(--shadow),
+    0 0 20px var(--glow);
+}
+
+.button.primary {
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent-2)
+    );
+
+  border-color: transparent;
+
+  box-shadow:
+    0 8px 28px var(--glow);
+}
+
+.button.secondary {
+  background: var(--surface-2);
+}
+
+.button.danger {
+  color: #fff;
+
+  background: rgba(180, 35, 70, 0.22);
+
+  border-color: rgba(255, 90, 110, 0.4);
+}
+
+
+/* =========================================================
+   HOME STATS
+   ========================================================= */
+
+.stats-overview {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 15px;
+
+  margin-top: 24px;
+}
+
+.overview-card {
+  padding: 22px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  background: var(--surface);
+
+  box-shadow: 0 12px 30px var(--shadow);
+
+  transition: 0.2s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-3px);
+
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 15px 35px var(--shadow),
+    0 0 22px var(--glow);
+}
+
+.overview-card strong {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-size: 34px;
+
+  color: var(--accent);
+}
+
+.overview-card span {
+  color: var(--muted);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   SECTIONS / CARDS
+   ========================================================= */
+
+.glow-card,
+.form-section,
+.profile-section,
+.organization-card,
+.lore-card,
+.relationship-card,
+.mini-card,
+.membership-card {
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+
+  box-shadow:
+    0 12px 35px var(--shadow);
+
+  transition: 0.2s ease;
+}
+
+.glow-card:hover,
+.form-section:hover,
+.profile-section:hover,
+.organization-card:hover,
+.lore-card:hover,
+.relationship-card:hover {
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 16px 40px var(--shadow),
+    0 0 25px var(--glow);
+}
+
+.form-section {
+  padding: 25px;
+
+  margin-bottom: 20px;
+
+  border-radius: var(--radius-lg);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.section-title h3 {
+  margin: 0;
+
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   THE PATTERNS CONTINUE INSIDE THE CARDS
+   ========================================================= */
+
+html[data-theme="circus"] .glow-card,
+html[data-theme="circus"] .form-section,
+html[data-theme="circus"] .profile-section,
+html[data-theme="circus"] .character-card,
+html[data-theme="circus"] .organization-card,
+html[data-theme="circus"] .lore-card {
+  background:
+    linear-gradient(
+      45deg,
+      transparent 42%,
+      rgba(208, 154, 82, 0.045) 43%,
+      rgba(208, 154, 82, 0.045) 47%,
+      transparent 48%
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 42%,
+      rgba(208, 154, 82, 0.045) 43%,
+      rgba(208, 154, 82, 0.045) 47%,
+      transparent 48%
+    ),
+    var(--surface);
+
+  background-size: 40px 40px;
+}
+
+html[data-theme="asylum"] .glow-card,
+html[data-theme="asylum"] .form-section,
+html[data-theme="asylum"] .profile-section,
+html[data-theme="asylum"] .character-card,
+html[data-theme="asylum"] .organization-card,
+html[data-theme="asylum"] .lore-card {
+  background:
+    linear-gradient(
+      rgba(112, 170, 169, 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(112, 170, 169, 0.045) 1px,
+      transparent 1px
+    ),
+    var(--surface);
+
+  background-size: 28px 28px;
+}
+
+html[data-theme="detective"] .glow-card,
+html[data-theme="detective"] .form-section,
+html[data-theme="detective"] .profile-section,
+html[data-theme="detective"] .character-card,
+html[data-theme="detective"] .organization-card,
+html[data-theme="detective"] .lore-card {
+  background:
+    linear-gradient(
+      rgba(191, 153, 101, 0.04) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(191, 153, 101, 0.04) 1px,
+      transparent 1px
+    ),
+    var(--surface);
+
+  background-size: 25px 25px;
+}
+
+html[data-theme="forest"] .glow-card,
+html[data-theme="forest"] .form-section,
+html[data-theme="forest"] .profile-section,
+html[data-theme="forest"] .character-card,
+html[data-theme="forest"] .organization-card,
+html[data-theme="forest"] .lore-card {
+  background:
+    repeating-linear-gradient(
+      118deg,
+      transparent 0,
+      transparent 48px,
+      rgba(157, 183, 110, 0.04) 49px,
+      rgba(157, 183, 110, 0.04) 51px,
+      transparent 52px,
+      transparent 85px
+    ),
+    var(--surface);
+}
+
+html[data-theme="goth"] .glow-card,
+html[data-theme="goth"] .form-section,
+html[data-theme="goth"] .profile-section,
+html[data-theme="goth"] .character-card,
+html[data-theme="goth"] .organization-card,
+html[data-theme="goth"] .lore-card {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      transparent 0 13px,
+      rgba(184, 131, 202, 0.045) 14px 15px,
+      transparent 16px
+    ),
+    radial-gradient(
+      circle at 82% 75%,
+      transparent 0 20px,
+      rgba(184, 131, 202, 0.04) 21px 22px,
+      transparent 23px
+    ),
+    var(--surface);
+
+  background-size:
+    80px 80px,
+    120px 120px;
+}
+
+html[data-theme="mafia"] .glow-card,
+html[data-theme="mafia"] .form-section,
+html[data-theme="mafia"] .profile-section,
+html[data-theme="mafia"] .character-card,
+html[data-theme="mafia"] .organization-card,
+html[data-theme="mafia"] .lore-card {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 18px,
+      rgba(196, 161, 93, 0.035) 19px,
+      transparent 20px
+    ),
+    var(--surface);
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  margin-bottom: 15px;
+}
+
+.field-wide {
+  width: 100%;
+}
+
+.field > span {
+  color: var(--muted);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+
+  color: var(--text);
+
+  background: rgba(0, 0, 0, 0.25);
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  padding: 11px 13px;
+
+  outline: none;
+
+  transition: 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--dim);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft),
+    0 0 18px var(--glow);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+
+/* =========================================================
+   SELECT OPTIONS
+   ========================================================= */
+
+select option {
+  background: #17121b;
+  color: #f1e9f3;
+}
+
+
+/* =========================================================
+   IMAGE UPLOAD
+   ========================================================= */
+
+.image-upload {
+  margin-top: 18px;
+}
+
+.image-upload > span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.upload-area {
+  width: 100%;
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  padding: 0;
+
+  border: 1px dashed var(--border-strong);
+  border-radius: 18px;
+
+  background: var(--accent-soft);
+
+  color: var(--text);
+}
+
+.upload-area:hover {
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 25px var(--glow);
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--muted);
+}
+
+.upload-placeholder strong {
+  font-size: 32px;
+  color: var(--accent);
+}
+
+.upload-preview {
+  width: 100%;
+  height: 320px;
+
+  object-fit: cover;
+}
+
+.upload-preview-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 6px;
+
+  padding: 8px;
+}
+
+.upload-preview-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+}
+
+.upload-actions {
+  margin-top: 8px;
+}
+
+
+/* =========================================================
+   CHARACTER GRID
+   ========================================================= */
+
+.character-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.character-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: var(--radius-lg);
+
+  box-shadow:
+    0 15px 40px var(--shadow);
+
+  transition: 0.25s ease;
+}
+
+.character-card:hover {
+  transform: translateY(-5px);
+
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 22px 55px var(--shadow),
+    0 0 28px var(--glow);
+}
+
+.character-image {
+  position: relative;
+
+  width: 100%;
+  height: 280px;
+
+  background: var(--surface-3);
+
+  overflow: hidden;
+}
+
+.character-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.character-card-content {
+  padding: 20px;
+}
+
+.character-card-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 10px;
+}
+
+.character-card h3 {
+  margin: 0;
+
+  font-size: 22px;
+}
+
+.nickname {
+  margin-top: 3px;
+
+  color: var(--accent);
+
+  font-size: 13px;
+}
+
+.character-summary {
+  display: grid;
+  gap: 5px;
+
+  margin-top: 14px;
+
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+.character-card-actions {
+  display: flex;
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.badge-alive,
+.badge-dead {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  backdrop-filter: blur(8px);
+}
+
+.badge-alive {
+  color: #baffd3;
+
+  background: rgba(40, 160, 90, 0.25);
+
+  border: 1px solid rgba(100, 230, 140, 0.4);
+}
+
+.badge-dead {
+  color: #ffabb9;
+
+  background: rgba(170, 35, 70, 0.28);
+
+  border: 1px solid rgba(255, 100, 130, 0.4);
+}
+
+
+/* =========================================================
+   ARCHIVE HEADER
+   ========================================================= */
+
+.archive-header,
+.page-header,
+.editor-header,
+.creator-header {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  margin-bottom: 25px;
+}
+
+.archive-header h1,
+.page-header h1,
+.editor-header h1,
+.creator-header h1 {
+  margin: 0;
+
+  font-size: clamp(32px, 5vw, 52px);
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.archive-tools {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 25px;
+}
+
+.search-box {
+  min-width: 280px;
+}
+
+.archive-count {
+  color: var(--muted);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+  padding: 60px 25px;
+
+  text-align: center;
+
+  border: 1px dashed var(--border-strong);
+
+  border-radius: var(--radius-lg);
+
+  background: var(--accent-soft);
+}
+
+.empty-state h2 {
+  margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+   ========================================================= */
+
+.form-actions,
+.editor-actions,
+.bottom-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+}
+
+.bottom-actions {
+  margin-top: 25px;
+}
+
+
+/* =========================================================
+   PERSONALITY
+   ========================================================= */
+
+.stats-list {
+  display: grid;
+
+  gap: 12px;
+}
+
+.stat-row {
+  display: grid;
+
+  grid-template-columns: 100px 1fr 100px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 10px 0;
+}
+
+.stat-label {
+  color: var(--muted);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stat-label.right {
+  text-align: right;
+}
+
+.stat-pips {
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 5px;
+}
+
+.stat-pip {
+  height: 10px;
+
+  padding: 0;
+
+  border-radius: 999px;
+
+  border: 1px solid var(--border);
+
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.stat-pip.active {
+  background: var(--accent);
+
+  border-color: var(--accent);
+
+  box-shadow: 0 0 10px var(--glow);
+}
+
+
+/* =========================================================
+   SKILLS
+   ========================================================= */
+
+.skills-list {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px 20px;
+}
+
+.skill-row {
+  display: grid;
+
+  grid-template-columns: 1fr 100px 40px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 9px 0;
+}
+
+.skill-name {
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+.skill-pips {
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 4px;
+}
+
+.skill-pip {
+  height: 8px;
+
+  padding: 0;
+
+  border-radius: 999px;
+
+  border: 1px solid var(--border);
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.skill-pip.active {
+  background: var(--accent);
+
+  border-color: var(--accent);
+
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.skill-value {
+  color: var(--accent);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   RELATIONSHIPS
+   ========================================================= */
+
+.relationship-editor {
+  display: grid;
+
+  gap: 15px;
+}
+
+.relationship-card {
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: var(--surface-2);
+}
+
+.relationship-edit-row {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 12px;
+}
+
+.relationship-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 10px;
+}
+
+
+/* =========================================================
+   ORGANIZATIONS
+   ========================================================= */
+
+.organization-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.organization-card,
+.lore-card {
+  padding: 20px;
+
+  border-radius: var(--radius-lg);
+}
+
+.organization-card h2,
+.organization-card h3,
+.lore-card h2,
+.lore-card h3 {
+  margin-top: 0;
+}
+
+.organization-editor-image img {
+  width: 100%;
+
+  max-height: 300px;
+
+  object-fit: cover;
+
+  border-radius: 16px;
+
+  margin-bottom: 10px;
+}
+
+.member-selector {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 9px;
+}
+
+.member-option {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 11px 13px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  background: rgba(0, 0, 0, 0.14);
+
+  cursor: pointer;
+
+  color: var(--muted);
+}
+
+.member-option:hover,
+.member-option.selected {
+  color: var(--text);
+
+  border-color: var(--border-strong);
+
+  background: var(--accent-soft);
+
+  box-shadow: 0 0 14px var(--glow);
+}
+
+.member-option input {
+  width: auto;
+}
+
+.branch-list {
+  display: grid;
+
+  gap: 10px;
+
+  margin-top: 15px;
+}
+
+.branch {
+  padding: 13px;
+
+  border-radius: 13px;
+
+  background: var(--accent-soft);
+
+  border: 1px solid var(--border);
+}
+
+.branch strong {
+  display: block;
+
+  margin-bottom: 3px;
+}
+
+.mini-card,
+.membership-card {
+  padding: 13px;
+
+  border-radius: 13px;
+
+  background: var(--surface-2);
+}
+
+.organization-memberships {
+  display: grid;
+
+  gap: 10px;
+}
+
+.membership-card {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+/* =========================================================
+   MOODBOARD
+   ========================================================= */
+
+.moodboard-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 12px;
+}
+
+.moodboard-grid img {
+  width: 100%;
+
+  aspect-ratio: 1;
+
+  object-fit: cover;
+
+  border-radius: 15px;
+
+  border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.profile-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.profile-section {
+  padding: 23px;
+
+  border-radius: var(--radius-lg);
+}
+
+.profile-wide {
+  grid-column: 1 / -1;
+}
+
+.profile-section h2 {
+  margin-top: 0;
+}
+
+.profile-image {
+  width: 100%;
+
+  max-height: 550px;
+
+  object-fit: cover;
+
+  border-radius: 20px;
+
+  border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   LORE
+   ========================================================= */
+
+.lore-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.lore-card {
+  white-space: pre-wrap;
+}
+
+.lore-category {
+  display: inline-flex;
+
+  padding: 5px 9px;
+
+  margin-bottom: 10px;
+
+  border-radius: 999px;
+
+  color: var(--accent);
+
+  background: var(--accent-soft);
+
+  border: 1px solid var(--border);
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   IMPORT / EXPORT
+   ========================================================= */
+
+.import-export-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.import-export-card {
+  padding: 25px;
+
+  border-radius: var(--radius-lg);
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+  width: min(calc(100% - 40px), var(--max-width));
+
+  margin: 0 auto;
+
+  padding: 30px 0 45px;
+
+  text-align: center;
+
+  color: var(--dim);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-2);
+
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    min-width: auto;
+  }
+
+  .theme-picker {
+    margin-left: 0;
+  }
+
+  .character-grid,
+  .organization-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-wide {
+    grid-column: auto;
+  }
+
+  .skills-list {
+    grid-template-columns: 1fr;
+  }
+
+  .import-export-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .home-page,
+  .archive-page,
+  .creator-page,
+  .profile-page,
+  .editor-page,
+  .import-export-page {
+    width: min(calc(100% - 20px), var(--max-width));
+
+    padding-top: 30px;
+  }
+
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .archive-nav {
+    width: 100%;
+
+    overflow-x: auto;
+
+    flex-wrap: nowrap;
+  }
+
+  .theme-picker {
+    width: 100%;
+  }
+
+  .theme-picker select {
+    flex: 1;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+
+    padding: 35px 24px;
+
+    min-height: auto;
+  }
+
+  .hero-symbol {
+    width: 110px;
+    height: 110px;
+
+    font-size: 45px;
+  }
+
+  .stats-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .character-grid,
+  .organization-grid,
+  .lore-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .relationship-edit-row {
+    grid-template-columns: 1fr;
+  }
+
+  .member-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .moodboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-row {
+    grid-template-columns: 75px 1fr 75px;
+  }
+
+  .archive-header,
+  .page-header,
+  .editor-header,
+  .creator-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .archive-tools {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .search-box {
+    min-width: 0;
+  }
+
+  .skills-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   END
+   ========================================================= */
