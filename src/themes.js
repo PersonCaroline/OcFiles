@@ -33,21 +33,30 @@ export const THEMES = [
 
 export function getTheme() {
   try {
-    return localStorage.getItem("oc-theme") || "goth";
+    return (
+      localStorage.getItem("oc-theme") ||
+      "goth"
+    );
   } catch {
     return "goth";
   }
 }
 
 export function applyTheme(id) {
-  const validTheme = THEMES.some((theme) => theme.id === id)
+  const validTheme = THEMES.some(
+    (theme) => theme.id === id
+  )
     ? id
     : "goth";
 
-  document.documentElement.dataset.theme = validTheme;
+  document.documentElement.dataset.theme =
+    validTheme;
 
   try {
-    localStorage.setItem("oc-theme", validTheme);
+    localStorage.setItem(
+      "oc-theme",
+      validTheme
+    );
   } catch {
     // Ignore localStorage errors.
   }
