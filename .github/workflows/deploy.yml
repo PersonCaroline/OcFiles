@@ -1,4 +1,4 @@
-name: Deploy OC Archive
+name: Deploy OC Archive to GitHub Pages
 
 on:
   push:
@@ -39,12 +39,17 @@ jobs:
           path: ./dist
 
   deploy:
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Deploy to GitHub Pages
