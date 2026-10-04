@@ -1,10 +1,34 @@
 export const THEMES = [
-  { id: "goth", name: "Goth" },
-  { id: "circus", name: "Circus" },
-  { id: "forest", name: "Forest" },
-  { id: "detective", name: "Detective" },
-  { id: "mafia", name: "Mafia" },
-  { id: "asylum", name: "Asylum" },
+  {
+    id: "goth",
+    name: "Goth",
+    symbol: "☾",
+  },
+  {
+    id: "circus",
+    name: "Circus",
+    symbol: "✦",
+  },
+  {
+    id: "forest",
+    name: "Forest",
+    symbol: "♧",
+  },
+  {
+    id: "detective",
+    name: "Detective",
+    symbol: "⌕",
+  },
+  {
+    id: "mafia",
+    name: "Mafia",
+    symbol: "♠",
+  },
+  {
+    id: "asylum",
+    name: "Asylum",
+    symbol: "✚",
+  },
 ];
 
 export function getTheme() {
@@ -15,12 +39,16 @@ export function getTheme() {
   }
 }
 
-export function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
+export function applyTheme(id) {
+  const validTheme = THEMES.some((theme) => theme.id === id)
+    ? id
+    : "goth";
+
+  document.documentElement.dataset.theme = validTheme;
 
   try {
-    localStorage.setItem("oc-theme", theme);
+    localStorage.setItem("oc-theme", validTheme);
   } catch {
-    // localStorage unavailable
+    // Ignore localStorage errors.
   }
 }
