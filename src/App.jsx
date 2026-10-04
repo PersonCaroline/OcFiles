@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { THEMES, applyTheme, getTheme } from "./themes";
 
 const emptyCharacter = {
@@ -8,33 +8,573 @@ const emptyCharacter = {
   age: "",
   status: "alive",
   laterStatus: "",
+
   nationality: "",
   origins: "",
+  species: "",
+  gender: "",
+  pronouns: "",
+  sexuality: "",
+  dateOfBirth: "",
+
   affiliation: "",
   pastAffiliation: "",
   rank: "",
   pastRank: "",
-  pronouns: "",
-  dateOfBirth: "",
-  sexuality: "",
-  gender: "",
   job: "",
   sideJob: "",
+
   height: "",
   weight: "",
-  species: "",
   eyeColor: "",
   hairColor: "",
   hairStyle: "",
+
   ability: "",
   abilityDescription: "",
   sideEffects: "",
   weapon: "",
   mbti: "",
+
+  image: "",
 };
 
-function App() {
-  const [theme, setTheme] = useState(getTheme);
+function Section({ title, children }) {
+  return (
+    <section className="form-section glow-card">
+      <div className="section-title">
+        <span>{title}</span>
+      </div>
+
+      <div className="form-grid">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder = "",
+  type = "text",
+  wide = false,
+}) {
+  return (
+    <label className={wide ? "field field-wide" : "field"}>
+      <span>{label}</span>
+
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  );
+}
+
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder = "",
+}) {
+  return (
+    <label className="field field-wide">
+      <span>{label}</span>
+
+      <textarea
+        value={value}
+        placeholder={placeholder}
+        rows="4"
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  );
+}
+
+function CharacterCreator({ onCreate, onCancel }) {
+  const [character, setCharacter] = useState(emptyCharacter);
+
+  const update = (field, value) => {
+    setCharacter((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const submit = (event) => {
+    event.preventDefault();
+
+    if (!character.name.trim()) {
+      alert("Please give your character a name.");
+      return;
+    }
+
+    onCreate(character);
+  };
+
+  return (
+    <form className="creator-page" onSubmit={submit}>
+      <div className="creator-header">
+        <div>
+          <p className="eyebrow">NEW CHARACTER</p>
+          <h1>Create an OC</h1>
+          <p className="muted">
+            Build your character sheet. You can complete it gradually.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="button secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      </div>
+
+      <Section title="Identity">
+        <Field
+          label="First name"
+          value={character.name}
+          onChange={(value) => update("name", value)}
+          placeholder="Character's first name"
+        />
+
+        <Field
+          label="Last name"
+          value={character.lastName}
+          onChange={(value) => update("lastName", value)}
+          placeholder="Character's last name"
+        />
+
+        <Field
+          label="Nickname(s)"
+          value={character.nickname}
+          onChange={(value) => update("nickname", value)}
+          placeholder="Nicknames, aliases..."
+        />
+
+        <Field
+          label="Age"
+          value={character.age}
+          onChange={(value) => update("age", value)}
+          placeholder="e.g. 27"
+          type="number"
+        />
+
+        <Field
+          label="Gender"
+          value={character.gender}
+          onChange={(value) => update("gender", value)}
+          placeholder="Gender"
+        />
+
+        <Field
+          label="Pronouns"
+          value={character.pronouns}
+          onChange={(value) => update("pronouns", value)}
+          placeholder="e.g. she/her"
+        />
+
+        <Field
+          label="Sexuality"
+          value={character.sexuality}
+          onChange={(value) => update("sexuality", value)}
+          placeholder="Sexuality"
+        />
+
+        <Field
+          label="Date of birth"
+          value={character.dateOfBirth}
+          onChange={(value) => update("dateOfBirth", value)}
+          type="date"
+        />
+
+        <Field
+          label="Nationality"
+          value={character.nationality}
+          onChange={(value) => update("nationality", value)}
+          placeholder="Nationality"
+        />
+
+        <Field
+          label="Origins"
+          value={character.origins}
+          onChange={(value) => update("origins", value)}
+          placeholder="Where are they from?"
+        />
+
+        <Field
+          label="Species / Race"
+          value={character.species}
+          onChange={(value) => update("species", value)}
+          placeholder="Human, vampire, etc."
+        />
+      </Section>
+
+      <Section title="Status">
+        <label className="field">
+          <span>Current status</span>
+
+          <select
+            value={character.status}
+            onChange={(event) =>
+              update("status", event.target.value)
+            }
+          >
+            <option value="alive">Alive</option>
+            <option value="dead">Dead</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </label>
+
+        <Field
+          label="Later status"
+          value={character.laterStatus}
+          onChange={(value) => update("laterStatus", value)}
+          placeholder="What happens later?"
+        />
+      </Section>
+
+      <Section title="Occupation & Affiliations">
+        <Field
+          label="Job"
+          value={character.job}
+          onChange={(value) => update("job", value)}
+          placeholder="Main occupation"
+        />
+
+        <Field
+          label="Side job"
+          value={character.sideJob}
+          onChange={(value) => update("sideJob", value)}
+          placeholder="Optional"
+        />
+
+        <Field
+          label="Affiliation"
+          value={character.affiliation}
+          onChange={(value) => update("affiliation", value)}
+          placeholder="Current organization"
+        />
+
+        <Field
+          label="Past affiliation"
+          value={character.pastAffiliation}
+          onChange={(value) => update("pastAffiliation", value)}
+          placeholder="Previous organization"
+        />
+
+        <Field
+          label="Rank"
+          value={character.rank}
+          onChange={(value) => update("rank", value)}
+          placeholder="Current rank"
+        />
+
+        <Field
+          label="Past rank"
+          value={character.pastRank}
+          onChange={(value) => update("pastRank", value)}
+          placeholder="Previous rank"
+        />
+      </Section>
+
+      <Section title="Appearance">
+        <Field
+          label="Height"
+          value={character.height}
+          onChange={(value) => update("height", value)}
+          placeholder="e.g. 175 cm"
+        />
+
+        <Field
+          label="Weight"
+          value={character.weight}
+          onChange={(value) => update("weight", value)}
+          placeholder="e.g. 65 kg"
+        />
+
+        <Field
+          label="Eye color"
+          value={character.eyeColor}
+          onChange={(value) => update("eyeColor", value)}
+          placeholder="Eye color"
+        />
+
+        <Field
+          label="Hair color"
+          value={character.hairColor}
+          onChange={(value) => update("hairColor", value)}
+          placeholder="Hair color"
+        />
+
+        <Field
+          label="Hair style"
+          value={character.hairStyle}
+          onChange={(value) => update("hairStyle", value)}
+          placeholder="Hair style"
+        />
+
+        <Field
+          label="Character image URL"
+          value={character.image}
+          onChange={(value) => update("image", value)}
+          placeholder="Image URL for now"
+          wide
+        />
+      </Section>
+
+      <Section title="Ability">
+        <Field
+          label="Ability"
+          value={character.ability}
+          onChange={(value) => update("ability", value)}
+          placeholder="Ability name"
+        />
+
+        <Field
+          label="Weapon"
+          value={character.weapon}
+          onChange={(value) => update("weapon", value)}
+          placeholder="Main weapon"
+        />
+
+        <Field
+          label="MBTI"
+          value={character.mbti}
+          onChange={(value) => update("mbti", value)}
+          placeholder="e.g. INTJ"
+        />
+
+        <TextField
+          label="Ability description"
+          value={character.abilityDescription}
+          onChange={(value) =>
+            update("abilityDescription", value)
+          }
+          placeholder="Explain how the ability works..."
+        />
+
+        <TextField
+          label="Side effects & risks"
+          value={character.sideEffects}
+          onChange={(value) => update("sideEffects", value)}
+          placeholder="Limitations, consequences, risks..."
+        />
+      </Section>
+
+      <div className="creator-actions">
+        <button
+          type="button"
+          className="button secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+
+        <button type="submit" className="button primary">
+          Create character
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function CharacterCard({ character, onDelete }) {
+  return (
+    <article className="character-card glow-card">
+      <div className="character-image">
+        {character.image ? (
+          <img src={character.image} alt={character.name} />
+        ) : (
+          <div className="image-placeholder">
+            ✦
+          </div>
+        )}
+      </div>
+
+      <div className="character-card-content">
+        <div className="character-status">
+          <span
+            className={`status-dot ${
+              character.status === "dead"
+                ? "dead"
+                : character.status === "unknown"
+                  ? "unknown"
+                  : "alive"
+            }`}
+          />
+
+          {character.status}
+        </div>
+
+        <h2>
+          {character.name}{" "}
+          {character.lastName && (
+            <span>{character.lastName}</span>
+          )}
+        </h2>
+
+        {character.nickname && (
+          <p className="nickname">
+            “{character.nickname}”
+          </p>
+        )}
+
+        <div className="character-meta">
+          {character.age && (
+            <span>{character.age} years</span>
+          )}
+
+          {character.job && (
+            <span>{character.job}</span>
+          )}
+
+          {character.affiliation && (
+            <span>{character.affiliation}</span>
+          )}
+        </div>
+
+        <div className="character-card-actions">
+          <button
+            className="button danger"
+            type="button"
+            onClick={() => onDelete(character.id)}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function CharactersPage({
+  characters,
+  search,
+  setSearch,
+  onCreate,
+  onDelete,
+}) {
+  const filteredCharacters = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) {
+      return characters;
+    }
+
+    return characters.filter((character) => {
+      return [
+        character.name,
+        character.lastName,
+        character.nickname,
+        character.job,
+        character.affiliation,
+      ]
+        .filter(Boolean)
+        .some((value) =>
+          value.toLowerCase().includes(query)
+        );
+    });
+  }, [characters, search]);
+
+  return (
+    <main className="page">
+      <div className="page-header">
+        <div>
+          <p className="eyebrow">CHARACTER ARCHIVE</p>
+          <h1>Your Characters</h1>
+          <p className="muted">
+            {characters.length} character
+            {characters.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        <button
+          className="button primary"
+          type="button"
+          onClick={onCreate}
+        >
+          + New character
+        </button>
+      </div>
+
+      {characters.length > 0 && (
+        <div className="search-bar glow-card">
+          <input
+            value={search}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
+            placeholder="Search characters..."
+          />
+        </div>
+      )}
+
+      {filteredCharacters.length === 0 ? (
+        <div className="empty-state glow-card">
+          <div className="empty-icon">✦</div>
+
+          <h2>
+            {characters.length === 0
+              ? "Your archive is empty"
+              : "No characters found"}
+          </h2>
+
+          <p className="muted">
+            {characters.length === 0
+              ? "Create your first original character to begin."
+              : "Try another search."}
+          </p>
+
+          {characters.length === 0 && (
+            <button
+              className="button primary"
+              type="button"
+              onClick={onCreate}
+            >
+              Create your first OC
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="character-grid">
+          {filteredCharacters.map((character) => (
+            <CharacterCard
+              key={character.id}
+              character={character}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function PlaceholderPage({ title, description }) {
+  return (
+    <main className="page">
+      <div className="empty-state glow-card">
+        <div className="empty-icon">✦</div>
+
+        <p className="eyebrow">COMING SOON</p>
+
+        <h1>{title}</h1>
+
+        <p className="muted">{description}</p>
+      </div>
+    </main>
+  );
+}
+
+export default function App() {
+  const [theme, setTheme] = useState(getTheme());
   const [activeTab, setActiveTab] = useState("characters");
 
   const [characters, setCharacters] = useState(() => {
@@ -48,7 +588,6 @@ function App() {
 
   const [search, setSearch] = useState("");
   const [showCreator, setShowCreator] = useState(false);
-  const [character, setCharacter] = useState(emptyCharacter);
 
   useEffect(() => {
     applyTheme(theme);
@@ -56,832 +595,158 @@ function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("oc-characters", JSON.stringify(characters));
+      localStorage.setItem(
+        "oc-characters",
+        JSON.stringify(characters)
+      );
     } catch {
       /* ignore */
     }
   }, [characters]);
 
-  function updateCharacter(field, value) {
-    setCharacter((current) => ({
-      ...current,
-      [field]: value,
-    }));
-  }
-
-  function createCharacter() {
-    if (!character.name.trim()) {
-      return;
-    }
-
+  const createCharacter = (character) => {
     const newCharacter = {
       ...character,
       id: Date.now(),
     };
 
-    setCharacters((current) => [...current, newCharacter]);
-    setCharacter(emptyCharacter);
+    setCharacters((current) => [
+      ...current,
+      newCharacter,
+    ]);
+
     setShowCreator(false);
-  }
+    setActiveTab("characters");
+  };
 
-  function deleteCharacter(id) {
-    setCharacters((current) =>
-      current.filter((item) => item.id !== id)
+  const deleteCharacter = (id) => {
+    const confirmed = window.confirm(
+      "Delete this character? This cannot be undone."
     );
-  }
 
-  const filteredCharacters = characters.filter((item) => {
-    const query = search.toLowerCase().trim();
+    if (!confirmed) return;
 
-    if (!query) {
-      return true;
-    }
-
-    return [
-      item.name,
-      item.lastName,
-      item.nickname,
-      item.affiliation,
-      item.status,
-    ]
-      .filter(Boolean)
-      .some((value) =>
-        value.toLowerCase().includes(query)
-      );
-  });
+    setCharacters((current) =>
+      current.filter((character) => character.id !== id)
+    );
+  };
 
   return (
-    <div className="site-shell">
-      <header className="topbar glow-card">
-        <div>
-          <p className="eyebrow">OC ARCHIVE</p>
-          <h1>Character Archive</h1>
-          <p className="muted">
-            Your personal original character database.
-          </p>
+    <div className="app-shell">
+      <header className="site-header">
+        <div className="brand">
+          <div className="brand-symbol">✦</div>
+
+          <div>
+            <div className="brand-title">
+              OC Archive
+            </div>
+
+            <div className="brand-subtitle">
+              Original Character Database
+            </div>
+          </div>
         </div>
 
-        <label className="theme-picker">
-          <span>Theme</span>
+        <nav className="main-nav">
+          <button
+            className={
+              activeTab === "characters"
+                ? "nav-button active"
+                : "nav-button"
+            }
+            onClick={() => {
+              setActiveTab("characters");
+              setShowCreator(false);
+            }}
+          >
+            Characters
+          </button>
+
+          <button
+            className={
+              activeTab === "organizations"
+                ? "nav-button active"
+                : "nav-button"
+            }
+            onClick={() => {
+              setActiveTab("organizations");
+              setShowCreator(false);
+            }}
+          >
+            Organizations
+          </button>
+
+          <button
+            className={
+              activeTab === "lore"
+                ? "nav-button active"
+                : "nav-button"
+            }
+            onClick={() => {
+              setActiveTab("lore");
+              setShowCreator(false);
+            }}
+          >
+            Lore
+          </button>
+        </nav>
+
+        <div className="theme-switcher">
+          <label htmlFor="theme-select">
+            Theme
+          </label>
 
           <select
+            id="theme-select"
             value={theme}
-            onChange={(event) =>
-              setTheme(event.target.value)
-            }
+            onChange={(event) => {
+              setTheme(event.target.value);
+              applyTheme(event.target.value);
+            }}
           >
-            {THEMES.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
+            {THEMES.map((themeOption) => (
+              <option
+                key={themeOption.id}
+                value={themeOption.id}
+              >
+                {themeOption.name}
               </option>
             ))}
           </select>
-        </label>
+        </div>
       </header>
 
-      <nav className="archive-nav glow-card">
-        <button
-          type="button"
-          className={
-            activeTab === "characters"
-              ? "nav-active"
-              : ""
-          }
-          onClick={() => setActiveTab("characters")}
-        >
-          Characters
-        </button>
-
-        <button
-          type="button"
-          className={
-            activeTab === "organizations"
-              ? "nav-active"
-              : ""
-          }
-          onClick={() =>
-            setActiveTab("organizations")
-          }
-        >
-          Organizations
-        </button>
-
-        <button
-          type="button"
-          className={
-            activeTab === "lore"
-              ? "nav-active"
-              : ""
-          }
-          onClick={() => setActiveTab("lore")}
-        >
-          Lore
-        </button>
-      </nav>
-
-      {activeTab === "characters" && (
-        <main>
-          {!showCreator ? (
-            <>
-              <section className="archive-header">
-                <div>
-                  <p className="eyebrow">
-                    CHARACTER DATABASE
-                  </p>
-                  <h2>Your Characters</h2>
-                  <p className="muted">
-                    Create and organize your original
-                    characters.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="button button-primary"
-                  onClick={() =>
-                    setShowCreator(true)
-                  }
-                >
-                  + Create Character
-                </button>
-              </section>
-
-              <section className="archive-tools glow-card">
-                <div className="search-box">
-                  <span>⌕</span>
-
-                  <input
-                    type="search"
-                    placeholder="Search characters..."
-                    value={search}
-                    onChange={(event) =>
-                      setSearch(event.target.value)
-                    }
-                  />
-                </div>
-
-                <span className="archive-count">
-                  {characters.length}{" "}
-                  {characters.length === 1
-                    ? "character"
-                    : "characters"}
-                </span>
-              </section>
-
-              {filteredCharacters.length === 0 ? (
-                <section className="empty-state glow-card">
-                  <div className="empty-symbol">
-                    ✦
-                  </div>
-
-                  <p className="eyebrow">
-                    THE ARCHIVE IS EMPTY
-                  </p>
-
-                  <h3>No characters yet</h3>
-
-                  <p>
-                    Create your first character and
-                    start building their story.
-                  </p>
-
-                  <button
-                    type="button"
-                    className="button button-primary"
-                    onClick={() =>
-                      setShowCreator(true)
-                    }
-                  >
-                    + Create your first character
-                  </button>
-                </section>
-              ) : (
-                <section className="character-grid">
-                  {filteredCharacters.map((item) => (
-                    <article
-                      className="glow-card character-card"
-                      key={item.id}
-                    >
-                      <div className="character-image">
-                        <span>✦</span>
-                      </div>
-
-                      <div className="character-card-content">
-                        <div className="character-card-top">
-                          <span
-                            className={
-                              item.status === "dead"
-                                ? "badge-dead"
-                                : "badge-alive"
-                            }
-                          >
-                            {item.status.toUpperCase()}
-                          </span>
-                        </div>
-
-                        <p className="eyebrow">
-                          CHARACTER
-                        </p>
-
-                        <h3>
-                          {item.name}{" "}
-                          {item.lastName}
-                        </h3>
-
-                        {item.nickname && (
-                          <p className="nickname">
-                            “{item.nickname}”
-                          </p>
-                        )}
-
-                        <p className="muted">
-                          {item.affiliation ||
-                            "Unassigned"}
-                        </p>
-
-                        <div className="character-card-actions">
-                          <button
-                            type="button"
-                            className="button button-secondary"
-                          >
-                            Open
-                          </button>
-
-                          <button
-                            type="button"
-                            className="delete-button"
-                            onClick={() =>
-                              deleteCharacter(item.id)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </section>
-              )}
-            </>
-          ) : (
-            <section>
-              <div className="archive-header">
-                <div>
-                  <p className="eyebrow">
-                    CHARACTER CREATOR
-                  </p>
-                  <h2>New Character</h2>
-                  <p className="muted">
-                    Start with the character's basic
-                    information.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  onClick={() =>
-                    setShowCreator(false)
-                  }
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <form
-                className="character-form glow-card"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  createCharacter();
-                }}
-              >
-                <div className="form-section">
-                  <div className="form-section-title">
-                    <p className="eyebrow">
-                      IDENTITY
-                    </p>
-                    <h3>Basic Information</h3>
-                  </div>
-
-                  <div className="form-grid">
-                    <label>
-                      First name *
-                      <input
-                        value={character.name}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "name",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Character name"
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Last name
-                      <input
-                        value={character.lastName}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "lastName",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Last name"
-                      />
-                    </label>
-
-                    <label>
-                      Nickname(s)
-                      <input
-                        value={character.nickname}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "nickname",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Nickname"
-                      />
-                    </label>
-
-                    <label>
-                      Age
-                      <input
-                        type="number"
-                        min="0"
-                        value={character.age}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "age",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Age"
-                      />
-                    </label>
-
-                    <label>
-                      Status
-                      <select
-                        value={character.status}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "status",
-                            event.target.value
-                          )
-                        }
-                      >
-                        <option value="alive">
-                          Alive
-                        </option>
-                        <option value="dead">
-                          Dead
-                        </option>
-                      </select>
-                    </label>
-
-                    <label>
-                      Later status
-                      <input
-                        value={character.laterStatus}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "laterStatus",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Future status"
-                      />
-                    </label>
-
-                    <label>
-                      Pronouns
-                      <input
-                        value={character.pronouns}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "pronouns",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. she/her"
-                      />
-                    </label>
-
-                    <label>
-                      Gender
-                      <input
-                        value={character.gender}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "gender",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Gender"
-                      />
-                    </label>
-
-                    <label>
-                      Sexuality
-                      <input
-                        value={character.sexuality}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "sexuality",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Sexuality"
-                      />
-                    </label>
-
-                    <label>
-                      Date of birth
-                      <input
-                        value={character.dateOfBirth}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "dateOfBirth",
-                            event.target.value
-                          )
-                        }
-                        placeholder="DD / MM / YYYY"
-                      />
-                    </label>
-
-                    <label>
-                      Nationality
-                      <input
-                        value={character.nationality}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "nationality",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Nationality"
-                      />
-                    </label>
-
-                    <label>
-                      Origins
-                      <input
-                        value={character.origins}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "origins",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Origins"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <div className="form-section-title">
-                    <p className="eyebrow">
-                      AFFILIATIONS
-                    </p>
-                    <h3>Occupation & Rank</h3>
-                  </div>
-
-                  <div className="form-grid">
-                    <label>
-                      Affiliation
-                      <input
-                        value={character.affiliation}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "affiliation",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Current organization"
-                      />
-                    </label>
-
-                    <label>
-                      Past affiliation
-                      <input
-                        value={character.pastAffiliation}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "pastAffiliation",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Previous organization"
-                      />
-                    </label>
-
-                    <label>
-                      Rank
-                      <input
-                        value={character.rank}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "rank",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Current rank"
-                      />
-                    </label>
-
-                    <label>
-                      Past rank
-                      <input
-                        value={character.pastRank}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "pastRank",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Previous rank"
-                      />
-                    </label>
-
-                    <label>
-                      Job
-                      <input
-                        value={character.job}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "job",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Main occupation"
-                      />
-                    </label>
-
-                    <label>
-                      Side job
-                      <input
-                        value={character.sideJob}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "sideJob",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Secondary occupation"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <div className="form-section-title">
-                    <p className="eyebrow">
-                      APPEARANCE
-                    </p>
-                    <h3>Physical Information</h3>
-                  </div>
-
-                  <div className="form-grid">
-                    <label>
-                      Height
-                      <input
-                        value={character.height}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "height",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. 175 cm"
-                      />
-                    </label>
-
-                    <label>
-                      Weight
-                      <input
-                        value={character.weight}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "weight",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. 65 kg"
-                      />
-                    </label>
-
-                    <label>
-                      Species / Race
-                      <input
-                        value={character.species}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "species",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Species"
-                      />
-                    </label>
-
-                    <label>
-                      Eye color
-                      <input
-                        value={character.eyeColor}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "eyeColor",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Eye color"
-                      />
-                    </label>
-
-                    <label>
-                      Hair color
-                      <input
-                        value={character.hairColor}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "hairColor",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Hair color"
-                      />
-                    </label>
-
-                    <label>
-                      Hair style
-                      <input
-                        value={character.hairStyle}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "hairStyle",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Hair style"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <div className="form-section-title">
-                    <p className="eyebrow">
-                      ABILITY
-                    </p>
-                    <h3>Power & Equipment</h3>
-                  </div>
-
-                  <div className="form-grid">
-                    <label>
-                      Ability
-                      <input
-                        value={character.ability}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "ability",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Ability name"
-                      />
-                    </label>
-
-                    <label>
-                      Weapon
-                      <input
-                        value={character.weapon}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "weapon",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Weapon"
-                      />
-                    </label>
-
-                    <label>
-                      MBTI
-                      <input
-                        value={character.mbti}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "mbti",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. INFP"
-                      />
-                    </label>
-                  </div>
-
-                  <div className="form-grid form-grid-wide">
-                    <label>
-                      Ability description
-                      <textarea
-                        value={
-                          character.abilityDescription
-                        }
-                        onChange={(event) =>
-                          updateCharacter(
-                            "abilityDescription",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Describe the ability..."
-                      />
-                    </label>
-
-                    <label>
-                      Side effects & risks
-                      <textarea
-                        value={character.sideEffects}
-                        onChange={(event) =>
-                          updateCharacter(
-                            "sideEffects",
-                            event.target.value
-                          )
-                        }
-                        placeholder="Side effects, limitations and risks..."
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={() =>
-                      setShowCreator(false)
-                    }
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="button button-primary"
-                  >
-                    Create Character
-                  </button>
-                </div>
-              </form>
-            </section>
-          )}
-        </main>
+      {showCreator ? (
+        <CharacterCreator
+          onCreate={createCharacter}
+          onCancel={() => setShowCreator(false)}
+        />
+      ) : activeTab === "characters" ? (
+        <CharactersPage
+          characters={characters}
+          search={search}
+          setSearch={setSearch}
+          onCreate={() => setShowCreator(true)}
+          onDelete={deleteCharacter}
+        />
+      ) : activeTab === "organizations" ? (
+        <PlaceholderPage
+          title="Organizations"
+          description="Organizations, branches and members will live here."
+        />
+      ) : (
+        <PlaceholderPage
+          title="Lore"
+          description="Your worldbuilding, events and lore will live here."
+        />
       )}
 
-      {activeTab === "organizations" && (
-        <main>
-          <section className="empty-state glow-card">
-            <div className="empty-symbol">♜</div>
-            <p className="eyebrow">ORGANIZATIONS</p>
-            <h2>Organizations</h2>
-            <p>
-              Branches, members, ranks and affiliations
-              will be built here.
-            </p>
-            <span className="coming-soon">
-              COMING NEXT
-            </span>
-          </section>
-        </main>
-      )}
-
-      {activeTab === "lore" && (
-        <main>
-          <section className="empty-state glow-card">
-            <div className="empty-symbol">✧</div>
-            <p className="eyebrow">WORLD & LORE</p>
-            <h2>Lore Archive</h2>
-            <p>
-              Worldbuilding, events, locations and
-              important notes will be built here.
-            </p>
-            <span className="coming-soon">
-              COMING NEXT
-            </span>
-          </section>
-        </main>
-      )}
-
-      <footer>
+      <footer className="site-footer">
         <span>OC Archive</span>
-        <span>Personal Character Database</span>
+        <span>✦</span>
+        <span>Personal OC Database</span>
       </footer>
     </div>
   );
 }
-
-export default App;
