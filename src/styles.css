@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* =========================================================
-   BASE THEME
+   THEME VARIABLES
    ========================================================= */
 
 :root {
@@ -17,11 +17,39 @@
   --glow-2: 46 65% 55%;
   --radius: 1.25rem;
 
-  /* PAGE BACKGROUND */
-  --deco:
+  --page-pattern:
     radial-gradient(
       circle at 15% 20%,
       hsl(var(--accent) / 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      hsl(var(--primary) / 0.08),
+      transparent 28%
+    );
+}
+
+/* =========================================================
+   GOTH
+   ========================================================= */
+
+html[data-theme="goth"] {
+  --background: 250 17% 5%;
+  --foreground: 255 45% 89%;
+  --card: 264 15% 13%;
+  --card-foreground: 255 45% 89%;
+  --primary: 46 65% 52%;
+  --primary-foreground: 250 17% 5%;
+  --accent: 0 100% 27%;
+  --border: 258 14% 20%;
+  --glow-1: 0 100% 30%;
+  --glow-2: 46 65% 55%;
+
+  --page-pattern:
+    radial-gradient(
+      circle at 15% 20%,
+      hsl(var(--accent) / 0.13),
       transparent 30%
     ),
     radial-gradient(
@@ -36,24 +64,11 @@
       hsl(var(--primary) / 0.025) 91px,
       transparent 92px
     );
-
-  /* CARD DECORATION — intentionally subtle */
-  --deco-card:
-    radial-gradient(
-      circle at 10% 0%,
-      hsl(var(--accent) / 0.12),
-      transparent 42%
-    ),
-    radial-gradient(
-      circle at 100% 100%,
-      hsl(var(--primary) / 0.08),
-      transparent 38%
-    );
 }
 
 /* =========================================================
    CIRCUS
-   Stripes belong to the PAGE BACKGROUND
+   DIAGONAL STRIPES = PAGE BACKGROUND
    ========================================================= */
 
 html[data-theme="circus"] {
@@ -68,13 +83,13 @@ html[data-theme="circus"] {
   --glow-1: 356 72% 45%;
   --glow-2: 43 74% 58%;
 
-  --deco:
+  --page-pattern:
     repeating-linear-gradient(
       45deg,
-      transparent 0,
-      transparent 70px,
-      hsl(var(--accent) / 0.045) 71px,
-      hsl(var(--accent) / 0.045) 72px
+      hsl(var(--accent) / 0.035) 0,
+      hsl(var(--accent) / 0.035) 2px,
+      transparent 2px,
+      transparent 70px
     ),
     radial-gradient(
       circle at 20% 15%,
@@ -85,18 +100,6 @@ html[data-theme="circus"] {
       circle at 80% 80%,
       hsl(var(--primary) / 0.1),
       transparent 25%
-    );
-
-  --deco-card:
-    radial-gradient(
-      circle at 0% 0%,
-      hsl(var(--accent) / 0.12),
-      transparent 42%
-    ),
-    radial-gradient(
-      circle at 100% 100%,
-      hsl(var(--primary) / 0.1),
-      transparent 38%
     );
 }
 
@@ -116,7 +119,7 @@ html[data-theme="forest"] {
   --glow-1: 140 40% 38%;
   --glow-2: 95 40% 55%;
 
-  --deco:
+  --page-pattern:
     radial-gradient(
       circle at 10% 20%,
       hsl(var(--accent) / 0.18),
@@ -133,18 +136,6 @@ html[data-theme="forest"] {
       transparent 95px,
       hsl(var(--primary) / 0.025) 96px,
       transparent 97px
-    );
-
-  --deco-card:
-    radial-gradient(
-      ellipse at 0% 100%,
-      hsl(var(--accent) / 0.16),
-      transparent 48%
-    ),
-    radial-gradient(
-      ellipse at 100% 0%,
-      hsl(var(--primary) / 0.08),
-      transparent 42%
     );
 }
 
@@ -164,7 +155,7 @@ html[data-theme="detective"] {
   --glow-1: 15 50% 38%;
   --glow-2: 45 55% 50%;
 
-  --deco:
+  --page-pattern:
     repeating-linear-gradient(
       0deg,
       transparent 0,
@@ -182,20 +173,11 @@ html[data-theme="detective"] {
       hsl(var(--primary) / 0.06),
       transparent 30%
     );
-
-  --deco-card:
-    linear-gradient(
-      90deg,
-      hsl(var(--accent) / 0.07),
-      transparent 20%,
-      transparent 80%,
-      hsl(var(--primary) / 0.06)
-    );
 }
 
 /* =========================================================
    MAFIA
-   Vertical stripes belong to the PAGE BACKGROUND
+   VERTICAL STRIPES = PAGE BACKGROUND
    ========================================================= */
 
 html[data-theme="mafia"] {
@@ -210,13 +192,13 @@ html[data-theme="mafia"] {
   --glow-1: 350 60% 35%;
   --glow-2: 45 60% 55%;
 
-  --deco:
+  --page-pattern:
     repeating-linear-gradient(
       90deg,
-      transparent 0,
-      transparent 110px,
-      hsl(var(--primary) / 0.035) 111px,
-      transparent 112px
+      hsl(var(--primary) / 0.035) 0,
+      hsl(var(--primary) / 0.035) 2px,
+      transparent 2px,
+      transparent 110px
     ),
     radial-gradient(
       circle at 15% 85%,
@@ -228,23 +210,11 @@ html[data-theme="mafia"] {
       hsl(var(--primary) / 0.08),
       transparent 26%
     );
-
-  --deco-card:
-    radial-gradient(
-      circle at 100% 0%,
-      hsl(var(--primary) / 0.11),
-      transparent 45%
-    ),
-    linear-gradient(
-      145deg,
-      hsl(var(--accent) / 0.06),
-      transparent 55%
-    );
 }
 
 /* =========================================================
    ASYLUM
-   Grid belongs to the PAGE BACKGROUND
+   GRID = PAGE BACKGROUND
    ========================================================= */
 
 html[data-theme="asylum"] {
@@ -259,34 +229,25 @@ html[data-theme="asylum"] {
   --glow-1: 200 35% 42%;
   --glow-2: 170 25% 55%;
 
-  --deco:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0,
-      transparent 45px,
-      hsl(var(--primary) / 0.035) 46px,
-      transparent 47px
-    ),
-    repeating-linear-gradient(
+  --page-pattern:
+    linear-gradient(
       90deg,
       transparent 0,
-      transparent 45px,
-      hsl(var(--accent) / 0.025) 46px,
-      transparent 47px
+      transparent 44px,
+      hsl(var(--accent) / 0.035) 45px,
+      transparent 46px
+    ),
+    linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 44px,
+      hsl(var(--primary) / 0.04) 45px,
+      transparent 46px
     ),
     radial-gradient(
       circle at 50% 0%,
       hsl(var(--accent) / 0.13),
       transparent 40%
-    );
-
-  --deco-card:
-    linear-gradient(
-      135deg,
-      hsl(var(--primary) / 0.07),
-      transparent 35%,
-      transparent 65%,
-      hsl(var(--accent) / 0.07)
     );
 }
 
@@ -315,28 +276,33 @@ body {
   line-height: 1.6;
 }
 
+/*
+   THIS IS WHERE THE THEME PATTERN LIVES.
+   It covers the whole page.
+*/
+
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: -1;
   pointer-events: none;
-  background-image: var(--deco);
+  background-image: var(--page-pattern);
+  background-repeat: repeat;
   background-attachment: fixed;
 }
+
+/*
+   No second decorative layer over the cards.
+*/
 
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -3;
+  z-index: -2;
   pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      hsl(var(--primary) / 0.08),
-      transparent 42%
-    );
+  background: transparent;
 }
 
 button,
@@ -383,7 +349,7 @@ p {
 }
 
 /* =========================================================
-   LAYOUT
+   MAIN CONTAINER
    ========================================================= */
 
 .site-shell {
@@ -392,41 +358,33 @@ p {
   padding: 24px 0 50px;
 }
 
+/* =========================================================
+   CARDS
+   NO THEME PATTERNS HERE
+   ========================================================= */
+
 .glow-card {
   position: relative;
   overflow: hidden;
+
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
-  background: var(--deco-card), hsl(var(--card) / 0.94);
+
+  background: hsl(var(--card) / 0.94);
+
   box-shadow:
     0 10px 40px hsl(0 0% 0% / 0.28),
     inset 0 1px 0 hsl(var(--foreground) / 0.025);
+
   transition:
     transform 180ms ease,
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
 
-.glow-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 0% 0%,
-      hsl(var(--glow-1) / 0.08),
-      transparent 32%
-    ),
-    radial-gradient(
-      circle at 100% 100%,
-      hsl(var(--glow-2) / 0.05),
-      transparent 30%
-    );
-}
-
 .glow-card:hover {
   border-color: hsl(var(--primary) / 0.4);
+
   box-shadow:
     0 0 22px hsl(var(--glow-1) / 0.12),
     0 0 50px hsl(var(--glow-2) / 0.05),
@@ -491,7 +449,7 @@ p {
 }
 
 /* =========================================================
-   NAVIGATION
+   NAV
    ========================================================= */
 
 .archive-nav {
@@ -527,7 +485,7 @@ p {
 }
 
 /* =========================================================
-   ARCHIVE HEADER
+   HEADER
    ========================================================= */
 
 .archive-header {
@@ -643,7 +601,7 @@ p {
 }
 
 /* =========================================================
-   CHARACTER CARDS
+   CHARACTER GRID
    ========================================================= */
 
 .character-grid {
@@ -669,7 +627,9 @@ p {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
   border-bottom: 1px solid hsl(var(--border));
+
   background:
     radial-gradient(
       circle,
@@ -843,7 +803,7 @@ p {
 }
 
 /* =========================================================
-   DECORATIVE DIVIDER
+   DIVIDER
    ========================================================= */
 
 .ornate-divider {
@@ -903,7 +863,7 @@ p {
 }
 
 /* =========================================================
-   CHARACTER CREATOR FORM
+   CHARACTER FORM
    ========================================================= */
 
 .character-form {
