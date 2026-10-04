@@ -407,14 +407,23 @@ html {
 }
 
 body {
+ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
+
   font-family: "Inter", sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
+  color: hsl(var(--foreground));
+
+  background-color: hsl(var(--background));
+  background-image: var(--page-pattern);
+  background-attachment: fixed;
+  background-size: auto, auto, auto;
+
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
 }
 
 body::before {
@@ -428,19 +437,6 @@ body::before {
   background-attachment: fixed;
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -3;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      hsl(var(--primary) / 0.08),
-      transparent 42%
-    );
-}
 
 button,
 input,
@@ -1399,4 +1395,146 @@ textarea:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+
+   /* =========================================================
+   THEME BACKGROUND MOTIFS
+   ========================================================= */
+
+html[data-theme="goth"] body {
+  background-image:
+    radial-gradient(
+      circle at 15% 20%,
+      hsl(0 100% 30% / 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      hsl(46 65% 55% / 0.10),
+      transparent 28%
+    ),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0,
+      transparent 90px,
+      hsl(46 65% 55% / 0.045) 91px,
+      transparent 93px
+    ),
+    hsl(var(--background));
+}
+
+html[data-theme="circus"] body {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 35px,
+      hsl(46 65% 55% / 0.045) 36px,
+      hsl(46 65% 55% / 0.045) 38px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      transparent 70px,
+      hsl(0 100% 35% / 0.06) 71px,
+      hsl(0 100% 35% / 0.06) 73px
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      hsl(330 70% 45% / 0.12),
+      transparent 55%
+    ),
+    hsl(var(--background));
+}
+
+html[data-theme="forest"] body {
+  background-image:
+    radial-gradient(
+      circle at 20% 20%,
+      hsl(105 45% 45% / 0.14),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      hsl(145 40% 35% / 0.13),
+      transparent 35%
+    ),
+    repeating-linear-gradient(
+      120deg,
+      transparent 0,
+      transparent 85px,
+      hsl(100 40% 60% / 0.035) 86px,
+      transparent 88px
+    ),
+    hsl(var(--background));
+}
+
+html[data-theme="detective"] body {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 55px,
+      hsl(40 50% 60% / 0.035) 56px,
+      transparent 58px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 85px,
+      hsl(25 60% 45% / 0.035) 86px,
+      transparent 88px
+    ),
+    radial-gradient(
+      circle at 50% 40%,
+      hsl(35 60% 40% / 0.10),
+      transparent 55%
+    ),
+    hsl(var(--background));
+}
+
+html[data-theme="mafia"] body {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 48px,
+      hsl(45 65% 55% / 0.035) 49px,
+      transparent 51px
+    ),
+    radial-gradient(
+      circle at 20% 30%,
+      hsl(0 70% 30% / 0.14),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 75%,
+      hsl(220 50% 35% / 0.10),
+      transparent 35%
+    ),
+    hsl(var(--background));
+}
+
+html[data-theme="asylum"] body {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 45px,
+      hsl(200 35% 70% / 0.045) 46px,
+      transparent 48px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 45px,
+      hsl(200 35% 70% / 0.045) 46px,
+      transparent 48px
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      hsl(195 35% 55% / 0.08),
+      transparent 60%
+    ),
+    hsl(var(--background));
+}
 }
