@@ -1,15 +1,5 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import {
-  THEMES,
-  applyTheme,
-  getTheme,
-} from "./themes";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { THEMES, applyTheme, getTheme } from "./themes";
 
 /* =========================================================
    CONSTANTS
@@ -91,6 +81,14 @@ const RELATIONSHIP_TYPES = [
   "Other",
 ];
 
+const NAV_ITEMS = [
+  ["home", "Home"],
+  ["characters", "Characters"],
+  ["organizations", "Organizations"],
+  ["lore", "Lore"],
+  ["data", "Import / Export"],
+];
+
 /* =========================================================
    HELPERS
 ========================================================= */
@@ -114,6 +112,14 @@ function readStorage(key, fallback) {
   }
 }
 
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage can fail if browser storage is unavailable.
+  }
+}
+
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -131,9 +137,16 @@ async function filesToDataURLs(files) {
   );
 }
 
-/* =========================================================
-   EMPTY DATA
-========================================================= */
+function displayName(character) {
+  if (!character) return "Unknown";
+
+  const name = [character.name, character.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return name || "Unnamed character";
+}
 
 function makeEmptyCharacter() {
   return {
@@ -182,6 +195,7 @@ function makeEmptyCharacter() {
     fears: "",
     sickness: "",
     addictions: "",
+
     likes: "",
     dislikes: "",
 
@@ -266,19 +280,38 @@ function normalizeCharacter(character = {}) {
   };
 }
 
-function displayName(character) {
-  if (!character) return "Unknown";
+function normalizeOrganization(organization = {}) {
+  const base = makeEmptyOrganization();
 
-  return (
-    [character.name, character.lastName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "Unnamed character"
-  );
+  return {
+    ...base,
+    ...organization,
+
+    members: Array.isArray(organization.members)
+      ? organization.members
+      : [],
+
+    branches: Array.isArray(organization.branches)
+      ? organization.branches.map((branch) => ({
+          ...makeEmptyBranch(),
+          ...branch,
+          members: Array.isArray(branch.members)
+            ? branch.members
+            : [],
+        }))
+      : [],
+  };
+}
+
+function normalizeLore(lore = {}) {
+  return {
+    ...makeEmptyLore(),
+    ...lore,
+  };
 }
 
 /* =========================================================
-   SMALL UI
+   SMALL UI COMPONENTS
 ========================================================= */
 
 function Button({
@@ -360,20 +393,34 @@ function SelectField({
           onChange(event.target.value)
         }
       >
-        {options.map((option) => (
-          <option
-            key={option.value ?? option}
-            value={option.value ?? option}
-          >
-            {option.label ?? option}
-          </option>
-        ))}
+        {options.map((option) => {
+          const item =
+            typeof option === "string"
+              ? {
+                  value: option,
+                  label: option,
+                }
+              : option;
+
+          return (
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+          );
+        })}
       </select>
     </label>
   );
 }
 
-function Section({ title, eyebrow, children }) {
+function Section({
+  title,
+  eyebrow,
+  children,
+}) {
   return (
     <section className="form-section glow-card">
       <div className="section-title">
@@ -387,7 +434,9 @@ function Section({ title, eyebrow, children }) {
           <h2>{title}</h2>
         </div>
 
-        <span className="section-symbol">✦</span>
+        <span className="section-symbol">
+          ✦
+        </span>
       </div>
 
       {children}
@@ -636,13 +685,13 @@ function RelationshipEditor({
       <div className="relationship-intro">
         <div>
           <strong>
-            Add as many relationships as you want.
+            Unlimited relationships
           </strong>
 
           <p>
-            A character can have multiple friends,
-            enemies, lovers, family members, rivals,
-            and custom relationship categories.
+            Add as many family members, friends,
+            enemies, lovers, rivals and custom
+            relationships as you need.
           </p>
         </div>
 
@@ -660,160 +709,169 @@ function RelationshipEditor({
         </div>
       ) : (
         <div className="relationship-list">
-          {relationships.map((relationship) => (
-            <div
-              className="relationship-card"
-              key={relationship.id}
-            >
-              <div className="relationship-card-heading">
-                <span>
-                  {relationship.type === "Other"
-                    ? relationship.customType ||
-                      "Custom relationship"
-                    : relationship.type}
-                </span>
+          {relationships.map(
+            (relationship) => (
+              <div
+                className="relationship-card"
+                key={relationship.id}
+              >
+                <div className="relationship-card-heading">
+                  <span>
+                    {relationship.type ===
+                    "Other"
+                      ? relationship.customType ||
+                        "Custom relationship"
+                      : relationship.type}
+                  </span>
 
-                <Button
-                  variant="danger"
-                  onClick={() =>
-                    removeRelationship(
-                      relationship.id
-                    )
-                  }
-                >
-                  Remove
-                </Button>
-              </div>
-
-              <div className="form-grid">
-                <SelectField
-                  label="Category"
-                  value={relationship.type}
-                  onChange={(value) =>
-                    updateRelationship(
-                      relationship.id,
-                      "type",
-                      value
-                    )
-                  }
-                  options={RELATIONSHIP_TYPES}
-                />
-
-                <label className="field">
-                  <span>Person</span>
-
-                  <select
-                    value={
-                      relationship.targetId
-                    }
-                    onChange={(event) => {
-                      const id =
-                        event.target.value;
-
-                      const person =
-                        characters.find(
-                          (character) =>
-                            character.id === id
-                        );
-
-                      updateRelationship(
-                        relationship.id,
-                        "targetId",
-                        id
-                      );
-
-                      if (person) {
-                        updateRelationship(
-                          relationship.id,
-                          "personName",
-                          displayName(person)
-                        );
-                      }
-                    }}
-                  >
-                    <option value="">
-                      Choose a character
-                    </option>
-
-                    {characters
-                      .filter(
-                        (character) =>
-                          character.id !==
-                          currentCharacterId
+                  <Button
+                    variant="danger"
+                    onClick={() =>
+                      removeRelationship(
+                        relationship.id
                       )
-                      .map((character) => (
-                        <option
-                          key={character.id}
-                          value={character.id}
-                        >
-                          {displayName(character)}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-
-                <Field
-                  label="Person's name"
-                  value={
-                    relationship.personName
-                  }
-                  onChange={(value) =>
-                    updateRelationship(
-                      relationship.id,
-                      "personName",
-                      value
-                    )
-                  }
-                />
-
-                <Field
-                  label="Relationship status"
-                  value={relationship.status}
-                  placeholder="Complicated, close, deceased..."
-                  onChange={(value) =>
-                    updateRelationship(
-                      relationship.id,
-                      "status",
-                      value
-                    )
-                  }
-                />
-
-                {relationship.type ===
-                  "Other" && (
-                  <Field
-                    label="Custom category"
-                    value={
-                      relationship.customType
                     }
-                    placeholder="Guardian, handler, soulmate..."
+                  >
+                    Remove
+                  </Button>
+                </div>
+
+                <div className="form-grid">
+                  <SelectField
+                    label="Category"
+                    value={relationship.type}
                     onChange={(value) =>
                       updateRelationship(
                         relationship.id,
-                        "customType",
+                        "type",
+                        value
+                      )
+                    }
+                    options={RELATIONSHIP_TYPES}
+                  />
+
+                  <label className="field">
+                    <span>
+                      Choose existing character
+                    </span>
+
+                    <select
+                      value={
+                        relationship.targetId
+                      }
+                      onChange={(event) => {
+                        const id =
+                          event.target.value;
+
+                        const person =
+                          characters.find(
+                            (character) =>
+                              character.id ===
+                              id
+                          );
+
+                        updateRelationship(
+                          relationship.id,
+                          "targetId",
+                          id
+                        );
+
+                        if (person) {
+                          updateRelationship(
+                            relationship.id,
+                            "personName",
+                            displayName(person)
+                          );
+                        }
+                      }}
+                    >
+                      <option value="">
+                        Choose a character
+                      </option>
+
+                      {characters
+                        .filter(
+                          (character) =>
+                            character.id !==
+                            currentCharacterId
+                        )
+                        .map((character) => (
+                          <option
+                            key={character.id}
+                            value={character.id}
+                          >
+                            {displayName(character)}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+
+                  <Field
+                    label="Person's name"
+                    value={
+                      relationship.personName
+                    }
+                    onChange={(value) =>
+                      updateRelationship(
+                        relationship.id,
+                        "personName",
+                        value
+                      )
+                    }
+                    placeholder="Can also be someone not in the archive"
+                  />
+
+                  <Field
+                    label="Relationship status"
+                    value={
+                      relationship.status
+                    }
+                    placeholder="Close, complicated, deceased..."
+                    onChange={(value) =>
+                      updateRelationship(
+                        relationship.id,
+                        "status",
                         value
                       )
                     }
                   />
-                )}
 
-                <TextField
-                  label="Notes"
-                  value={
-                    relationship.description
-                  }
-                  onChange={(value) =>
-                    updateRelationship(
-                      relationship.id,
-                      "description",
-                      value
-                    )
-                  }
-                  rows={3}
-                />
+                  {relationship.type ===
+                    "Other" && (
+                    <Field
+                      label="Custom category"
+                      value={
+                        relationship.customType
+                      }
+                      placeholder="Handler, soulmate, guardian..."
+                      onChange={(value) =>
+                        updateRelationship(
+                          relationship.id,
+                          "customType",
+                          value
+                        )
+                      }
+                    />
+                  )}
+
+                  <TextField
+                    label="Notes"
+                    value={
+                      relationship.description
+                    }
+                    onChange={(value) =>
+                      updateRelationship(
+                        relationship.id,
+                        "description",
+                        value
+                      )
+                    }
+                    rows={3}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       )}
     </div>
@@ -874,8 +932,7 @@ function CharacterEditor({
           </div>
 
           <h1>
-            {form.name ||
-              "New character"}
+            {form.name || "New character"}
           </h1>
 
           <p>
@@ -1037,7 +1094,7 @@ function CharacterEditor({
         </div>
 
         <ImageUpload
-          label="Character picture"
+          label="Character / appearance picture"
           value={form.image}
           onChange={(value) =>
             update("image", value)
@@ -1046,12 +1103,12 @@ function CharacterEditor({
       </Section>
 
       <Section
-        title="Status, work & affiliation"
+        title="Status, work & affiliations"
         eyebrow="02"
       >
         <div className="form-grid">
           <SelectField
-            label="Status"
+            label="Current status"
             value={form.status}
             onChange={(value) =>
               update("status", value)
@@ -1075,6 +1132,7 @@ function CharacterEditor({
           <Field
             label="Later status"
             value={form.laterStatus}
+            placeholder="What happens later?"
             onChange={(value) =>
               update(
                 "laterStatus",
@@ -1112,9 +1170,7 @@ function CharacterEditor({
 
           <Field
             label="Past affiliation"
-            value={
-              form.pastAffiliation
-            }
+            value={form.pastAffiliation}
             onChange={(value) =>
               update(
                 "pastAffiliation",
@@ -1172,31 +1228,31 @@ function CharacterEditor({
               update("mbti", value)
             }
           />
+
+          <TextField
+            label="Ability description"
+            value={
+              form.abilityDescription
+            }
+            onChange={(value) =>
+              update(
+                "abilityDescription",
+                value
+              )
+            }
+          />
+
+          <TextField
+            label="Side effects & risks"
+            value={form.sideEffects}
+            onChange={(value) =>
+              update(
+                "sideEffects",
+                value
+              )
+            }
+          />
         </div>
-
-        <TextField
-          label="Ability description"
-          value={
-            form.abilityDescription
-          }
-          onChange={(value) =>
-            update(
-              "abilityDescription",
-              value
-            )
-          }
-        />
-
-        <TextField
-          label="Side effects & risks"
-          value={form.sideEffects}
-          onChange={(value) =>
-            update(
-              "sideEffects",
-              value
-            )
-          }
-        />
       </Section>
 
       <Section
@@ -1211,9 +1267,8 @@ function CharacterEditor({
                 left={left}
                 right={right}
                 value={
-                  form.personality[
-                    left
-                  ] || 3
+                  form.personality[left] ||
+                  3
                 }
                 onChange={(value) =>
                   updateNested(
@@ -1253,7 +1308,7 @@ function CharacterEditor({
       </Section>
 
       <Section
-        title="Social statistics"
+        title="Social stats"
         eyebrow="06"
       >
         <div className="skills-list">
@@ -1262,7 +1317,8 @@ function CharacterEditor({
               key={stat}
               name={stat}
               value={
-                form.socialStats[stat] || 3
+                form.socialStats[stat] ||
+                3
               }
               onChange={(value) =>
                 updateNested(
@@ -1277,54 +1333,59 @@ function CharacterEditor({
       </Section>
 
       <Section
-        title="Personal information"
+        title="Personal details"
         eyebrow="07"
       >
-        <TextField
-          label="Fears"
-          value={form.fears}
-          onChange={(value) =>
-            update("fears", value)
-          }
-        />
+        <div className="form-grid">
+          <TextField
+            label="Fears"
+            value={form.fears}
+            onChange={(value) =>
+              update("fears", value)
+            }
+          />
 
-        <TextField
-          label="Sickness"
-          value={form.sickness}
-          onChange={(value) =>
-            update("sickness", value)
-          }
-        />
+          <TextField
+            label="Sickness"
+            value={form.sickness}
+            onChange={(value) =>
+              update(
+                "sickness",
+                value
+              )
+            }
+          />
 
-        <TextField
-          label="Addictions"
-          value={form.addictions}
-          onChange={(value) =>
-            update(
-              "addictions",
-              value
-            )
-          }
-        />
+          <TextField
+            label="Addictions"
+            value={form.addictions}
+            onChange={(value) =>
+              update(
+                "addictions",
+                value
+              )
+            }
+          />
 
-        <TextField
-          label="Likes"
-          value={form.likes}
-          onChange={(value) =>
-            update("likes", value)
-          }
-        />
+          <TextField
+            label="Likes"
+            value={form.likes}
+            onChange={(value) =>
+              update("likes", value)
+            }
+          />
 
-        <TextField
-          label="Dislikes"
-          value={form.dislikes}
-          onChange={(value) =>
-            update(
-              "dislikes",
-              value
-            )
-          }
-        />
+          <TextField
+            label="Dislikes"
+            value={form.dislikes}
+            onChange={(value) =>
+              update(
+                "dislikes",
+                value
+              )
+            }
+          />
+        </div>
       </Section>
 
       <Section
@@ -1351,9 +1412,9 @@ function CharacterEditor({
         eyebrow="09"
       >
         <ImageUpload
-          label="Moodboard pictures"
-          multiple
+          label="Appearance, clothes, atmosphere, references..."
           value={form.moodboard}
+          multiple
           onChange={(value) =>
             update(
               "moodboard",
@@ -1363,7 +1424,7 @@ function CharacterEditor({
         />
       </Section>
 
-      <div className="bottom-actions">
+      <div className="editor-actions bottom-actions">
         <Button onClick={onCancel}>
           Cancel
         </Button>
@@ -1380,99 +1441,8 @@ function CharacterEditor({
 }
 
 /* =========================================================
-   CHARACTER CARD
-========================================================= */
-
-function CharacterCard({
-  character,
-  onOpen,
-  onEdit,
-  onDelete,
-}) {
-  return (
-    <article
-      className="character-card glow-card"
-      onClick={onOpen}
-    >
-      <div className="character-card-image">
-        {character.image ? (
-          <img
-            src={character.image}
-            alt=""
-          />
-        ) : (
-          <div className="no-image">
-            ✦
-          </div>
-        )}
-
-        <span
-          className={`status-badge ${character.status}`}
-        >
-          {character.status}
-        </span>
-      </div>
-
-      <div className="character-card-content">
-        <div className="card-kicker">
-          Character
-        </div>
-
-        <h3>
-          {displayName(character)}
-        </h3>
-
-        {character.nicknames && (
-          <p className="nickname">
-            “{character.nicknames}”
-          </p>
-        )}
-
-        <div className="character-summary">
-          {character.job ||
-            character.affiliation ||
-            character.species}
-        </div>
-
-        <div
-          className="card-actions"
-          onClick={(event) =>
-            event.stopPropagation()
-          }
-        >
-          <Button onClick={onEdit}>
-            Edit
-          </Button>
-
-          <Button
-            variant="danger"
-            onClick={onDelete}
-          >
-            Delete
-          </Button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/* =========================================================
    CHARACTER PROFILE
 ========================================================= */
-
-function ProfileField({
-  label,
-  value,
-}) {
-  if (!value) return null;
-
-  return (
-    <div className="profile-field">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
 
 function CharacterProfile({
   character,
@@ -1484,36 +1454,45 @@ function CharacterProfile({
   const relationships =
     character.relationships || [];
 
+  const memberships =
+    organizations.flatMap((organization) => {
+      const result = [];
+
+      if (
+        organization.members.includes(
+          character.id
+        )
+      ) {
+        result.push({
+          organization:
+            organization.name,
+          branch: "Main organization",
+        });
+      }
+
+      organization.branches.forEach(
+        (branch) => {
+          if (
+            branch.members.includes(
+              character.id
+            )
+          ) {
+            result.push({
+              organization:
+                organization.name,
+              branch: branch.name,
+            });
+          }
+        }
+      );
+
+      return result;
+    });
+
   return (
     <div className="profile-page">
-      <div className="profile-actions">
-        <Button onClick={onBack}>
-          ← Back
-        </Button>
-
-        <Button
-          variant="primary"
-          onClick={onEdit}
-        >
-          Edit character
-        </Button>
-      </div>
-
-      <section className="profile-hero glow-card">
-        <div className="profile-hero-image">
-          {character.image ? (
-            <img
-              src={character.image}
-              alt=""
-            />
-          ) : (
-            <div className="profile-no-image">
-              ✦
-            </div>
-          )}
-        </div>
-
-        <div className="profile-heading">
+      <div className="page-header">
+        <div>
           <div className="eyebrow">
             Character profile
           </div>
@@ -1522,213 +1501,213 @@ function CharacterProfile({
             {displayName(character)}
           </h1>
 
-          {character.nicknames && (
-            <p className="profile-nickname">
-              “{character.nicknames}”
-            </p>
-          )}
-
-          <div className="profile-badges">
-            <span>
-              {character.status}
-            </span>
-
-            {character.age && (
-              <span>
-                {character.age} years
-              </span>
-            )}
-
-            {character.mbti && (
-              <span>
-                {character.mbti}
-              </span>
-            )}
-          </div>
+          <p>
+            {character.nicknames ||
+              "No nickname recorded."}
+          </p>
         </div>
-      </section>
+
+        <div className="editor-actions">
+          <Button onClick={onBack}>
+            ← Back
+          </Button>
+
+          <Button
+            variant="primary"
+            onClick={onEdit}
+          >
+            Edit character
+          </Button>
+        </div>
+      </div>
 
       <div className="profile-grid">
-        <section className="profile-section glow-card">
+        <section className="profile-section">
+          {character.image ? (
+            <img
+              className="profile-image"
+              src={character.image}
+              alt={displayName(character)}
+            />
+          ) : (
+            <div className="empty-state">
+              No main image.
+            </div>
+          )}
+        </section>
+
+        <section className="profile-section">
           <h2>Identity</h2>
 
-          <div className="profile-fields">
-            <ProfileField
-              label="Pronouns"
-              value={character.pronouns}
-            />
+          <dl>
+            <dt>Name</dt>
+            <dd>
+              {displayName(character)}
+            </dd>
 
-            <ProfileField
-              label="Gender"
-              value={character.gender}
-            />
+            <dt>Nicknames</dt>
+            <dd>
+              {character.nicknames ||
+                "—"}
+            </dd>
 
-            <ProfileField
-              label="Sexuality"
-              value={
-                character.sexuality
-              }
-            />
+            <dt>Age</dt>
+            <dd>
+              {character.age || "—"}
+            </dd>
 
-            <ProfileField
-              label="Nationality"
-              value={
-                character.nationality
-              }
-            />
+            <dt>Pronouns</dt>
+            <dd>
+              {character.pronouns ||
+                "—"}
+            </dd>
 
-            <ProfileField
-              label="Origins"
-              value={character.origins}
-            />
+            <dt>Gender</dt>
+            <dd>
+              {character.gender || "—"}
+            </dd>
 
-            <ProfileField
-              label="Species"
-              value={character.species}
-            />
+            <dt>Sexuality</dt>
+            <dd>
+              {character.sexuality ||
+                "—"}
+            </dd>
 
-            <ProfileField
-              label="Date of birth"
-              value={
-                character.dateOfBirth
-              }
-            />
+            <dt>Nationality</dt>
+            <dd>
+              {character.nationality ||
+                "—"}
+            </dd>
 
-            <ProfileField
-              label="Height"
-              value={character.height}
-            />
+            <dt>Origins</dt>
+            <dd>
+              {character.origins || "—"}
+            </dd>
 
-            <ProfileField
-              label="Weight"
-              value={character.weight}
-            />
-          </div>
+            <dt>Species</dt>
+            <dd>
+              {character.species || "—"}
+            </dd>
+          </dl>
         </section>
 
-        <section className="profile-section glow-card">
+        <section className="profile-section">
+          <h2>Status & career</h2>
+
+          <dl>
+            <dt>Status</dt>
+            <dd>
+              {character.status}
+            </dd>
+
+            <dt>Later status</dt>
+            <dd>
+              {character.laterStatus ||
+                "—"}
+            </dd>
+
+            <dt>Job</dt>
+            <dd>
+              {character.job || "—"}
+            </dd>
+
+            <dt>Side job</dt>
+            <dd>
+              {character.sideJob || "—"}
+            </dd>
+
+            <dt>Affiliation</dt>
+            <dd>
+              {character.affiliation ||
+                "—"}
+            </dd>
+
+            <dt>Past affiliation</dt>
+            <dd>
+              {character.pastAffiliation ||
+                "—"}
+            </dd>
+
+            <dt>Rank</dt>
+            <dd>
+              {character.rank || "—"}
+            </dd>
+
+            <dt>Past rank</dt>
+            <dd>
+              {character.pastRank || "—"}
+            </dd>
+          </dl>
+        </section>
+
+        <section className="profile-section">
           <h2>Appearance</h2>
 
-          <div className="profile-fields">
-            <ProfileField
-              label="Eyes"
-              value={
-                character.eyeColor
-              }
-            />
+          <dl>
+            <dt>Height</dt>
+            <dd>
+              {character.height || "—"}
+            </dd>
 
-            <ProfileField
-              label="Hair"
-              value={
-                character.hairColor
-              }
-            />
+            <dt>Weight</dt>
+            <dd>
+              {character.weight || "—"}
+            </dd>
 
-            <ProfileField
-              label="Hair style"
-              value={
-                character.hairStyle
-              }
-            />
-          </div>
+            <dt>Eyes</dt>
+            <dd>
+              {character.eyeColor || "—"}
+            </dd>
+
+            <dt>Hair</dt>
+            <dd>
+              {character.hairColor || "—"}
+            </dd>
+
+            <dt>Hair style</dt>
+            <dd>
+              {character.hairStyle || "—"}
+            </dd>
+          </dl>
         </section>
 
-        <section className="profile-section glow-card">
-          <h2>Occupation & status</h2>
-
-          <div className="profile-fields">
-            <ProfileField
-              label="Job"
-              value={character.job}
-            />
-
-            <ProfileField
-              label="Side job"
-              value={
-                character.sideJob
-              }
-            />
-
-            <ProfileField
-              label="Affiliation"
-              value={
-                character.affiliation
-              }
-            />
-
-            <ProfileField
-              label="Past affiliation"
-              value={
-                character.pastAffiliation
-              }
-            />
-
-            <ProfileField
-              label="Rank"
-              value={character.rank}
-            />
-
-            <ProfileField
-              label="Past rank"
-              value={
-                character.pastRank
-              }
-            />
-
-            <ProfileField
-              label="Later status"
-              value={
-                character.laterStatus
-              }
-            />
-          </div>
-        </section>
-
-        <section className="profile-section glow-card">
+        <section className="profile-section profile-wide">
           <h2>Ability</h2>
 
-          <div className="profile-fields">
-            <ProfileField
-              label="Ability"
-              value={character.ability}
-            />
+          <h3>
+            {character.ability ||
+              "No ability recorded."}
+          </h3>
 
-            <ProfileField
-              label="Weapon"
-              value={character.weapon}
-            />
+          <p>
+            {character.abilityDescription ||
+              "No description."}
+          </p>
 
-            <ProfileField
-              label="MBTI"
-              value={character.mbti}
-            />
-          </div>
+          <h3>Side effects & risks</h3>
 
-          {character.abilityDescription && (
-            <div className="profile-text">
-              <h3>Description</h3>
-              <p>
-                {
-                  character.abilityDescription
-                }
-              </p>
-            </div>
-          )}
+          <p>
+            {character.sideEffects ||
+              "None recorded."}
+          </p>
 
-          {character.sideEffects && (
-            <div className="profile-text">
-              <h3>Side effects & risks</h3>
-              <p>
-                {character.sideEffects}
-              </p>
-            </div>
-          )}
+          <h3>Weapon</h3>
+
+          <p>
+            {character.weapon || "—"}
+          </p>
+
+          <h3>MBTI</h3>
+
+          <p>
+            {character.mbti || "—"}
+          </p>
         </section>
 
-        <section className="profile-section glow-card profile-wide">
+        <section className="profile-section">
           <h2>Personality</h2>
 
-          <div className="profile-stat-list">
+          <div className="stats-list">
             {PERSONALITY_STATS.map(
               ([left, right]) => (
                 <StatBar
@@ -1736,8 +1715,7 @@ function CharacterProfile({
                   left={left}
                   right={right}
                   value={
-                    character
-                      .personality?.[
+                    character.personality[
                       left
                     ] || 3
                   }
@@ -1748,18 +1726,17 @@ function CharacterProfile({
           </div>
         </section>
 
-        <section className="profile-section glow-card">
+        <section className="profile-section">
           <h2>Skills</h2>
 
-          <div className="profile-skill-list">
+          <div className="skills-list">
             {SKILLS.map((skill) => (
               <SkillBar
                 key={skill}
                 name={skill}
                 value={
-                  character.skills?.[
-                    skill
-                  ] || 3
+                  character.skills[skill] ||
+                  3
                 }
                 onChange={() => {}}
               />
@@ -1767,72 +1744,77 @@ function CharacterProfile({
           </div>
         </section>
 
-        <section className="profile-section glow-card">
-          <h2>Social</h2>
-
-          <div className="profile-skill-list">
-            {SOCIAL_STATS.map((stat) => (
-              <SkillBar
-                key={stat}
-                name={stat}
-                value={
-                  character
-                    .socialStats?.[
-                    stat
-                  ] || 3
-                }
-                onChange={() => {}}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="profile-section glow-card profile-wide">
+        <section className="profile-section">
           <h2>Personal</h2>
 
-          <div className="profile-text-grid">
-            <ProfileField
-              label="Fears"
-              value={character.fears}
-            />
+          <h3>Fears</h3>
+          <p>
+            {character.fears || "—"}
+          </p>
 
-            <ProfileField
-              label="Sickness"
-              value={
-                character.sickness
-              }
-            />
+          <h3>Sickness</h3>
+          <p>
+            {character.sickness || "—"}
+          </p>
 
-            <ProfileField
-              label="Addictions"
-              value={
-                character.addictions
-              }
-            />
+          <h3>Addictions</h3>
+          <p>
+            {character.addictions ||
+              "—"}
+          </p>
 
-            <ProfileField
-              label="Likes"
-              value={character.likes}
-            />
+          <h3>Likes</h3>
+          <p>
+            {character.likes || "—"}
+          </p>
 
-            <ProfileField
-              label="Dislikes"
-              value={
-                character.dislikes
-              }
-            />
-          </div>
+          <h3>Dislikes</h3>
+          <p>
+            {character.dislikes || "—"}
+          </p>
         </section>
 
-        <section className="profile-section glow-card profile-wide">
+        <section className="profile-section">
+          <h2>Organizations</h2>
+
+          {memberships.length === 0 ? (
+            <div className="empty-mini">
+              No organization membership.
+            </div>
+          ) : (
+            <div className="organization-memberships">
+              {memberships.map(
+                (membership, index) => (
+                  <div
+                    className="membership-card"
+                    key={`${membership.organization}-${membership.branch}-${index}`}
+                  >
+                    <strong>
+                      {
+                        membership.organization
+                      }
+                    </strong>
+
+                    <p>
+                      {membership.branch}
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="profile-section profile-wide">
           <h2>Relationships</h2>
 
-          {relationships.length === 0 ? (
+          {relationships.length ===
+          0 ? (
             <div className="empty-mini">
               No relationships.
             </div>
           ) : (
-            <div className="relationship-display-grid">
+            <div className="relationship-list">
               {relationships.map(
                 (relationship) => {
                   const target =
@@ -1842,64 +1824,44 @@ function CharacterProfile({
                         relationship.targetId
                     );
 
-                  const name =
-                    target
-                      ? displayName(target)
-                      : relationship.personName ||
-                        "Unknown person";
-
-                  const type =
-                    relationship.type ===
-                    "Other"
-                      ? relationship.customType ||
-                        "Custom"
-                      : relationship.type;
-
                   return (
                     <div
-                      className="relationship-display"
-                      key={
-                        relationship.id
-                      }
+                      className="relationship-card"
+                      key={relationship.id}
                     >
-                      <div className="relationship-avatar">
-                        {target?.image ? (
-                          <img
-                            src={
-                              target.image
-                            }
-                            alt=""
-                          />
-                        ) : (
-                          "✦"
-                        )}
-                      </div>
-
-                      <div>
-                        <strong>
-                          {name}
-                        </strong>
-
+                      <div className="relationship-card-heading">
                         <span>
-                          {type}
+                          {relationship.type ===
+                          "Other"
+                            ? relationship.customType ||
+                              "Custom"
+                            : relationship.type}
                         </span>
-
-                        {relationship.status && (
-                          <small>
-                            {
-                              relationship.status
-                            }
-                          </small>
-                        )}
-
-                        {relationship.description && (
-                          <p>
-                            {
-                              relationship.description
-                            }
-                          </p>
-                        )}
                       </div>
+
+                      <h3>
+                        {target
+                          ? displayName(target)
+                          : relationship.personName ||
+                            "Unknown person"}
+                      </h3>
+
+                      {relationship.status && (
+                        <p>
+                          Status:{" "}
+                          {
+                            relationship.status
+                          }
+                        </p>
+                      )}
+
+                      {relationship.description && (
+                        <p>
+                          {
+                            relationship.description
+                          }
+                        </p>
+                      )}
                     </div>
                   );
                 }
@@ -1908,70 +1870,15 @@ function CharacterProfile({
           )}
         </section>
 
-        <section className="profile-section glow-card profile-wide">
-          <h2>Organizations</h2>
+        <section className="profile-section profile-wide">
+          <h2>Moodboard</h2>
 
-          <div className="organization-memberships">
-            {organizations
-              .filter((organization) =>
-                organization.members?.includes(
-                  character.id
-                ) ||
-                organization.branches?.some(
-                  (branch) =>
-                    branch.members?.includes(
-                      character.id
-                    )
-                )
-              )
-              .map((organization) => (
-                <div
-                  className="membership-card"
-                  key={organization.id}
-                >
-                  <strong>
-                    {organization.name}
-                  </strong>
-
-                  {organization.branches
-                    ?.filter((branch) =>
-                      branch.members?.includes(
-                        character.id
-                      )
-                    )
-                    .map((branch) => (
-                      <span
-                        key={branch.id}
-                      >
-                        {branch.name}
-                      </span>
-                    ))}
-                </div>
-              ))}
-
-            {!organizations.some(
-              (organization) =>
-                organization.members?.includes(
-                  character.id
-                ) ||
-                organization.branches?.some(
-                  (branch) =>
-                    branch.members?.includes(
-                      character.id
-                    )
-                )
-            ) && (
-              <div className="empty-mini">
-                No organization memberships.
-              </div>
-            )}
-          </div>
-        </section>
-
-        {character.moodboard?.length > 0 && (
-          <section className="profile-section glow-card profile-wide">
-            <h2>Moodboard</h2>
-
+          {character.moodboard.length ===
+          0 ? (
+            <div className="empty-mini">
+              No moodboard images.
+            </div>
+          ) : (
             <div className="moodboard-grid">
               {character.moodboard.map(
                 (image, index) => (
@@ -1983,9 +1890,187 @@ function CharacterProfile({
                 )
               )}
             </div>
-          </section>
-        )}
+          )}
+        </section>
       </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   CHARACTER ARCHIVE
+========================================================= */
+
+function CharacterArchive({
+  characters,
+  onCreate,
+  onOpen,
+  onEdit,
+  onDelete,
+}) {
+  const [search, setSearch] =
+    useState("");
+
+  const filtered =
+    useMemo(() => {
+      const query =
+        search.trim().toLowerCase();
+
+      if (!query) return characters;
+
+      return characters.filter(
+        (character) =>
+          [
+            character.name,
+            character.lastName,
+            character.nicknames,
+            character.job,
+            character.affiliation,
+            character.nationality,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(query)
+      );
+    }, [characters, search]);
+
+  return (
+    <div className="archive-page">
+      <div className="archive-header">
+        <div>
+          <div className="eyebrow">
+            Character archive
+          </div>
+
+          <h1>Characters</h1>
+
+          <p>
+            Your complete original character
+            database.
+          </p>
+        </div>
+
+        <div className="archive-tools">
+          <Button
+            variant="primary"
+            onClick={onCreate}
+          >
+            + New character
+          </Button>
+        </div>
+      </div>
+
+      <div className="archive-tools">
+        <label className="search-box">
+          <span>⌕</span>
+
+          <input
+            value={search}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
+            placeholder="Search characters..."
+          />
+        </label>
+
+        <div className="archive-count">
+          {filtered.length} character
+          {filtered.length === 1
+            ? ""
+            : "s"}
+        </div>
+      </div>
+
+      <div className="character-grid">
+        {filtered.map((character) => (
+          <article
+            className="character-card"
+            key={character.id}
+          >
+            {character.image ? (
+              <img
+                className="character-image"
+                src={character.image}
+                alt={displayName(character)}
+              />
+            ) : (
+              <div className="character-image character-image-empty">
+                ✦
+              </div>
+            )}
+
+            <div className="character-card-content">
+              <div className="character-card-top">
+                <div>
+                  <h3>
+                    {displayName(character)}
+                  </h3>
+
+                  {character.nicknames && (
+                    <div className="nickname">
+                      {character.nicknames}
+                    </div>
+                  )}
+                </div>
+
+                <span
+                  className={
+                    character.status ===
+                    "dead"
+                      ? "badge-dead"
+                      : "badge-alive"
+                  }
+                >
+                  {character.status}
+                </span>
+              </div>
+
+              <p className="character-summary">
+                {character.job ||
+                  character.affiliation ||
+                  character.species ||
+                  "Character"}
+              </p>
+
+              <div className="character-card-actions">
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    onOpen(character.id)
+                  }
+                >
+                  View
+                </Button>
+
+                <Button
+                  onClick={() =>
+                    onEdit(character.id)
+                  }
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  variant="danger"
+                  onClick={() =>
+                    onDelete(character.id)
+                  }
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="empty-state">
+          {characters.length === 0
+            ? "No characters yet. Create your first one."
+            : "No characters match your search."}
+        </div>
+      )}
     </div>
   );
 }
@@ -2000,10 +2085,12 @@ function OrganizationEditor({
   onSave,
   onCancel,
 }) {
-  const [form, setForm] = useState({
-    ...makeEmptyOrganization(),
-    ...clone(organization),
-  });
+  const [form, setForm] =
+    useState(
+      normalizeOrganization(
+        organization
+      )
+    );
 
   function update(field, value) {
     setForm((current) => ({
@@ -2012,31 +2099,28 @@ function OrganizationEditor({
     }));
   }
 
-  function toggleMember(
-    memberId
-  ) {
-    setForm((current) => {
-      const members =
-        current.members || [];
-
-      return {
-        ...current,
-        members: members.includes(
-          memberId
-        )
-          ? members.filter(
-              (id) => id !== memberId
-            )
-          : [...members, memberId],
-      };
-    });
+  function toggleMember(id) {
+    setForm((current) => ({
+      ...current,
+      members: current.members.includes(
+        id
+      )
+        ? current.members.filter(
+            (memberId) =>
+              memberId !== id
+          )
+        : [...current.members, id],
+    }));
   }
 
   function addBranch() {
-    update("branches", [
-      ...(form.branches || []),
-      makeEmptyBranch(),
-    ]);
+    setForm((current) => ({
+      ...current,
+      branches: [
+        ...current.branches,
+        makeEmptyBranch(),
+      ],
+    }));
   }
 
   function updateBranch(
@@ -2044,73 +2128,60 @@ function OrganizationEditor({
     field,
     value
   ) {
-    update(
-      "branches",
-      form.branches.map((branch) =>
-        branch.id === branchId
-          ? {
-              ...branch,
-              [field]: value,
-            }
-          : branch
-      )
-    );
+    setForm((current) => ({
+      ...current,
+      branches: current.branches.map(
+        (branch) =>
+          branch.id === branchId
+            ? {
+                ...branch,
+                [field]: value,
+              }
+            : branch
+      ),
+    }));
+  }
+
+  function deleteBranch(branchId) {
+    setForm((current) => ({
+      ...current,
+      branches: current.branches.filter(
+        (branch) =>
+          branch.id !== branchId
+      ),
+    }));
   }
 
   function toggleBranchMember(
     branchId,
-    memberId
+    characterId
   ) {
-    update(
-      "branches",
-      form.branches.map((branch) => {
-        if (branch.id !== branchId)
-          return branch;
+    setForm((current) => ({
+      ...current,
+      branches: current.branches.map(
+        (branch) => {
+          if (branch.id !== branchId) {
+            return branch;
+          }
 
-        const members =
-          branch.members || [];
-
-        return {
-          ...branch,
-          members: members.includes(
-            memberId
-          )
-            ? members.filter(
-                (id) =>
-                  id !== memberId
+          return {
+            ...branch,
+            members:
+              branch.members.includes(
+                characterId
               )
-            : [
-                ...members,
-                memberId,
-              ],
-        };
-      })
-    );
-  }
-
-  function removeBranch(
-    branchId
-  ) {
-    update(
-      "branches",
-      form.branches.filter(
-        (branch) =>
-          branch.id !== branchId
-      )
-    );
-  }
-
-  async function saveImage(event) {
-    const file =
-      event.target.files?.[0];
-
-    if (!file) return;
-
-    const image =
-      await readFileAsDataURL(file);
-
-    update("image", image);
-    event.target.value = "";
+                ? branch.members.filter(
+                    (id) =>
+                      id !== characterId
+                  )
+                : [
+                    ...branch.members,
+                    characterId,
+                  ],
+          };
+        }
+      ),
+    }));
   }
 
   function save() {
@@ -2135,6 +2206,11 @@ function OrganizationEditor({
             {form.name ||
               "New organization"}
           </h1>
+
+          <p>
+            Build organizations, branches and
+            memberships.
+          </p>
         </div>
 
         <div className="editor-actions">
@@ -2163,58 +2239,32 @@ function OrganizationEditor({
               update("name", value)
             }
           />
+
+          <TextField
+            label="Description"
+            value={form.description}
+            onChange={(value) =>
+              update(
+                "description",
+                value
+              )
+            }
+          />
         </div>
 
-        <TextField
-          label="Description"
-          value={form.description}
+        <ImageUpload
+          label="Organization image"
+          value={form.image}
           onChange={(value) =>
-            update(
-              "description",
-              value
-            )
+            update("image", value)
           }
         />
-
-        <label className="field field-wide">
-          <span>Organization image</span>
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={saveImage}
-          />
-        </label>
-
-        {form.image && (
-          <div className="organization-editor-image">
-            <img
-              src={form.image}
-              alt=""
-            />
-
-            <Button
-              variant="danger"
-              onClick={() =>
-                update("image", "")
-              }
-            >
-              Remove image
-            </Button>
-          </div>
-        )}
       </Section>
 
       <Section
         title="Organization members"
         eyebrow="02"
       >
-        <p className="section-description">
-          Add any number of characters to
-          the main organization. A character
-          can also belong to several branches.
-        </p>
-
         <div className="member-selector">
           {characters.length === 0 ? (
             <div className="empty-mini">
@@ -2223,22 +2273,14 @@ function OrganizationEditor({
           ) : (
             characters.map((character) => (
               <label
-                className={`member-option ${
-                  form.members?.includes(
-                    character.id
-                  )
-                    ? "selected"
-                    : ""
-                }`}
+                className="member-option"
                 key={character.id}
               >
                 <input
                   type="checkbox"
-                  checked={
-                    form.members?.includes(
-                      character.id
-                    ) || false
-                  }
+                  checked={form.members.includes(
+                    character.id
+                  )}
                   onChange={() =>
                     toggleMember(
                       character.id
@@ -2247,9 +2289,7 @@ function OrganizationEditor({
                 />
 
                 <span>
-                  {displayName(
-                    character
-                  )}
+                  {displayName(character)}
                 </span>
               </label>
             ))
@@ -2261,12 +2301,17 @@ function OrganizationEditor({
         title="Branches"
         eyebrow="03"
       >
-        <div className="branch-header">
-          <p className="section-description">
-            Create as many branches as you
-            need and assign different
-            characters to each one.
-          </p>
+        <div className="section-heading">
+          <div>
+            <h3>
+              Organization branches
+            </h3>
+
+            <p>
+              A character can belong to
+              several branches.
+            </p>
+          </div>
 
           <Button
             variant="primary"
@@ -2276,41 +2321,22 @@ function OrganizationEditor({
           </Button>
         </div>
 
-        {form.branches?.length === 0 ? (
+        {form.branches.length === 0 ? (
           <div className="empty-mini">
             No branches yet.
           </div>
         ) : (
           <div className="branch-list">
             {form.branches.map(
-              (branch, index) => (
+              (branch) => (
                 <div
-                  className="branch-editor-card"
+                  className="branch"
                   key={branch.id}
                 >
-                  <div className="branch-editor-top">
-                    <strong>
-                      Branch {index + 1}
-                    </strong>
-
-                    <Button
-                      variant="danger"
-                      onClick={() =>
-                        removeBranch(
-                          branch.id
-                        )
-                      }
-                    >
-                      Delete branch
-                    </Button>
-                  </div>
-
                   <div className="form-grid">
                     <Field
                       label="Branch name"
-                      value={
-                        branch.name
-                      }
+                      value={branch.name}
                       onChange={(value) =>
                         updateBranch(
                           branch.id,
@@ -2321,7 +2347,7 @@ function OrganizationEditor({
                     />
 
                     <TextField
-                      label="Description"
+                      label="Branch description"
                       value={
                         branch.description
                       }
@@ -2332,55 +2358,54 @@ function OrganizationEditor({
                           value
                         )
                       }
-                      rows={3}
                     />
                   </div>
 
-                  <div className="branch-members">
-                    <h4>
-                      Branch members
-                    </h4>
+                  <h3>
+                    Branch members
+                  </h3>
 
-                    <div className="member-selector">
-                      {characters.map(
-                        (character) => (
-                          <label
-                            className={`member-option ${
-                              branch.members?.includes(
+                  <div className="member-selector">
+                    {characters.map(
+                      (character) => (
+                        <label
+                          className="member-option"
+                          key={character.id}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={branch.members.includes(
+                              character.id
+                            )}
+                            onChange={() =>
+                              toggleBranchMember(
+                                branch.id,
                                 character.id
                               )
-                                ? "selected"
-                                : ""
-                            }`}
-                            key={
-                              character.id
                             }
-                          >
-                            <input
-                              type="checkbox"
-                              checked={
-                                branch.members?.includes(
-                                  character.id
-                                ) ||
-                                false
-                              }
-                              onChange={() =>
-                                toggleBranchMember(
-                                  branch.id,
-                                  character.id
-                                )
-                              }
-                            />
+                          />
 
-                            <span>
-                              {displayName(
-                                character
-                              )}
-                            </span>
-                          </label>
+                          <span>
+                            {displayName(
+                              character
+                            )}
+                          </span>
+                        </label>
+                      )
+                    )}
+                  </div>
+
+                  <div className="upload-actions">
+                    <Button
+                      variant="danger"
+                      onClick={() =>
+                        deleteBranch(
+                          branch.id
                         )
-                      )}
-                    </div>
+                      }
+                    >
+                      Delete branch
+                    </Button>
                   </div>
                 </div>
               )
@@ -2388,37 +2413,24 @@ function OrganizationEditor({
           </div>
         )}
       </Section>
-
-      <div className="bottom-actions">
-        <Button onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button
-          variant="primary"
-          onClick={save}
-        >
-          Save organization
-        </Button>
-      </div>
     </div>
   );
 }
 
 /* =========================================================
-   ORGANIZATIONS PAGE
+   ORGANIZATION ARCHIVE
 ========================================================= */
 
-function OrganizationsPage({
+function OrganizationArchive({
   organizations,
   characters,
-  onNew,
+  onCreate,
   onEdit,
   onDelete,
 }) {
   return (
     <div className="archive-page">
-      <div className="page-header">
+      <div className="archive-header">
         <div>
           <div className="eyebrow">
             World building
@@ -2427,111 +2439,97 @@ function OrganizationsPage({
           <h1>Organizations</h1>
 
           <p>
-            Groups, factions, branches,
-            members and hierarchies.
+            Groups, factions, companies,
+            families, institutions and branches.
           </p>
         </div>
 
         <Button
           variant="primary"
-          onClick={onNew}
+          onClick={onCreate}
         >
-          + Add organization
+          + New organization
         </Button>
       </div>
 
-      {organizations.length === 0 ? (
-        <div className="empty-state glow-card">
-          <div>♠</div>
+      <div className="organization-grid">
+        {organizations.map(
+          (organization) => (
+            <article
+              className="organization-card"
+              key={organization.id}
+            >
+              {organization.image && (
+                <img
+                  src={organization.image}
+                  alt=""
+                />
+              )}
 
-          <h2>
-            No organizations yet
-          </h2>
+              <div className="organization-card-content">
+                <h3>
+                  {organization.name}
+                </h3>
 
-          <p>
-            Create your first organization
-            and start assigning characters.
-          </p>
-        </div>
-      ) : (
-        <div className="organization-grid">
-          {organizations.map(
-            (organization) => (
-              <article
-                className="organization-card glow-card"
-                key={organization.id}
-              >
-                <div className="organization-image">
-                  {organization.image ? (
-                    <img
-                      src={
-                        organization.image
-                      }
-                      alt=""
-                    />
-                  ) : (
-                    <span>♠</span>
-                  )}
+                <p>
+                  {organization.description ||
+                    "No description."}
+                </p>
+
+                <p>
+                  <strong>
+                    {organization.members.length}
+                  </strong>{" "}
+                  direct member
+                  {organization.members
+                    .length === 1
+                    ? ""
+                    : "s"}
+                </p>
+
+                <p>
+                  <strong>
+                    {organization.branches.length}
+                  </strong>{" "}
+                  branch
+                  {organization.branches
+                    .length === 1
+                    ? ""
+                    : "es"}
+                </p>
+
+                <div className="character-card-actions">
+                  <Button
+                    variant="primary"
+                    onClick={() =>
+                      onEdit(
+                        organization.id
+                      )
+                    }
+                  >
+                    Edit
+                  </Button>
+
+                  <Button
+                    variant="danger"
+                    onClick={() =>
+                      onDelete(
+                        organization.id
+                      )
+                    }
+                  >
+                    Delete
+                  </Button>
                 </div>
+              </div>
+            </article>
+          )
+        )}
+      </div>
 
-                <div className="organization-content">
-                  <div className="card-kicker">
-                    Organization
-                  </div>
-
-                  <h2>
-                    {organization.name}
-                  </h2>
-
-                  <p>
-                    {organization.description ||
-                      "No description."}
-                  </p>
-
-                  <div className="organization-meta">
-                    <span>
-                      {
-                        organization.members
-                          ?.length
-                      }{" "}
-                      members
-                    </span>
-
-                    <span>
-                      {
-                        organization
-                          .branches?.length
-                      }{" "}
-                      branches
-                    </span>
-                  </div>
-
-                  <div className="card-actions">
-                    <Button
-                      onClick={() =>
-                        onEdit(
-                          organization
-                        )
-                      }
-                    >
-                      Edit
-                    </Button>
-
-                    <Button
-                      variant="danger"
-                      onClick={() =>
-                        onDelete(
-                          organization.id
-                        )
-                      }
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </article>
-            )
-          )}
+      {organizations.length === 0 && (
+        <div className="empty-state">
+          No organizations yet.
         </div>
       )}
     </div>
@@ -2542,113 +2540,19 @@ function OrganizationsPage({
    LORE
 ========================================================= */
 
-function LorePage({
-  lore,
-  onNew,
-  onEdit,
-  onDelete,
-}) {
-  return (
-    <div className="archive-page">
-      <div className="page-header">
-        <div>
-          <div className="eyebrow">
-            World building
-          </div>
-
-          <h1>Lore</h1>
-
-          <p>
-            Keep your world, timeline and
-            important notes in one place.
-          </p>
-        </div>
-
-        <Button
-          variant="primary"
-          onClick={onNew}
-        >
-          + Add lore
-        </Button>
-      </div>
-
-      {lore.length === 0 ? (
-        <div className="empty-state glow-card">
-          <div>✦</div>
-          <h2>No lore yet</h2>
-          <p>
-            Start documenting your world.
-          </p>
-        </div>
-      ) : (
-        <div className="lore-grid">
-          {lore.map((entry) => (
-            <article
-              className="lore-card glow-card"
-              key={entry.id}
-            >
-              <div className="card-kicker">
-                {entry.category ||
-                  "Lore"}
-              </div>
-
-              <h2>{entry.title}</h2>
-
-              <p>
-                {entry.content}
-              </p>
-
-              <div className="card-actions">
-                <Button
-                  onClick={() =>
-                    onEdit(entry)
-                  }
-                >
-                  Edit
-                </Button>
-
-                <Button
-                  variant="danger"
-                  onClick={() =>
-                    onDelete(entry.id)
-                  }
-                >
-                  Delete
-                </Button>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function LoreEditor({
-  entry,
+  lore,
   onSave,
   onCancel,
 }) {
-  const [form, setForm] = useState({
-    ...makeEmptyLore(),
-    ...clone(entry),
-  });
+  const [form, setForm] =
+    useState(normalizeLore(lore));
 
   function update(field, value) {
     setForm((current) => ({
       ...current,
       [field]: value,
     }));
-  }
-
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("lore"),
-      title:
-        form.title.trim() ||
-        "Untitled lore",
-    });
   }
 
   return (
@@ -2661,7 +2565,7 @@ function LoreEditor({
 
           <h1>
             {form.title ||
-              "New lore"}
+              "New lore entry"}
           </h1>
         </div>
 
@@ -2672,7 +2576,17 @@ function LoreEditor({
 
           <Button
             variant="primary"
-            onClick={save}
+            onClick={() =>
+              onSave({
+                ...form,
+                id:
+                  form.id ||
+                  uid("lore"),
+                title:
+                  form.title.trim() ||
+                  "Untitled lore",
+              })
+            }
           >
             Save lore
           </Button>
@@ -2695,7 +2609,7 @@ function LoreEditor({
           <Field
             label="Category"
             value={form.category}
-            placeholder="History, event, place..."
+            placeholder="World, history, event, location..."
             onChange={(value) =>
               update(
                 "category",
@@ -2703,282 +2617,97 @@ function LoreEditor({
               )
             }
           />
-        </div>
 
-        <TextField
-          label="Content"
-          rows={16}
-          value={form.content}
-          onChange={(value) =>
-            update("content", value)
-          }
-        />
+          <TextField
+            label="Content"
+            value={form.content}
+            onChange={(value) =>
+              update(
+                "content",
+                value
+              )
+            }
+            rows={12}
+          />
+        </div>
       </Section>
-
-      <div className="bottom-actions">
-        <Button onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button
-          variant="primary"
-          onClick={save}
-        >
-          Save lore
-        </Button>
-      </div>
     </div>
   );
 }
 
-/* =========================================================
-   HOME
-========================================================= */
-
-function HomePage({
-  characters,
-  organizations,
+function LorePage({
   lore,
-  onNavigate,
-}) {
-  return (
-    <div className="home-page">
-      <section className="hero glow-card">
-        <div className="hero-decoration">
-          ✦
-        </div>
-
-        <div className="hero-copy">
-          <div className="eyebrow">
-            Original character archive
-          </div>
-
-          <h1>
-            Your characters.
-            <br />
-            Your world.
-          </h1>
-
-          <p>
-            A personal archive for
-            characters, relationships,
-            organizations and lore.
-          </p>
-
-          <div className="hero-actions">
-            <Button
-              variant="primary"
-              onClick={() =>
-                onNavigate("characters")
-              }
-            >
-              Open character archive
-            </Button>
-
-            <Button
-              onClick={() =>
-                onNavigate(
-                  "organizations"
-                )
-              }
-            >
-              Organizations
-            </Button>
-          </div>
-        </div>
-
-        <div className="hero-symbol">
-          ☾
-        </div>
-      </section>
-
-      <section className="stats-overview">
-        <div
-          className="overview-card glow-card"
-          onClick={() =>
-            onNavigate("characters")
-          }
-        >
-          <span>Characters</span>
-          <strong>
-            {characters.length}
-          </strong>
-        </div>
-
-        <div
-          className="overview-card glow-card"
-          onClick={() =>
-            onNavigate(
-              "organizations"
-            )
-          }
-        >
-          <span>Organizations</span>
-          <strong>
-            {organizations.length}
-          </strong>
-        </div>
-
-        <div
-          className="overview-card glow-card"
-          onClick={() =>
-            onNavigate("lore")
-          }
-        >
-          <span>Lore entries</span>
-          <strong>
-            {lore.length}
-          </strong>
-        </div>
-      </section>
-
-      <section className="theme-summary glow-card">
-        <div>
-          <div className="eyebrow">
-            Archive atmosphere
-          </div>
-
-          <h2>
-            Six worlds, one archive.
-          </h2>
-
-          <p>
-            Switch between Goth, Circus,
-            Forest, Detective, Mafia and
-            Asylum whenever you want.
-          </p>
-        </div>
-
-        <div className="theme-mark">
-          ✦
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* =========================================================
-   CHARACTER ARCHIVE
-========================================================= */
-
-function CharactersPage({
-  characters,
-  onNew,
-  onOpen,
+  onCreate,
   onEdit,
   onDelete,
 }) {
-  const [search, setSearch] =
-    useState("");
-
-  const filtered = useMemo(() => {
-    const query =
-      search.toLowerCase().trim();
-
-    if (!query) return characters;
-
-    return characters.filter(
-      (character) =>
-        displayName(character)
-          .toLowerCase()
-          .includes(query) ||
-        character.nicknames
-          ?.toLowerCase()
-          .includes(query) ||
-        character.affiliation
-          ?.toLowerCase()
-          .includes(query) ||
-        character.job
-          ?.toLowerCase()
-          .includes(query)
-    );
-  }, [characters, search]);
-
   return (
     <div className="archive-page">
-      <div className="page-header">
+      <div className="archive-header">
         <div>
           <div className="eyebrow">
-            Character archive
+            World building
           </div>
 
-          <h1>Characters</h1>
+          <h1>Lore</h1>
 
           <p>
-            {characters.length} character
-            {characters.length === 1
-              ? ""
-              : "s"} in your archive.
+            Keep your universe, history and
+            world-building notes together.
           </p>
         </div>
 
         <Button
           variant="primary"
-          onClick={onNew}
+          onClick={onCreate}
         >
-          + New character
+          + New lore
         </Button>
       </div>
 
-      <div className="archive-tools">
-        <input
-          className="search-box"
-          value={search}
-          onChange={(event) =>
-            setSearch(
-              event.target.value
-            )
-          }
-          placeholder="Search characters..."
-        />
+      <div className="lore-grid">
+        {lore.map((entry) => (
+          <article
+            className="lore-card"
+            key={entry.id}
+          >
+            <span className="lore-category">
+              {entry.category ||
+                "Uncategorized"}
+            </span>
 
-        <span className="archive-count">
-          {filtered.length} shown
-        </span>
+            <h2>{entry.title}</h2>
+
+            <p>
+              {entry.content ||
+                "No content yet."}
+            </p>
+
+            <div className="character-card-actions">
+              <Button
+                onClick={() =>
+                  onEdit(entry.id)
+                }
+              >
+                Edit
+              </Button>
+
+              <Button
+                variant="danger"
+                onClick={() =>
+                  onDelete(entry.id)
+                }
+              >
+                Delete
+              </Button>
+            </div>
+          </article>
+        ))}
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="empty-state glow-card">
-          <div>☾</div>
-
-          <h2>
-            {characters.length === 0
-              ? "Your archive is empty"
-              : "No characters found"}
-          </h2>
-
-          <p>
-            {characters.length === 0
-              ? "Create your first character to begin."
-              : "Try another search."}
-          </p>
-
-          {characters.length === 0 && (
-            <Button
-              variant="primary"
-              onClick={onNew}
-            >
-              Create character
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="character-grid">
-          {filtered.map((character) => (
-            <CharacterCard
-              key={character.id}
-              character={character}
-              onOpen={() =>
-                onOpen(character)
-              }
-              onEdit={() =>
-                onEdit(character)
-              }
-              onDelete={() =>
-                onDelete(character.id)
-              }
-            />
-          ))}
+      {lore.length === 0 && (
+        <div className="empty-state">
+          No lore entries yet.
         </div>
       )}
     </div>
@@ -2995,11 +2724,11 @@ function DataPage({
   lore,
   onImport,
 }) {
-  const fileRef = useRef(null);
+  const inputRef = useRef(null);
 
   function exportData() {
     const data = {
-      version: 2,
+      version: 1,
       exportedAt:
         new Date().toISOString(),
       characters,
@@ -3029,9 +2758,7 @@ function DataPage({
     URL.revokeObjectURL(url);
   }
 
-  async function importFile(
-    event
-  ) {
+  async function importData(event) {
     const file =
       event.target.files?.[0];
 
@@ -3044,21 +2771,7 @@ function DataPage({
       const data =
         JSON.parse(text);
 
-      if (
-        !Array.isArray(
-          data.characters
-        )
-      ) {
-        throw new Error(
-          "Invalid archive"
-        );
-      }
-
       onImport(data);
-
-      alert(
-        "Archive imported successfully."
-      );
     } catch {
       alert(
         "This file is not a valid OC Archive backup."
@@ -3069,7 +2782,7 @@ function DataPage({
   }
 
   return (
-    <div className="archive-page">
+    <div className="import-export-page">
       <div className="page-header">
         <div>
           <div className="eyebrow">
@@ -3081,8 +2794,8 @@ function DataPage({
           </h1>
 
           <p>
-            Keep a backup of your entire
-            archive.
+            Back up your characters,
+            organizations and lore.
           </p>
         </div>
       </div>
@@ -3096,9 +2809,8 @@ function DataPage({
           <h2>Export archive</h2>
 
           <p>
-            Download your characters,
-            organizations and lore as one
-            JSON file.
+            Download everything as one JSON
+            backup file.
           </p>
 
           <Button
@@ -3122,20 +2834,20 @@ function DataPage({
           </p>
 
           <input
-            ref={fileRef}
+            ref={inputRef}
             type="file"
             accept=".json,application/json"
             hidden
-            onChange={importFile}
+            onChange={importData}
           />
 
           <Button
             variant="primary"
             onClick={() =>
-              fileRef.current?.click()
+              inputRef.current?.click()
             }
           >
-            Choose JSON
+            Import JSON
           </Button>
         </section>
       </div>
@@ -3144,16 +2856,125 @@ function DataPage({
 }
 
 /* =========================================================
-   APP
+   HOME
+========================================================= */
+
+function HomePage({
+  characters,
+  organizations,
+  lore,
+  theme,
+  onCharacters,
+  onOrganizations,
+  onLore,
+}) {
+  const currentTheme =
+    THEMES.find(
+      (item) => item.id === theme
+    ) || THEMES[0];
+
+  return (
+    <div className="home-page">
+      <section className="hero">
+        <div className="hero-copy">
+          <div className="eyebrow">
+            Personal OC database
+          </div>
+
+          <h1>
+            Your characters.
+            <br />
+            Your universe.
+          </h1>
+
+          <p>
+            Build detailed original characters,
+            relationships, organizations,
+            branches and lore in one place.
+          </p>
+
+          <div className="hero-actions">
+            <Button
+              variant="primary"
+              onClick={onCharacters}
+            >
+              Open characters
+            </Button>
+
+            <Button
+              onClick={onOrganizations}
+            >
+              Organizations
+            </Button>
+
+            <Button onClick={onLore}>
+              Lore
+            </Button>
+          </div>
+        </div>
+
+        <div className="hero-symbol">
+          {currentTheme.symbol}
+        </div>
+      </section>
+
+      <div className="stats-overview">
+        <div className="overview-card">
+          <strong>
+            {characters.length}
+          </strong>
+
+          <span>Characters</span>
+        </div>
+
+        <div className="overview-card">
+          <strong>
+            {organizations.length}
+          </strong>
+
+          <span>Organizations</span>
+        </div>
+
+        <div className="overview-card">
+          <strong>
+            {lore.length}
+          </strong>
+
+          <span>Lore entries</span>
+        </div>
+      </div>
+
+      <div className="section-heading">
+        <div>
+          <h2>
+            OC Archive
+          </h2>
+
+          <p>
+            Everything is saved automatically
+            in this browser.
+          </p>
+        </div>
+
+        <div className="theme-summary">
+          <div className="theme-mark">
+            {currentTheme.symbol}
+          </div>
+
+          <span>
+            {currentTheme.name} theme
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   MAIN APP
 ========================================================= */
 
 export default function App() {
-  const [theme, setTheme] =
-    useState(getTheme());
-
-  const [page, setPage] =
-    useState("home");
-
   const [characters, setCharacters] =
     useState(() =>
       readStorage(
@@ -3167,7 +2988,7 @@ export default function App() {
       readStorage(
         "oc-organizations",
         []
-      )
+      ).map(normalizeOrganization)
     );
 
   const [lore, setLore] =
@@ -3175,135 +2996,163 @@ export default function App() {
       readStorage(
         "oc-lore",
         []
-      )
+      ).map(normalizeLore)
     );
 
-  const [
-    selectedCharacter,
-    setSelectedCharacter,
-  ] = useState(null);
+  const [theme, setTheme] =
+    useState(getTheme());
 
-  const [
-    editingCharacter,
-    setEditingCharacter,
-  ] = useState(null);
+  const [page, setPage] =
+    useState("home");
 
-  const [
-    editingOrganization,
-    setEditingOrganization,
-  ] = useState(null);
+  const [editingCharacterId, setEditingCharacterId] =
+    useState(null);
 
-  const [
-    editingLore,
-    setEditingLore,
-  ] = useState(null);
+  const [viewingCharacterId, setViewingCharacterId] =
+    useState(null);
+
+  const [editingOrganizationId, setEditingOrganizationId] =
+    useState(null);
+
+  const [editingLoreId, setEditingLoreId] =
+    useState(null);
 
   useEffect(() => {
-    localStorage.setItem(
+    writeStorage(
       "oc-characters",
-      JSON.stringify(characters)
+      characters
     );
   }, [characters]);
 
   useEffect(() => {
-    localStorage.setItem(
+    writeStorage(
       "oc-organizations",
-      JSON.stringify(
-        organizations
-      )
+      organizations
     );
   }, [organizations]);
 
   useEffect(() => {
-    localStorage.setItem(
+    writeStorage(
       "oc-lore",
-      JSON.stringify(lore)
+      lore
     );
   }, [lore]);
 
-  function changeTheme(
-    nextTheme
-  ) {
-    setTheme(nextTheme);
-    applyTheme(nextTheme);
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  function changeTheme(value) {
+    setTheme(value);
+    applyTheme(value);
   }
 
-  function saveCharacter(
-    character
-  ) {
+  function createCharacter() {
+    setEditingCharacterId("new");
+    setViewingCharacterId(null);
+  }
+
+  function editCharacter(id) {
+    setEditingCharacterId(id);
+    setViewingCharacterId(null);
+  }
+
+  function openCharacter(id) {
+    setViewingCharacterId(id);
+    setEditingCharacterId(null);
+  }
+
+  function saveCharacter(character) {
     setCharacters((current) => {
       const exists = current.some(
         (item) =>
           item.id === character.id
       );
 
-      return exists
-        ? current.map((item) =>
-            item.id === character.id
-              ? normalizeCharacter(
-                  character
-                )
-              : item
-          )
-        : [
-            ...current,
-            normalizeCharacter(
-              character
-            ),
-          ];
+      if (exists) {
+        return current.map((item) =>
+          item.id === character.id
+            ? normalizeCharacter(
+                character
+              )
+            : item
+        );
+      }
+
+      return [
+        ...current,
+        normalizeCharacter(
+          character
+        ),
+      ];
     });
 
-    setEditingCharacter(null);
-    setSelectedCharacter(
-      character
-    );
-    setPage("profile");
-  }
-
-  function deleteCharacter(
-    id
-  ) {
-    if (
-      !window.confirm(
-        "Delete this character?"
-      )
-    ) {
-      return;
-    }
-
-    setCharacters((current) =>
-      current.filter(
-        (character) =>
-          character.id !== id
-      )
-    );
-
-    setOrganizations(
-      (current) =>
-        current.map(
-          (organization) => ({
-            ...organization,
-            members:
-              organization.members?.filter(
-                (memberId) =>
-                  memberId !== id
-              ) || [],
-            branches:
-              organization.branches?.map(
-                (branch) => ({
-                  ...branch,
-                  members:
-                    branch.members?.filter(
-                      (memberId) =>
-                        memberId !== id
-                    ) || [],
-                })
-              ) || [],
-          })
-        )
+    setEditingCharacterId(null);
+    setViewingCharacterId(
+      character.id
     );
 
     setPage("characters");
+  }
+
+  function deleteCharacter(id) {
+    const character =
+      characters.find(
+        (item) => item.id === id
+      );
+
+    if (!character) return;
+
+    const confirmed =
+      window.confirm(
+        `Delete ${displayName(
+          character
+        )}? This cannot be undone.`
+      );
+
+    if (!confirmed) return;
+
+    setCharacters((current) =>
+      current.filter(
+        (item) => item.id !== id
+      )
+    );
+
+    setOrganizations((current) =>
+      current.map((organization) => ({
+        ...organization,
+
+        members:
+          organization.members.filter(
+            (memberId) =>
+              memberId !== id
+          ),
+
+        branches:
+          organization.branches.map(
+            (branch) => ({
+              ...branch,
+              members:
+                branch.members.filter(
+                  (memberId) =>
+                    memberId !== id
+                ),
+            })
+          ),
+      }))
+    );
+
+    setViewingCharacterId(null);
+  }
+
+  function createOrganization() {
+    setEditingOrganizationId(
+      "new"
+    );
+  }
+
+  function editOrganization(id) {
+    setEditingOrganizationId(id);
   }
 
   function saveOrganization(
@@ -3312,36 +3161,41 @@ export default function App() {
     setOrganizations((current) => {
       const exists = current.some(
         (item) =>
-          item.id ===
-          organization.id
+          item.id === organization.id
       );
 
-      return exists
-        ? current.map((item) =>
-            item.id ===
-            organization.id
-              ? organization
-              : item
-          )
-        : [
-            ...current,
-            organization,
-          ];
+      if (exists) {
+        return current.map((item) =>
+          item.id === organization.id
+            ? normalizeOrganization(
+                organization
+              )
+            : item
+        );
+      }
+
+      return [
+        ...current,
+        normalizeOrganization(
+          organization
+        ),
+      ];
     });
 
-    setEditingOrganization(
-      null
-    );
-
-    setPage("organizations");
+    setEditingOrganizationId(null);
   }
 
-  function deleteOrganization(
-    id
-  ) {
+  function deleteOrganization(id) {
+    const organization =
+      organizations.find(
+        (item) => item.id === id
+      );
+
+    if (!organization) return;
+
     if (
       !window.confirm(
-        "Delete this organization?"
+        `Delete ${organization.name}?`
       )
     ) {
       return;
@@ -3349,10 +3203,17 @@ export default function App() {
 
     setOrganizations((current) =>
       current.filter(
-        (organization) =>
-          organization.id !== id
+        (item) => item.id !== id
       )
     );
+  }
+
+  function createLore() {
+    setEditingLoreId("new");
+  }
+
+  function editLore(id) {
+    setEditingLoreId(id);
   }
 
   function saveLore(entry) {
@@ -3362,17 +3223,21 @@ export default function App() {
           item.id === entry.id
       );
 
-      return exists
-        ? current.map((item) =>
-            item.id === entry.id
-              ? entry
-              : item
-          )
-        : [...current, entry];
+      if (exists) {
+        return current.map((item) =>
+          item.id === entry.id
+            ? normalizeLore(entry)
+            : item
+        );
+      }
+
+      return [
+        ...current,
+        normalizeLore(entry),
+      ];
     });
 
-    setEditingLore(null);
-    setPage("lore");
+    setEditingLoreId(null);
   }
 
   function deleteLore(id) {
@@ -3386,299 +3251,319 @@ export default function App() {
 
     setLore((current) =>
       current.filter(
-        (entry) => entry.id !== id
+        (item) => item.id !== id
       )
     );
   }
 
-  function importData(data) {
+  function importArchive(data) {
+    if (
+      !data ||
+      !Array.isArray(data.characters)
+    ) {
+      alert(
+        "This backup does not contain valid character data."
+      );
+
+      return;
+    }
+
+    if (
+      !window.confirm(
+        "Import this archive? Your current data will be replaced."
+      )
+    ) {
+      return;
+    }
+
     setCharacters(
-      (data.characters || []).map(
+      data.characters.map(
         normalizeCharacter
       )
     );
 
     setOrganizations(
-      data.organizations || []
+      Array.isArray(
+        data.organizations
+      )
+        ? data.organizations.map(
+            normalizeOrganization
+          )
+        : []
     );
 
-    setLore(data.lore || []);
-
-    setSelectedCharacter(null);
-    setEditingCharacter(null);
-    setEditingOrganization(
-      null
+    setLore(
+      Array.isArray(data.lore)
+        ? data.lore.map(
+            normalizeLore
+          )
+        : []
     );
-    setEditingLore(null);
 
     setPage("home");
-  }
 
-  function navigate(
-    nextPage
-  ) {
-    setPage(nextPage);
-    setSelectedCharacter(null);
-    setEditingCharacter(null);
-    setEditingOrganization(
-      null
+    alert(
+      "Archive imported successfully."
     );
-    setEditingLore(null);
   }
 
-  const pageContent =
-    page === "home" ? (
-      <HomePage
-        characters={characters}
-        organizations={organizations}
-        lore={lore}
-        onNavigate={navigate}
-      />
-    ) : page === "characters" ? (
-      <CharactersPage
-        characters={characters}
-        onNew={() => {
-          setEditingCharacter(
-            makeEmptyCharacter()
-          );
-          setPage("character-editor");
-        }}
-        onOpen={(character) => {
-          setSelectedCharacter(
-            character
-          );
-          setPage("profile");
-        }}
-        onEdit={(character) => {
-          setEditingCharacter(
-            character
-          );
-          setPage("character-editor");
-        }}
-        onDelete={deleteCharacter}
-      />
-    ) : page === "character-editor" ? (
-      <CharacterEditor
-        character={
-          editingCharacter ||
-          makeEmptyCharacter()
-        }
-        characters={characters}
-        onSave={saveCharacter}
-        onCancel={() =>
-          navigate("characters")
-        }
-      />
-    ) : page === "profile" &&
-      selectedCharacter ? (
-      <CharacterProfile
-        character={
-          characters.find(
-            (character) =>
-              character.id ===
-              selectedCharacter.id
-          ) ||
-          selectedCharacter
-        }
-        characters={characters}
-        organizations={organizations}
-        onBack={() =>
-          navigate("characters")
-        }
-        onEdit={() => {
-          const current =
-            characters.find(
-              (character) =>
-                character.id ===
-                selectedCharacter.id
-            );
+  function renderPage() {
+    if (editingCharacterId) {
+      const character =
+        editingCharacterId === "new"
+          ? makeEmptyCharacter()
+          : characters.find(
+              (item) =>
+                item.id ===
+                editingCharacterId
+            ) ||
+            makeEmptyCharacter();
 
-          setEditingCharacter(
-            current ||
-              selectedCharacter
-          );
+      return (
+        <CharacterEditor
+          character={character}
+          characters={characters}
+          onSave={saveCharacter}
+          onCancel={() =>
+            setEditingCharacterId(
+              null
+            )
+          }
+        />
+      );
+    }
 
-          setPage(
-            "character-editor"
-          );
-        }}
-      />
-    ) : page === "organizations" ? (
-      <OrganizationsPage
-        organizations={organizations}
-        characters={characters}
-        onNew={() => {
-          setEditingOrganization(
-            makeEmptyOrganization()
-          );
-          setPage(
-            "organization-editor"
-          );
-        }}
-        onEdit={(organization) => {
-          setEditingOrganization(
+    if (viewingCharacterId) {
+      const character =
+        characters.find(
+          (item) =>
+            item.id ===
+            viewingCharacterId
+        );
+
+      if (!character) {
+        setViewingCharacterId(null);
+        return null;
+      }
+
+      return (
+        <CharacterProfile
+          character={character}
+          characters={characters}
+          organizations={
+            organizations
+          }
+          onBack={() =>
+            setViewingCharacterId(
+              null
+            )
+          }
+          onEdit={() =>
+            editCharacter(
+              character.id
+            )
+          }
+        />
+      );
+    }
+
+    if (editingOrganizationId) {
+      const organization =
+        editingOrganizationId ===
+        "new"
+          ? makeEmptyOrganization()
+          : organizations.find(
+              (item) =>
+                item.id ===
+                editingOrganizationId
+            ) ||
+            makeEmptyOrganization();
+
+      return (
+        <OrganizationEditor
+          organization={
             organization
-          );
-          setPage(
-            "organization-editor"
-          );
-        }}
-        onDelete={
-          deleteOrganization
-        }
-      />
-    ) : page ===
-      "organization-editor" ? (
-      <OrganizationEditor
-        organization={
-          editingOrganization ||
-          makeEmptyOrganization()
-        }
-        characters={characters}
-        onSave={saveOrganization}
-        onCancel={() =>
-          navigate(
-            "organizations"
-          )
-        }
-      />
-    ) : page === "lore" ? (
-      <LorePage
-        lore={lore}
-        onNew={() => {
-          setEditingLore(
-            makeEmptyLore()
-          );
-          setPage("lore-editor");
-        }}
-        onEdit={(entry) => {
-          setEditingLore(entry);
-          setPage("lore-editor");
-        }}
-        onDelete={deleteLore}
-      />
-    ) : page === "lore-editor" ? (
-      <LoreEditor
-        entry={
-          editingLore ||
-          makeEmptyLore()
-        }
-        onSave={saveLore}
-        onCancel={() =>
-          navigate("lore")
-        }
-      />
-    ) : page === "data" ? (
-      <DataPage
-        characters={characters}
-        organizations={organizations}
-        lore={lore}
-        onImport={importData}
-      />
-    ) : (
+          }
+          characters={characters}
+          onSave={
+            saveOrganization
+          }
+          onCancel={() =>
+            setEditingOrganizationId(
+              null
+            )
+          }
+        />
+      );
+    }
+
+    if (editingLoreId) {
+      const entry =
+        editingLoreId === "new"
+          ? makeEmptyLore()
+          : lore.find(
+              (item) =>
+                item.id ===
+                editingLoreId
+            ) ||
+            makeEmptyLore();
+
+      return (
+        <LoreEditor
+          lore={entry}
+          onSave={saveLore}
+          onCancel={() =>
+            setEditingLoreId(null)
+          }
+        />
+      );
+    }
+
+    if (page === "characters") {
+      return (
+        <CharacterArchive
+          characters={characters}
+          onCreate={createCharacter}
+          onOpen={openCharacter}
+          onEdit={editCharacter}
+          onDelete={
+            deleteCharacter
+          }
+        />
+      );
+    }
+
+    if (page === "organizations") {
+      return (
+        <OrganizationArchive
+          organizations={
+            organizations
+          }
+          characters={characters}
+          onCreate={
+            createOrganization
+          }
+          onEdit={
+            editOrganization
+          }
+          onDelete={
+            deleteOrganization
+          }
+        />
+      );
+    }
+
+    if (page === "lore") {
+      return (
+        <LorePage
+          lore={lore}
+          onCreate={createLore}
+          onEdit={editLore}
+          onDelete={deleteLore}
+        />
+      );
+    }
+
+    if (page === "data") {
+      return (
+        <DataPage
+          characters={characters}
+          organizations={
+            organizations
+          }
+          lore={lore}
+          onImport={importArchive}
+        />
+      );
+    }
+
+    return (
       <HomePage
         characters={characters}
-        organizations={organizations}
+        organizations={
+          organizations
+        }
         lore={lore}
-        onNavigate={navigate}
+        theme={theme}
+        onCharacters={() =>
+          setPage("characters")
+        }
+        onOrganizations={() =>
+          setPage("organizations")
+        }
+        onLore={() =>
+          setPage("lore")
+        }
       />
     );
+  }
 
   return (
     <div className="site-shell">
       <header className="topbar">
         <button
           className="brand"
-          onClick={() =>
-            navigate("home")
-          }
+          type="button"
+          onClick={() => {
+            setPage("home");
+            setViewingCharacterId(
+              null
+            );
+            setEditingCharacterId(
+              null
+            );
+          }}
         >
           <span className="brand-symbol">
             ✦
           </span>
 
           <span>
-            <strong>OC</strong>
-            <small>ARCHIVE</small>
+            <strong>
+              OC ARCHIVE
+            </strong>
+
+            <small>
+              ORIGINAL CHARACTER DATABASE
+            </small>
           </span>
         </button>
 
         <nav className="archive-nav">
-          <button
-            className={
-              page === "home"
-                ? "nav-active"
-                : ""
-            }
-            onClick={() =>
-              navigate("home")
-            }
-          >
-            Home
-          </button>
-
-          <button
-            className={
-              [
-                "characters",
-                "character-editor",
-                "profile",
-              ].includes(page)
-                ? "nav-active"
-                : ""
-            }
-            onClick={() =>
-              navigate("characters")
-            }
-          >
-            Characters
-          </button>
-
-          <button
-            className={
-              [
-                "organizations",
-                "organization-editor",
-              ].includes(page)
-                ? "nav-active"
-                : ""
-            }
-            onClick={() =>
-              navigate(
-                "organizations"
-              )
-            }
-          >
-            Organizations
-          </button>
-
-          <button
-            className={
-              ["lore", "lore-editor"].includes(
-                page
-              )
-                ? "nav-active"
-                : ""
-            }
-            onClick={() =>
-              navigate("lore")
-            }
-          >
-            Lore
-          </button>
-
-          <button
-            className={
-              page === "data"
-                ? "nav-active"
-                : ""
-            }
-            onClick={() =>
-              navigate("data")
-            }
-          >
-            Data
-          </button>
+          {NAV_ITEMS.map(
+            ([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={
+                  page === id &&
+                  !editingCharacterId &&
+                  !viewingCharacterId &&
+                  !editingOrganizationId &&
+                  !editingLoreId
+                    ? "nav-active"
+                    : ""
+                }
+                onClick={() => {
+                  setPage(id);
+                  setViewingCharacterId(
+                    null
+                  );
+                  setEditingCharacterId(
+                    null
+                  );
+                  setEditingOrganizationId(
+                    null
+                  );
+                  setEditingLoreId(
+                    null
+                  );
+                }}
+              >
+                {label}
+              </button>
+            )
+          )}
         </nav>
 
         <label className="theme-picker">
@@ -3694,10 +3579,9 @@ export default function App() {
           >
             {THEMES.map((item) => (
               <option
-                value={item.id}
                 key={item.id}
+                value={item.id}
               >
-                {item.symbol}{" "}
                 {item.name}
               </option>
             ))}
@@ -3706,7 +3590,7 @@ export default function App() {
       </header>
 
       <main className="main-content">
-        {pageContent}
+        {renderPage()}
       </main>
 
       <footer className="footer">
@@ -3715,7 +3599,8 @@ export default function App() {
         </span>
 
         <span>
-          Your characters · Your world
+          Saved automatically in your
+          browser.
         </span>
       </footer>
     </div>
