@@ -1,4 +1,4 @@
-name: Deploy OC Archive to GitHub Pages
+name: Deploy OC Archive
 
 on:
   push:
