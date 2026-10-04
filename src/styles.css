@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* =========================================================
-   THEME VARIABLES
+   BASE THEME
    ========================================================= */
 
 :root {
@@ -17,9 +17,18 @@
   --glow-2: 46 65% 55%;
   --radius: 1.25rem;
 
+  /* PAGE BACKGROUND */
   --deco:
-    radial-gradient(circle at 15% 20%, hsl(var(--accent) / 0.12), transparent 30%),
-    radial-gradient(circle at 85% 75%, hsl(var(--primary) / 0.08), transparent 28%),
+    radial-gradient(
+      circle at 15% 20%,
+      hsl(var(--accent) / 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      hsl(var(--primary) / 0.08),
+      transparent 28%
+    ),
     repeating-radial-gradient(
       circle at 50% 50%,
       transparent 0,
@@ -28,12 +37,24 @@
       transparent 92px
     );
 
+  /* CARD DECORATION — intentionally subtle */
   --deco-card:
-    radial-gradient(circle at 10% 0%, hsl(var(--accent) / 0.12), transparent 42%),
-    radial-gradient(circle at 100% 100%, hsl(var(--primary) / 0.08), transparent 38%);
+    radial-gradient(
+      circle at 10% 0%,
+      hsl(var(--accent) / 0.12),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      hsl(var(--primary) / 0.08),
+      transparent 38%
+    );
 }
 
-/* CIRCUS */
+/* =========================================================
+   CIRCUS
+   Stripes belong to the PAGE BACKGROUND
+   ========================================================= */
 
 html[data-theme="circus"] {
   --background: 338 35% 6%;
@@ -55,21 +76,33 @@ html[data-theme="circus"] {
       hsl(var(--accent) / 0.045) 71px,
       hsl(var(--accent) / 0.045) 72px
     ),
-    radial-gradient(circle at 20% 15%, hsl(var(--accent) / 0.18), transparent 27%),
-    radial-gradient(circle at 80% 80%, hsl(var(--primary) / 0.1), transparent 25%);
+    radial-gradient(
+      circle at 20% 15%,
+      hsl(var(--accent) / 0.18),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      hsl(var(--primary) / 0.1),
+      transparent 25%
+    );
 
   --deco-card:
-    repeating-linear-gradient(
-      135deg,
-      hsl(var(--accent) / 0.05) 0,
-      hsl(var(--accent) / 0.05) 18px,
-      transparent 18px,
-      transparent 36px
+    radial-gradient(
+      circle at 0% 0%,
+      hsl(var(--accent) / 0.12),
+      transparent 42%
     ),
-    radial-gradient(circle at 100% 0%, hsl(var(--primary) / 0.12), transparent 42%);
+    radial-gradient(
+      circle at 100% 100%,
+      hsl(var(--primary) / 0.1),
+      transparent 38%
+    );
 }
 
-/* FOREST */
+/* =========================================================
+   FOREST
+   ========================================================= */
 
 html[data-theme="forest"] {
   --background: 130 22% 5%;
@@ -84,8 +117,16 @@ html[data-theme="forest"] {
   --glow-2: 95 40% 55%;
 
   --deco:
-    radial-gradient(circle at 10% 20%, hsl(var(--accent) / 0.18), transparent 30%),
-    radial-gradient(circle at 90% 75%, hsl(var(--primary) / 0.08), transparent 28%),
+    radial-gradient(
+      circle at 10% 20%,
+      hsl(var(--accent) / 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 75%,
+      hsl(var(--primary) / 0.08),
+      transparent 28%
+    ),
     repeating-linear-gradient(
       135deg,
       transparent 0,
@@ -95,11 +136,21 @@ html[data-theme="forest"] {
     );
 
   --deco-card:
-    radial-gradient(ellipse at 0% 100%, hsl(var(--accent) / 0.16), transparent 48%),
-    radial-gradient(ellipse at 100% 0%, hsl(var(--primary) / 0.08), transparent 42%);
+    radial-gradient(
+      ellipse at 0% 100%,
+      hsl(var(--accent) / 0.16),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 100% 0%,
+      hsl(var(--primary) / 0.08),
+      transparent 42%
+    );
 }
 
-/* DETECTIVE */
+/* =========================================================
+   DETECTIVE
+   ========================================================= */
 
 html[data-theme="detective"] {
   --background: 40 20% 6%;
@@ -121,8 +172,16 @@ html[data-theme="detective"] {
       hsl(var(--primary) / 0.025) 39px,
       transparent 40px
     ),
-    radial-gradient(circle at 20% 10%, hsl(var(--accent) / 0.12), transparent 30%),
-    radial-gradient(circle at 80% 90%, hsl(var(--primary) / 0.06), transparent 30%);
+    radial-gradient(
+      circle at 20% 10%,
+      hsl(var(--accent) / 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 90%,
+      hsl(var(--primary) / 0.06),
+      transparent 30%
+    );
 
   --deco-card:
     linear-gradient(
@@ -134,7 +193,10 @@ html[data-theme="detective"] {
     );
 }
 
-/* MAFIA */
+/* =========================================================
+   MAFIA
+   Vertical stripes belong to the PAGE BACKGROUND
+   ========================================================= */
 
 html[data-theme="mafia"] {
   --background: 240 8% 6%;
@@ -153,18 +215,37 @@ html[data-theme="mafia"] {
       90deg,
       transparent 0,
       transparent 110px,
-      hsl(var(--primary) / 0.025) 111px,
+      hsl(var(--primary) / 0.035) 111px,
       transparent 112px
     ),
-    radial-gradient(circle at 15% 85%, hsl(var(--accent) / 0.18), transparent 30%),
-    radial-gradient(circle at 90% 10%, hsl(var(--primary) / 0.08), transparent 26%);
+    radial-gradient(
+      circle at 15% 85%,
+      hsl(var(--accent) / 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      hsl(var(--primary) / 0.08),
+      transparent 26%
+    );
 
   --deco-card:
-    radial-gradient(circle at 100% 0%, hsl(var(--primary) / 0.11), transparent 45%),
-    linear-gradient(145deg, hsl(var(--accent) / 0.06), transparent 55%);
+    radial-gradient(
+      circle at 100% 0%,
+      hsl(var(--primary) / 0.11),
+      transparent 45%
+    ),
+    linear-gradient(
+      145deg,
+      hsl(var(--accent) / 0.06),
+      transparent 55%
+    );
 }
 
-/* ASYLUM */
+/* =========================================================
+   ASYLUM
+   Grid belongs to the PAGE BACKGROUND
+   ========================================================= */
 
 html[data-theme="asylum"] {
   --background: 195 14% 7%;
@@ -193,7 +274,11 @@ html[data-theme="asylum"] {
       hsl(var(--accent) / 0.025) 46px,
       transparent 47px
     ),
-    radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.13), transparent 40%);
+    radial-gradient(
+      circle at 50% 0%,
+      hsl(var(--accent) / 0.13),
+      transparent 40%
+    );
 
   --deco-card:
     linear-gradient(
@@ -256,7 +341,8 @@ body::after {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -296,24 +382,22 @@ p {
   margin: 0;
 }
 
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+
 .site-shell {
   width: min(1400px, calc(100% - 32px));
   margin: 0 auto;
   padding: 24px 0 50px;
 }
 
-/* =========================================================
-   CARDS / GLOW
-   ========================================================= */
-
 .glow-card {
   position: relative;
   overflow: hidden;
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
-  background:
-    var(--deco-card),
-    hsl(var(--card) / 0.94);
+  background: var(--deco-card), hsl(var(--card) / 0.94);
   box-shadow:
     0 10px 40px hsl(0 0% 0% / 0.28),
     inset 0 1px 0 hsl(var(--foreground) / 0.025);
@@ -350,7 +434,7 @@ p {
 }
 
 /* =========================================================
-   HEADER
+   TOP BAR
    ========================================================= */
 
 .topbar {
@@ -509,7 +593,7 @@ p {
 }
 
 /* =========================================================
-   SEARCH / TOOLS
+   SEARCH
    ========================================================= */
 
 .archive-tools {
@@ -559,7 +643,7 @@ p {
 }
 
 /* =========================================================
-   CHARACTER GRID
+   CHARACTER CARDS
    ========================================================= */
 
 .character-grid {
@@ -759,7 +843,7 @@ p {
 }
 
 /* =========================================================
-   ORNATE DIVIDER
+   DECORATIVE DIVIDER
    ========================================================= */
 
 .ornate-divider {
@@ -780,12 +864,13 @@ p {
   content: "";
   height: 1px;
   flex: 1;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    hsl(var(--primary) / 0.35),
-    transparent
-  );
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--primary) / 0.35),
+      transparent
+    );
 }
 
 /* =========================================================
@@ -818,6 +903,102 @@ p {
 }
 
 /* =========================================================
+   CHARACTER CREATOR FORM
+   ========================================================= */
+
+.character-form {
+  padding: 24px;
+}
+
+.form-section {
+  position: relative;
+  padding: 24px 0;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.form-section:first-child {
+  padding-top: 0;
+}
+
+.form-section:last-of-type {
+  border-bottom: 0;
+}
+
+.form-section-title {
+  margin-bottom: 20px;
+}
+
+.form-section-title h3 {
+  font-size: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid-wide {
+  margin-top: 16px;
+}
+
+.form-grid-wide label {
+  min-height: 160px;
+}
+
+.form-section label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: hsl(var(--foreground) / 0.65);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+  width: 100%;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.9rem;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background) / 0.55);
+  outline: none;
+  padding: 12px 14px;
+  transition: 180ms ease;
+}
+
+.form-section input,
+.form-section select {
+  min-height: 46px;
+}
+
+.form-section textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-section input::placeholder,
+.form-section textarea::placeholder {
+  color: hsl(var(--foreground) / 0.3);
+}
+
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus {
+  border-color: hsl(var(--primary) / 0.65);
+  box-shadow: 0 0 18px hsl(var(--primary) / 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 24px;
+}
+
+/* =========================================================
    FOOTER
    ========================================================= */
 
@@ -831,7 +1012,7 @@ footer {
 }
 
 /* =========================================================
-   MOBILE
+   RESPONSIVE
    ========================================================= */
 
 @media (max-width: 900px) {
@@ -897,6 +1078,26 @@ footer {
 
   .theme-summary {
     padding: 22px;
+  }
+
+  .character-form {
+    padding: 18px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-wide {
+    margin-top: 0;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .button {
+    width: 100%;
   }
 
   footer {
