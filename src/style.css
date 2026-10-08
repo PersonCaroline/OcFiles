@@ -6778,3 +6778,729 @@ body.theme-asylum {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   OCFILES — FULL THEME VISUAL SYSTEM
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   BASE THEME VARIABLES
+--------------------------------------------------------- */
+
+:root {
+  --theme-pattern-opacity: 0.12;
+  --theme-glow-strength: 0.18;
+}
+
+/* ---------------------------------------------------------
+   GLOBAL THEME ATMOSPHERE
+--------------------------------------------------------- */
+
+body {
+  position: relative;
+  isolation: isolate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: var(--theme-pattern-opacity);
+  transition:
+    background 0.6s ease,
+    opacity 0.6s ease;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  transition: background 0.6s ease;
+}
+
+/* =========================================================
+   🖤 GOTH
+========================================================= */
+
+body.theme-goth {
+  --theme-pattern-opacity: 0.14;
+  --theme-glow-strength: 0.22;
+}
+
+body.theme-goth::before {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      transparent 0 28px,
+      rgba(168, 85, 247, 0.20) 29px 30px,
+      transparent 31px
+    ),
+    radial-gradient(
+      circle at 80% 65%,
+      transparent 0 42px,
+      rgba(232, 121, 249, 0.13) 43px 44px,
+      transparent 45px
+    ),
+    radial-gradient(
+      circle at 55% 25%,
+      transparent 0 18px,
+      rgba(168, 85, 247, 0.13) 19px 20px,
+      transparent 21px
+    );
+
+  background-size:
+    180px 180px,
+    260px 260px,
+    130px 130px;
+}
+
+body.theme-goth::after {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(168, 85, 247, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(232, 121, 249, 0.08),
+      transparent 30%
+    );
+}
+
+body.theme-goth .card,
+body.theme-goth .quick-card,
+body.theme-goth .stat-card {
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.38),
+    0 0 28px rgba(168, 85, 247, 0.035);
+}
+
+/* =========================================================
+   🎪 CIRCUS
+========================================================= */
+
+body.theme-circus {
+  --theme-pattern-opacity: 0.13;
+}
+
+body.theme-circus::before {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(220, 38, 38, 0.08) 0,
+      rgba(220, 38, 38, 0.08) 14px,
+      transparent 14px,
+      transparent 28px
+    );
+}
+
+body.theme-circus::after {
+  background:
+    radial-gradient(
+      circle at 20% 10%,
+      rgba(220, 38, 38, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 80% 15%,
+      rgba(245, 158, 11, 0.12),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(220, 38, 38, 0.08),
+      transparent 35%
+    );
+}
+
+body.theme-circus .card,
+body.theme-circus .quick-card,
+body.theme-circus .stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+body.theme-circus .card::before,
+body.theme-circus .quick-card::before,
+body.theme-circus .stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 12px,
+      rgba(220, 38, 38, 0.35) 12px 18px
+    );
+}
+
+body.theme-circus .button.primary {
+  background:
+    linear-gradient(
+      135deg,
+      #9f1239,
+      #dc2626 45%,
+      #d97706
+    );
+}
+
+/* Diamonds */
+
+body.theme-circus .quick-icon,
+body.theme-circus .nav-icon {
+  border-radius: 6px;
+  transform: rotate(45deg);
+}
+
+body.theme-circus .quick-icon > *,
+body.theme-circus .nav-icon > * {
+  transform: rotate(-45deg);
+}
+
+/* =========================================================
+   🌲 FOREST
+========================================================= */
+
+body.theme-forest {
+  --theme-pattern-opacity: 0.11;
+}
+
+body.theme-forest::before {
+  background:
+    linear-gradient(
+      118deg,
+      transparent 0 46%,
+      rgba(74, 222, 128, 0.09) 47%,
+      transparent 48%
+    ),
+    linear-gradient(
+      62deg,
+      transparent 0 55%,
+      rgba(34, 197, 94, 0.08) 56%,
+      transparent 57%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 70px,
+      rgba(74, 222, 128, 0.035) 70px 71px
+    );
+}
+
+body.theme-forest::after {
+  background:
+    radial-gradient(
+      ellipse at 15% 100%,
+      rgba(34, 197, 94, 0.13),
+      transparent 35%
+    ),
+    radial-gradient(
+      ellipse at 90% 10%,
+      rgba(74, 222, 128, 0.08),
+      transparent 32%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(2, 8, 5, 0.05),
+      rgba(3, 8, 6, 0.45)
+    );
+}
+
+body.theme-forest .card,
+body.theme-forest .quick-card,
+body.theme-forest .stat-card {
+  border-radius: 18px 8px 18px 8px;
+}
+
+body.theme-forest .card:hover,
+body.theme-forest .quick-card:hover {
+  border-color:
+    rgba(74, 222, 128, 0.38);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.38),
+    0 0 35px rgba(34, 197, 94, 0.08);
+}
+
+/* =========================================================
+   🕵️ DETECTIVE
+========================================================= */
+
+body.theme-detective {
+  --theme-pattern-opacity: 0.14;
+}
+
+body.theme-detective::before {
+  background:
+    linear-gradient(
+      rgba(192, 132, 87, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(192, 132, 87, 0.08) 1px,
+      transparent 1px
+    );
+  background-size: 34px 34px;
+}
+
+body.theme-detective::after {
+  background:
+    radial-gradient(
+      circle at 50% 10%,
+      rgba(234, 182, 118, 0.10),
+      transparent 32%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(80, 46, 20, 0.12),
+      transparent 20%,
+      transparent 80%,
+      rgba(80, 46, 20, 0.12)
+    );
+}
+
+body.theme-detective .card,
+body.theme-detective .quick-card,
+body.theme-detective .stat-card {
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(48, 31, 18, 0.78),
+      rgba(27, 18, 11, 0.88)
+    );
+}
+
+body.theme-detective .card::after,
+body.theme-detective .quick-card::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px dashed rgba(234, 182, 118, 0.09);
+  pointer-events: none;
+}
+
+body.theme-detective .button.primary {
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      135deg,
+      #8b5e3c,
+      #c08457
+    );
+}
+
+body.theme-detective input,
+body.theme-detective textarea,
+body.theme-detective select {
+  border-radius: 4px;
+}
+
+/* =========================================================
+   ♠️ MAFIA
+========================================================= */
+
+body.theme-mafia {
+  --theme-pattern-opacity: 0.12;
+}
+
+body.theme-mafia::before {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 9px,
+      rgba(255, 255, 255, 0.025) 9px 10px
+    );
+}
+
+body.theme-mafia::after {
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(185, 28, 60, 0.12),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(212, 175, 55, 0.07),
+      transparent 25%
+    );
+}
+
+body.theme-mafia .card,
+body.theme-mafia .quick-card,
+body.theme-mafia .stat-card {
+  border-color:
+    rgba(212, 175, 55, 0.13);
+  border-radius: 8px;
+}
+
+body.theme-mafia .card:hover,
+body.theme-mafia .quick-card:hover {
+  border-color:
+    rgba(212, 175, 55, 0.30);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.50),
+    0 0 25px rgba(185, 28, 60, 0.09);
+}
+
+body.theme-mafia .brand-mark {
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      135deg,
+      #7f1d1d,
+      #b91c3c
+    );
+}
+
+body.theme-mafia .button.primary {
+  background:
+    linear-gradient(
+      135deg,
+      #7f1d1d,
+      #b91c3c
+    );
+}
+
+/* =========================================================
+   🏥 ASYLUM
+========================================================= */
+
+body.theme-asylum {
+  --theme-pattern-opacity: 0.13;
+}
+
+body.theme-asylum::before {
+  background:
+    linear-gradient(
+      rgba(85, 214, 190, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(85, 214, 190, 0.06) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+}
+
+body.theme-asylum::after {
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(85, 214, 190, 0.10),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 80% 85%,
+      rgba(114, 167, 255, 0.09),
+      transparent 28%
+    );
+}
+
+body.theme-asylum .card,
+body.theme-asylum .quick-card,
+body.theme-asylum .stat-card {
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(14, 24, 26, 0.95),
+      rgba(8, 16, 18, 0.95)
+    );
+}
+
+body.theme-asylum .card:hover,
+body.theme-asylum .quick-card:hover {
+  box-shadow:
+    0 0 25px rgba(85, 214, 190, 0.08),
+    inset 0 0 30px rgba(85, 214, 190, 0.025);
+}
+
+body.theme-asylum .button.primary {
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      135deg,
+      #168b7a,
+      #2772bd
+    );
+}
+
+body.theme-asylum input,
+body.theme-asylum textarea,
+body.theme-asylum select {
+  border-radius: 5px;
+}
+
+/* =========================================================
+   THEME-SPECIFIC SIDEBAR
+========================================================= */
+
+body.theme-goth .sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(16, 8, 22, 0.98),
+      rgba(6, 4, 10, 0.98)
+    );
+}
+
+body.theme-circus .sidebar {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(120, 15, 25, 0.10) 0 14px,
+      transparent 14px 28px
+    ),
+    #100607;
+}
+
+body.theme-forest .sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 20, 12, 0.98),
+      rgba(3, 10, 7, 0.98)
+    );
+}
+
+body.theme-detective .sidebar {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(38, 25, 15, 0.98),
+      rgba(20, 13, 8, 0.98)
+    );
+}
+
+body.theme-mafia .sidebar {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #080808 0 8px,
+      #0e0e0e 8px 10px
+    );
+}
+
+body.theme-asylum .sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(11, 25, 27, 0.98),
+      rgba(5, 12, 14, 0.98)
+    );
+}
+
+/* =========================================================
+   THEME SELECTOR
+========================================================= */
+
+.theme-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.theme-option {
+  position: relative;
+  min-height: 150px;
+  padding: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.theme-option:hover {
+  transform: translateY(-3px);
+}
+
+.theme-option.active {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 2px
+      color-mix(in srgb, var(--accent) 15%, transparent),
+    0 0 35px
+      color-mix(in srgb, var(--accent) 13%, transparent);
+}
+
+.theme-option-icon {
+  font-size: 26px;
+  margin-bottom: 12px;
+}
+
+.theme-option strong {
+  display: block;
+  font-size: 14px;
+}
+
+.theme-option p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* Theme preview backgrounds */
+
+.theme-option[data-theme="goth"] {
+  background:
+    radial-gradient(
+      circle,
+      rgba(168, 85, 247, 0.25),
+      transparent 45%
+    ),
+    #09050e;
+}
+
+.theme-option[data-theme="circus"] {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #31080d 0 12px,
+      #160507 12px 24px
+    );
+}
+
+.theme-option[data-theme="forest"] {
+  background:
+    linear-gradient(
+      135deg,
+      #06140b,
+      #0c2915
+    );
+}
+
+.theme-option[data-theme="detective"] {
+  background:
+    linear-gradient(
+      135deg,
+      #2b1a0e,
+      #120b06
+    );
+}
+
+.theme-option[data-theme="mafia"] {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #070707 0 8px,
+      #181010 8px 10px
+    );
+}
+
+.theme-option[data-theme="asylum"] {
+  background:
+    linear-gradient(
+      135deg,
+      #0a2223,
+      #081316
+    );
+}
+
+/* =========================================================
+   THEME TRANSITIONS
+========================================================= */
+
+body,
+.sidebar,
+.main-area,
+.topbar,
+.card,
+.quick-card,
+.stat-card,
+.button,
+.nav-item,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.45s ease,
+    background 0.45s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    color 0.35s ease;
+}
+
+/* =========================================================
+   THEME MOTION
+========================================================= */
+
+@keyframes themePulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+body.theme-goth .brand-mark {
+  animation: themePulse 4s ease-in-out infinite;
+}
+
+body.theme-circus .hero-symbol {
+  animation:
+    float 5s ease-in-out infinite,
+    themePulse 3s ease-in-out infinite;
+}
+
+body.theme-forest .hero-symbol {
+  animation: float 7s ease-in-out infinite;
+}
+
+body.theme-detective .hero-symbol {
+  filter:
+    sepia(0.25)
+    drop-shadow(
+      0 0 12px rgba(234, 182, 118, 0.15)
+    );
+}
+
+body.theme-mafia .hero-symbol {
+  filter:
+    drop-shadow(
+      0 0 18px rgba(185, 28, 60, 0.18)
+    );
+}
+
+body.theme-asylum .hero-symbol {
+  animation: themePulse 2.5s ease-in-out infinite;
+}
+
+/* =========================================================
+   MOBILE THEME ADJUSTMENTS
+========================================================= */
+
+@media (max-width: 700px) {
+  body.theme-circus::before {
+    background-size: 100% 100%;
+  }
+
+  body.theme-detective::before {
+    background-size: 25px 25px;
+  }
+
+  body.theme-asylum::before {
+    background-size: 18px 18px;
+  }
+}
