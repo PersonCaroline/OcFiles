@@ -7613,28 +7613,58 @@ body.theme-goth .post-card {
 }
 
 /* =========================================================
-   🎪 CIRCUS — VISIBLE DIAGONAL STRIPES
+   🎪 CIRCUS — DIAMONDS EVERYWHERE
    ========================================================= */
 
 body.theme-circus {
   background-color: #0b0505;
+
   background-image:
-    repeating-linear-gradient(
-      135deg,
-      rgba(220, 38, 38, 0.13) 0px,
-      rgba(220, 38, 38, 0.13) 2px,
-      transparent 2px,
-      transparent 34px
+    /* large diamond pattern */
+    linear-gradient(
+      45deg,
+      rgba(220, 38, 38, 0.12) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(220, 38, 38, 0.12) 75%
     ),
+    linear-gradient(
+      45deg,
+      rgba(220, 38, 38, 0.12) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(220, 38, 38, 0.12) 75%
+    ),
+    /* gold atmospheric glow */
     radial-gradient(
-      ellipse at 50% 0%,
-      rgba(220, 38, 38, 0.18),
-      transparent 60%
+      circle at 50% 0%,
+      rgba(245, 158, 11, 0.18),
+      transparent 45%
+    ),
+    /* red atmospheric glow */
+    radial-gradient(
+      circle at 10% 80%,
+      rgba(220, 38, 38, 0.14),
+      transparent 40%
     );
-  background-size: 100% 100%, auto;
+
+  background-size:
+    90px 90px,
+    90px 90px,
+    auto,
+    auto;
+
+  background-position:
+    0 0,
+    45px 45px,
+    center,
+    center;
+
   background-attachment: fixed;
 }
 
+
+/* Circus cards also contain diamonds */
 body.theme-circus .card,
 body.theme-circus .panel,
 body.theme-circus .stat-card,
@@ -7645,63 +7675,121 @@ body.theme-circus .organization-card,
 body.theme-circus .case-card,
 body.theme-circus .lore-card,
 body.theme-circus .post-card {
-  background-color: rgba(22, 9, 9, 0.94);
+  background-color: rgba(22, 9, 9, 0.93);
+
   background-image:
-    repeating-linear-gradient(
-      135deg,
-      rgba(220, 38, 38, 0.11) 0px,
-      rgba(220, 38, 38, 0.11) 2px,
-      transparent 2px,
-      transparent 22px
+    linear-gradient(
+      45deg,
+      rgba(220, 38, 38, 0.10) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(220, 38, 38, 0.10) 75%
     ),
     linear-gradient(
-      145deg,
-      rgba(245, 158, 11, 0.07),
-      transparent 65%
+      45deg,
+      rgba(220, 38, 38, 0.10) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(220, 38, 38, 0.10) 75%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.08),
+      transparent 60%
     );
-  border-color: rgba(220, 38, 38, 0.35);
-  border-radius: 16px;
+
+  background-size:
+    44px 44px,
+    44px 44px,
+    100% 100%;
+
+  background-position:
+    0 0,
+    22px 22px,
+    center;
+
+  border-color: rgba(220, 38, 38, 0.32);
 }
 
-body.theme-circus .sidebar,
-body.theme-circus .topbar {
-  background-image: repeating-linear-gradient(
-    135deg,
-    rgba(220, 38, 38, 0.07) 0px,
-    rgba(220, 38, 38, 0.07) 2px,
-    transparent 2px,
-    transparent 26px
-  );
-}
 
 /* =========================================================
-   🌲 FOREST — ORGANIC LINES & GREEN MIST
+   🌲 FOREST — ORGANIC FLOWING LINES / BRANCHES
    ========================================================= */
 
 body.theme-forest {
   background-color: #030806;
+
   background-image:
+    /* flowing organic line 1 */
     radial-gradient(
-      ellipse at 15% 15%,
-      rgba(34, 197, 94, 0.17),
+      ellipse 80px 260px at 12% 20%,
+      transparent 45%,
+      rgba(74, 222, 128, 0.10) 46%,
+      rgba(74, 222, 128, 0.10) 47%,
+      transparent 48%
+    ),
+
+    /* flowing organic line 2 */
+    radial-gradient(
+      ellipse 120px 320px at 32% 75%,
+      transparent 48%,
+      rgba(34, 197, 94, 0.09) 49%,
+      rgba(34, 197, 94, 0.09) 50%,
+      transparent 51%
+    ),
+
+    /* flowing organic line 3 */
+    radial-gradient(
+      ellipse 100px 300px at 72% 25%,
+      transparent 47%,
+      rgba(74, 222, 128, 0.08) 48%,
+      rgba(74, 222, 128, 0.08) 49%,
+      transparent 50%
+    ),
+
+    /* flowing organic line 4 */
+    radial-gradient(
+      ellipse 150px 350px at 90% 80%,
+      transparent 48%,
+      rgba(34, 197, 94, 0.08) 49%,
+      rgba(34, 197, 94, 0.08) 50%,
+      transparent 51%
+    ),
+
+    /* mist */
+    radial-gradient(
+      ellipse at 20% 20%,
+      rgba(34, 197, 94, 0.15),
       transparent 38%
     ),
+
     radial-gradient(
-      ellipse at 85% 80%,
-      rgba(20, 83, 45, 0.25),
-      transparent 42%
-    ),
-    repeating-linear-gradient(
-      115deg,
-      transparent 0px,
-      transparent 45px,
-      rgba(74, 222, 128, 0.07) 46px,
-      transparent 48px,
-      transparent 90px
+      ellipse at 80% 80%,
+      rgba(20, 83, 45, 0.20),
+      transparent 45%
     );
+
+  background-size:
+    500px 700px,
+    600px 800px,
+    550px 750px,
+    650px 850px,
+    auto,
+    auto;
+
+  background-position:
+    0 0,
+    100px 200px,
+    300px 0,
+    500px 300px,
+    center,
+    center;
+
   background-attachment: fixed;
 }
 
+
+/* Forest cards — subtle organic lines too */
 body.theme-forest .card,
 body.theme-forest .panel,
 body.theme-forest .stat-card,
@@ -7713,20 +7801,33 @@ body.theme-forest .case-card,
 body.theme-forest .lore-card,
 body.theme-forest .post-card {
   background-color: rgba(7, 17, 11, 0.91);
+
   background-image:
     radial-gradient(
-      ellipse at 100% 0%,
-      rgba(74, 222, 128, 0.12),
-      transparent 55%
+      ellipse 70px 220px at 10% 20%,
+      transparent 47%,
+      rgba(74, 222, 128, 0.08) 48%,
+      rgba(74, 222, 128, 0.08) 49%,
+      transparent 50%
     ),
-    repeating-linear-gradient(
-      115deg,
-      transparent 0px,
-      transparent 55px,
-      rgba(74, 222, 128, 0.035) 56px,
-      transparent 58px
+
+    radial-gradient(
+      ellipse 100px 250px at 85% 70%,
+      transparent 47%,
+      rgba(34, 197, 94, 0.07) 48%,
+      rgba(34, 197, 94, 0.07) 49%,
+      transparent 50%
+    ),
+
+    radial-gradient(
+      ellipse at 100% 0%,
+      rgba(74, 222, 128, 0.10),
+      transparent 55%
     );
+
   border-color: rgba(74, 222, 128, 0.22);
+
+  /* slightly organic corners */
   border-radius: 22px 14px 22px 14px;
 }
 
