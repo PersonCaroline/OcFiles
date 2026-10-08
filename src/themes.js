@@ -1,131 +1,97 @@
-export const themes = {
+export const THEMES = {
   goth: {
-    name: "Goth",
-    icon: "🖤",
-    description: "Black, purple, circles and supernatural atmosphere.",
-    variables: {
-      "--bg": "#08070c",
-      "--bg2": "#110d18",
-      "--panel": "#15101d",
-      "--panel2": "#1d1427",
-      "--text": "#f3edf7",
-      "--muted": "#aaa0b4",
-      "--accent": "#9b4dff",
-      "--accent2": "#d78cff",
-      "--danger": "#d34f76",
-      "--success": "#73d6a2",
-      "--grid": "rgba(166, 79, 255, .08)",
-      "--pattern": "radial-gradient(circle at 20% 20%, rgba(150,70,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 80% 70%, rgba(220,130,255,.08) 0 3px, transparent 4px)"
+    name: 'Goth',
+    icon: '🖤',
+    vars: {
+      bg: '#08060c',
+      panel: '#130e1c',
+      panel2: '#1b1327',
+      text: '#eee7f7',
+      muted: '#a99bb8',
+      accent: '#a85cff',
+      accent2: '#e4a8ff',
+      line: '#3b2551',
+      glow: 'rgba(168,92,255,.42)'
     }
   },
 
   circus: {
-    name: "Circus",
-    icon: "🎪",
-    description: "Dark red, gold, diagonal stripes and diamonds.",
-    variables: {
-      "--bg": "#100708",
-      "--bg2": "#1b0b0b",
-      "--panel": "#241010",
-      "--panel2": "#321414",
-      "--text": "#fff3dd",
-      "--muted": "#c9aa91",
-      "--accent": "#d69b35",
-      "--accent2": "#f1c75b",
-      "--danger": "#c94a55",
-      "--success": "#80c98e",
-      "--grid": "rgba(220,160,50,.08)",
-      "--pattern": "repeating-linear-gradient(45deg, rgba(150,25,35,.10) 0 10px, transparent 10px 20px), repeating-linear-gradient(-45deg, transparent 0 16px, rgba(220,170,60,.06) 16px 18px)"
+    name: 'Circus',
+    icon: '🎪',
+    vars: {
+      bg: '#17080b',
+      panel: '#271014',
+      panel2: '#36171c',
+      text: '#fff0d0',
+      muted: '#d2a98d',
+      accent: '#d8a33e',
+      accent2: '#c83c42',
+      line: '#69312e',
+      glow: 'rgba(216,163,62,.4)'
     }
   },
 
   forest: {
-    name: "Forest",
-    icon: "🌲",
-    description: "Deep green, branches, lines and nature.",
-    variables: {
-      "--bg": "#07100b",
-      "--bg2": "#0b1810",
-      "--panel": "#102219",
-      "--panel2": "#163020",
-      "--text": "#eaf7ed",
-      "--muted": "#9bb6a2",
-      "--accent": "#54c878",
-      "--accent2": "#9be48b",
-      "--danger": "#d26c6c",
-      "--success": "#72d99c",
-      "--grid": "rgba(70,210,110,.08)",
-      "--pattern": "linear-gradient(120deg, transparent 0 48%, rgba(80,190,100,.06) 49% 50%, transparent 51%), linear-gradient(30deg, transparent 0 48%, rgba(80,190,100,.05) 49% 50%, transparent 51%)"
+    name: 'Forest',
+    icon: '🌲',
+    vars: {
+      bg: '#07100b',
+      panel: '#0e1b12',
+      panel2: '#14251a',
+      text: '#e4f4e6',
+      muted: '#9cb9a2',
+      accent: '#6ecf83',
+      accent2: '#b2e68d',
+      line: '#244b2d',
+      glow: 'rgba(110,207,131,.35)'
     }
   },
 
   detective: {
-    name: "Detective",
-    icon: "🕵️",
-    description: "Ancient paper, brown tones and investigation-board atmosphere.",
-    variables: {
-      "--bg": "#17130d",
-      "--bg2": "#211b12",
-      "--panel": "#2b2418",
-      "--panel2": "#382d1d",
-      "--text": "#f3e5c8",
-      "--muted": "#bda982",
-      "--accent": "#c8954a",
-      "--accent2": "#e0bd78",
-      "--danger": "#bd6257",
-      "--success": "#86a96e",
-      "--grid": "rgba(220,180,100,.08)",
-      "--pattern": "linear-gradient(rgba(200,170,110,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(200,170,110,.07) 1px, transparent 1px)"
+    name: 'Detective',
+    icon: '🕵️',
+    vars: {
+      bg: '#17120c',
+      panel: '#2a2116',
+      panel2: '#36291a',
+      text: '#f5ead2',
+      muted: '#c6b28f',
+      accent: '#c69b55',
+      accent2: '#e0c48b',
+      line: '#665033',
+      glow: 'rgba(198,155,85,.34)'
     }
   },
 
   mafia: {
-    name: "Mafia",
-    icon: "♠️",
-    description: "Black, burgundy, gold and dangerous stripes.",
-    variables: {
-      "--bg": "#090708",
-      "--bg2": "#140a0d",
-      "--panel": "#1b1013",
-      "--panel2": "#281419",
-      "--text": "#f6ecec",
-      "--muted": "#bba4a7",
-      "--accent": "#b73b4d",
-      "--accent2": "#d8a94e",
-      "--danger": "#e15262",
-      "--success": "#77bd91",
-      "--grid": "rgba(190,60,75,.08)",
-      "--pattern": "repeating-linear-gradient(45deg, rgba(160,40,55,.10) 0 8px, transparent 8px 18px)"
+    name: 'Mafia',
+    icon: '♠️',
+    vars: {
+      bg: '#090b0d',
+      panel: '#15171b',
+      panel2: '#202329',
+      text: '#eeeef1',
+      muted: '#a7abb4',
+      accent: '#bd202b',
+      accent2: '#d7d7d7',
+      line: '#4d2026',
+      glow: 'rgba(189,32,43,.35)'
     }
   },
 
   asylum: {
-    name: "Asylum",
-    icon: "🏥",
-    description: "Institutional grid, faded green-blue and unsettling atmosphere.",
-    variables: {
-      "--bg": "#091112",
-      "--bg2": "#0d1819",
-      "--panel": "#132123",
-      "--panel2": "#1a2d2f",
-      "--text": "#e6f1ef",
-      "--muted": "#9bb5b5",
-      "--accent": "#64b6aa",
-      "--accent2": "#8bd4cb",
-      "--danger": "#c46b75",
-      "--success": "#72c89c",
-      "--grid": "rgba(100,190,180,.08)",
-      "--pattern": "linear-gradient(rgba(100,190,180,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(100,190,180,.07) 1px, transparent 1px)"
+    name: 'Asylum',
+    icon: '🏥',
+    vars: {
+      bg: '#071014',
+      panel: '#0e1c20',
+      panel2: '#15272b',
+      text: '#e4f6f4',
+      muted: '#9ebcbd',
+      accent: '#64c7bf',
+      accent2: '#9ad6e5',
+      line: '#285056',
+      glow: 'rgba(100,199,191,.35)'
     }
   }
-};
-
-export function applyTheme(themeId) {
-  const theme = themes[themeId] || themes.goth;
-
-  Object.entries(theme.variables).forEach(([key, value]) => {
-    document.documentElement.style.setProperty(key, value);
-  });
-
-  document.documentElement.dataset.theme = themeId;
 }
