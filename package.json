@@ -1,5 +1,5 @@
 {
-  "name": "oc-archive",
+  "name": "ocfiles",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,9 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "vite": "^6.1.0"
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {}
 }
