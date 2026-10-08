@@ -1,1284 +1,1819 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { applyTheme, themes } from "./themes";
+import React, {
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 
-const STORAGE_KEY = "oc_archive_v1";
-const USER_KEY = "oc_archive_user_v1";
+import { THEMES } from "./themes";
 
-const personalityFields = [
-  ["Nice", "Mean"],
-  ["Brave", "Coward"],
-  ["Pacifist", "Violent"],
-  ["Thoughtful", "Impulsive"],
-  ["Agreeable", "Contrary"],
-  ["Idealistic", "Pragmatic"],
-  ["Frugal", "Big spender"],
-  ["Collected", "Wild"],
-  ["Honest", "Deceptive"],
-  ["Polite", "Rude"],
-  ["Smart", "Idiot"],
-  ["Confident", "Insecure"],
-  ["Calm", "Anxious"],
-  ["Patient", "Impatient"],
-  ["Gullible", "Skeptical"],
-  ["Reserved", "Flirty"]
-];
+const STORAGE_KEY = "ocfiles_database_v2";
 
-const skillFields = [
-  "Perception",
-  "Communication",
-  "Persuasion",
-  "Mediation",
-  "Literacy",
-  "Creativity",
-  "Cooking",
-  "Tech savvy",
-  "Combat",
-  "Survival",
-  "Stealth",
-  "Street smarts",
-  "Seduction",
-  "Luck",
-  "Handling animals",
-  "Pacifying children",
-  "Reflexes",
-  "Strength",
-  "Speed",
-  "Battle IQ",
-  "Resistance",
-  "Flexibility"
-];
+const uid = () =>
+  `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
-const socialFields = [
-  "Charisma",
-  "Empathy",
-  "Generosity",
-  "Wealth",
-  "Aggression",
-  "Libido"
-];
+const blankCharacter = () => ({
+  id: uid(),
 
-const emptyCharacter = {
-  id: "",
   name: "",
   lastName: "",
   nickname: "",
+
   age: "",
-  dateOfBirth: "",
+  dob: "",
+
   gender: "",
   pronouns: "",
   sexuality: "",
+
   nationality: "",
   origins: "",
   species: "Human",
-  status: "Alive",
-  laterStatus: "Alive",
-  affiliation: "",
-  pastAffiliation: "",
-  rank: "",
-  pastRank: "",
+
   job: "",
   sideJob: "",
+
   height: "",
   weight: "",
+
   eyeColor: "",
   hairColor: "",
   hairStyle: "",
+
+  affiliation: "",
+  pastAffiliation: "",
+
+  rank: "",
+  pastRank: "",
+
+  status: "Alive",
+  laterStatus: "",
+
   mbti: "",
+
   abilities: "",
   abilityEffects: "",
   weapon: "",
+
   fears: "",
   sickness: "",
   addictions: "",
+
   likes: "",
   dislikes: "",
+
   anecdotes: "",
+
+  songs: "",
   lyrics: "",
-  song: "",
   quotes: "",
-  lore: "",
+
+  notes: "",
+
   image: "",
   moodboard: [],
-  family: "",
-  friends: "",
-  pets: "",
-  personality: {},
-  skills: {},
-  socials: {},
-  organizationIds: [],
-  branchIds: [],
-  relatedCharacterIds: [],
-  postIds: [],
-  investigationIds: [],
-  createdAt: ""
-};
 
-const emptyOrganization = {
-  id: "",
+  traits: {
+    nice: 50,
+    brave: 50,
+    pacifist: 50,
+    thoughtful: 50,
+    agreeable: 50,
+    idealistic: 50,
+    frugal: 50,
+    collected: 50,
+    honest: 50,
+    polite: 50,
+    smart: 50,
+    confident: 50,
+    calm: 50,
+    patient: 50,
+    gullible: 50,
+    reserved: 50
+  },
+
+  skills: {
+    perception: 3,
+    communication: 3,
+    persuasion: 3,
+    mediation: 3,
+    literacy: 3,
+    creativity: 3,
+    cooking: 3,
+    tech: 3,
+    combat: 3,
+    survival: 3,
+    stealth: 3,
+    street: 3,
+    seduction: 3,
+    luck: 3,
+    animals: 3,
+    children: 3,
+    reflexes: 3,
+    strength: 3,
+    speed: 3,
+    battleIQ: 3,
+    resistance: 3,
+    flexibility: 3
+  },
+
+  socials: {
+    charisma: 3,
+    empathy: 3,
+    generosity: 3,
+    wealth: 3,
+    aggression: 3,
+    libido: 3
+  },
+
+  relationships: {
+    family: [],
+    friends: [],
+    pets: []
+  },
+
+  linkedOrganizations: [],
+  linkedPosts: [],
+  linkedCases: [],
+
+  createdAt: Date.now()
+});
+
+const blankOrganization = () => ({
+  id: uid(),
   name: "",
   type: "",
   description: "",
-  leader: "",
+  ideology: "",
   headquarters: "",
-  status: "Active",
-  goals: "",
-  methods: "",
+  leader: "",
   branches: [],
-  characterIds: [],
-  postIds: [],
-  lore: ""
-};
+  members: [],
+  posts: [],
+  notes: ""
+});
 
-const emptyInvestigation = {
-  id: "",
-  title: "",
+const blankPost = () => ({
+  id: uid(),
+  title: "Untitled post",
+  content: "",
+  characters: [],
+  organizations: [],
+  date: new Date().toLocaleDateString()
+});
+
+const blankLore = () => ({
+  id: uid(),
+  title: "New lore entry",
+  category: "General",
+  content: "",
+  linkedCharacters: [],
+  linkedOrganizations: []
+});
+
+const blankCase = () => ({
+  id: uid(),
+  title: "Untitled investigation",
   status: "Open",
-  caseNumber: "",
+
   what: "",
   who: "",
-  when: "",
-  where: "",
   how: "",
   why: "",
-  culprit: "",
-  victims: "",
-  witnesses: "",
+  where: "",
+  when: "",
+
+  involved: [],
+
   evidence: "",
-  suspects: "",
-  investigators: "",
-  involvedCharacterIds: [],
-  organizationIds: [],
+  theory: "",
+  motive: "",
+  solution: "",
+
   notes: "",
-  conclusion: ""
+
+  linkedCharacters: [],
+  linkedOrganizations: [],
+
+  createdAt: Date.now()
+});
+
+const initialDatabase = {
+  theme: "goth",
+
+  activeTab: "dashboard",
+
+  session: null,
+
+  users: [],
+
+  characters: [],
+  organizations: [],
+  posts: [],
+  lore: [],
+  investigations: []
 };
-
-const emptyLore = {
-  id: "",
-  title: "",
-  category: "",
-  era: "",
-  summary: "",
-  content: "",
-  relatedCharacterIds: [],
-  organizationIds: [],
-  investigationIds: ""
-};
-
-const emptyPost = {
-  id: "",
-  title: "",
-  author: "",
-  date: "",
-  content: "",
-  tags: "",
-  characterIds: [],
-  organizationIds: []
-};
-
-function uid(prefix = "id") {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function blankDatabase() {
-  return {
-    characters: [],
-    organizations: [],
-    investigations: [],
-    lore: [],
-    posts: [],
-    settings: {
-      theme: "goth"
-    }
-  };
-}
 
 function loadDatabase() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : blankDatabase();
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      return initialDatabase;
+    }
+
+    return {
+      ...initialDatabase,
+      ...JSON.parse(raw)
+    };
   } catch {
-    return blankDatabase();
+    return initialDatabase;
   }
 }
 
-function saveDatabase(db) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
-function downloadFile(filename, content, type = "application/json") {
-  const blob = new Blob([content], { type });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
+function App() {
+  const [database, setDatabase] = useState(loadDatabase);
 
-function Card({ children, className = "", onClick }) {
+  const [selectedCharacter, setSelectedCharacter] =
+    useState(null);
+
+  const [selectedOrganization, setSelectedOrganization] =
+    useState(null);
+
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(database)
+    );
+  }, [database]);
+
+  useEffect(() => {
+    const theme =
+      THEMES[database.theme] || THEMES.goth;
+
+    document.documentElement.dataset.theme =
+      database.theme;
+
+    Object.entries(theme.vars).forEach(
+      ([key, value]) => {
+        document.documentElement.style.setProperty(
+          `--${key}`,
+          value
+        );
+      }
+    );
+  }, [database.theme]);
+
+  const updateDatabase = (callback) => {
+    setDatabase((current) => {
+      const next = clone(current);
+
+      callback(next);
+
+      return next;
+    });
+  };
+
+  const characters = useMemo(() => {
+    const q = search.trim().toLowerCase();
+
+    if (!q) {
+      return database.characters;
+    }
+
+    return database.characters.filter((character) =>
+      [
+        character.name,
+        character.lastName,
+        character.nickname,
+        character.affiliation,
+        character.job,
+        character.species
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [database.characters, search]);
+
+  if (!database.session) {
+    return (
+      <Authentication
+        database={database}
+        setDatabase={setDatabase}
+      />
+    );
+  }
+
+  const tabs = [
+    ["dashboard", "⌂", "Dashboard"],
+    ["characters", "♙", "Characters"],
+    ["organizations", "♜", "Organizations"],
+    ["posts", "✦", "Posts"],
+    ["lore", "☾", "Lore"],
+    ["investigations", "⌕", "Investigations"],
+    ["settings", "⚙", "Settings"]
+  ];
+
+  const activeTitle =
+    tabs.find(
+      ([id]) => id === database.activeTab
+    )?.[2] || "OC Files";
+
+  const changeTab = (tab) => {
+    updateDatabase(
+      (db) => {
+        db.activeTab = tab;
+      }
+    );
+
+    setSelectedCharacter(null);
+    setSelectedOrganization(null);
+  };
+
   return (
-    <div
-      className={`card ${className}`}
-      onClick={onClick}
-    >
-      {children}
+    <div className="app">
+      <aside className="sidebar">
+        <div className="brand">
+          OC <span>FILES</span>
+        </div>
+
+        <div className="user-pill">
+          ◈ {database.session}
+        </div>
+
+        <nav>
+          {tabs.map(([id, icon, label]) => (
+            <button
+              key={id}
+              className={
+                database.activeTab === id
+                  ? "nav-button active"
+                  : "nav-button"
+              }
+              onClick={() => changeTab(id)}
+            >
+              <b>{icon}</b>
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="theme-mini">
+          {Object.entries(THEMES).map(
+            ([id, theme]) => (
+              <button
+                key={id}
+                title={theme.name}
+                className={
+                  database.theme === id
+                    ? "theme-dot selected"
+                    : "theme-dot"
+                }
+                onClick={() =>
+                  updateDatabase(
+                    (db) => {
+                      db.theme = id;
+                    }
+                  )
+                }
+              >
+                {theme.icon}
+              </button>
+            )
+          )}
+        </div>
+
+        <button
+          className="logout"
+          onClick={() =>
+            updateDatabase(
+              (db) => {
+                db.session = null;
+              }
+            )
+          }
+        >
+          Log out
+        </button>
+      </aside>
+
+      <main className="main">
+        <header className="topbar">
+          <div>
+            <div className="eyebrow">
+              PERSONAL UNIVERSE ARCHIVE
+            </div>
+
+            <h1>{activeTitle}</h1>
+          </div>
+
+          <div className="top-actions">
+            {database.activeTab ===
+              "characters" && (
+              <input
+                className="search"
+                placeholder="Search characters..."
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+              />
+            )}
+
+            {database.activeTab ===
+              "characters" && (
+              <button
+                className="primary"
+                onClick={() => {
+                  const character =
+                    blankCharacter();
+
+                  updateDatabase((db) => {
+                    db.characters.unshift(
+                      character
+                    );
+                  });
+
+                  setSelectedCharacter(
+                    character.id
+                  );
+                }}
+              >
+                + New character
+              </button>
+            )}
+
+            {database.activeTab ===
+              "organizations" && (
+              <button
+                className="primary"
+                onClick={() => {
+                  const organization =
+                    blankOrganization();
+
+                  updateDatabase((db) => {
+                    db.organizations.unshift(
+                      organization
+                    );
+                  });
+
+                  setSelectedOrganization(
+                    organization.id
+                  );
+                }}
+              >
+                + Organization
+              </button>
+            )}
+          </div>
+        </header>
+
+        {database.activeTab ===
+          "dashboard" && (
+          <Dashboard
+            database={database}
+            updateDatabase={updateDatabase}
+            setSelectedCharacter={
+              setSelectedCharacter
+            }
+          />
+        )}
+
+        {database.activeTab ===
+          "characters" && (
+          <CharactersPage
+            database={database}
+            characters={characters}
+            updateDatabase={updateDatabase}
+            selectedCharacter={
+              selectedCharacter
+            }
+            setSelectedCharacter={
+              setSelectedCharacter
+            }
+          />
+        )}
+
+        {database.activeTab ===
+          "organizations" && (
+          <OrganizationsPage
+            database={database}
+            updateDatabase={updateDatabase}
+            selectedOrganization={
+              selectedOrganization
+            }
+            setSelectedOrganization={
+              setSelectedOrganization
+            }
+          />
+        )}
+
+        {database.activeTab === "posts" && (
+          <PostsPage
+            database={database}
+            updateDatabase={updateDatabase}
+          />
+        )}
+
+        {database.activeTab === "lore" && (
+          <LorePage
+            database={database}
+            updateDatabase={updateDatabase}
+          />
+        )}
+
+        {database.activeTab ===
+          "investigations" && (
+          <InvestigationsPage
+            database={database}
+            updateDatabase={updateDatabase}
+          />
+        )}
+
+        {database.activeTab === "settings" && (
+          <SettingsPage
+            database={database}
+            updateDatabase={updateDatabase}
+            setDatabase={setDatabase}
+          />
+        )}
+      </main>
     </div>
   );
 }
 
-function Button({
-  children,
-  onClick,
-  danger = false,
-  secondary = false,
-  small = false,
-  type = "button"
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+function Authentication({
+  database,
+  setDatabase
 }) {
-  return (
-    <button
-      type={type}
-      className={`button ${danger ? "danger" : ""} ${
-        secondary ? "secondary" : ""
-      } ${small ? "small" : ""}`}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-}
+  const [mode, setMode] = useState("login");
 
-function Input({
-  label,
-  value,
-  onChange,
-  placeholder = "",
-  type = "text",
-  textarea = false
-}) {
-  return (
-    <label className="field">
-      <span>{label}</span>
+  const [username, setUsername] =
+    useState("");
 
-      {textarea ? (
-        <textarea
-          value={value ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      ) : (
-        <input
-          type={type}
-          value={value ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      )}
-    </label>
-  );
-}
+  const [password, setPassword] =
+    useState("");
 
-function Select({ label, value, onChange, options }) {
-  return (
-    <label className="field">
-      <span>{label}</span>
-      <select
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
+  const [error, setError] = useState("");
 
-function Section({ title, children }) {
+  const submit = (event) => {
+    event.preventDefault();
+
+    setError("");
+
+    if (!username.trim() || !password) {
+      setError(
+        "Please enter a username and password."
+      );
+
+      return;
+    }
+
+    if (mode === "register") {
+      const exists = database.users.some(
+        (user) =>
+          user.username.toLowerCase() ===
+          username.trim().toLowerCase()
+      );
+
+      if (exists) {
+        setError(
+          "That username already exists."
+        );
+
+        return;
+      }
+
+      setDatabase({
+        ...database,
+
+        users: [
+          ...database.users,
+          {
+            username: username.trim(),
+            password
+          }
+        ],
+
+        session: username.trim()
+      });
+
+      return;
+    }
+
+    const account = database.users.find(
+      (user) =>
+        user.username === username.trim() &&
+        user.password === password
+    );
+
+    if (!account) {
+      setError(
+        "Incorrect username or password."
+      );
+
+      return;
+    }
+
+    setDatabase({
+      ...database,
+      session: account.username
+    });
+  };
+
   return (
-    <section className="editor-section">
-      <div className="section-title">
-        <h3>{title}</h3>
+    <div className="authentication">
+      <div className="auth-card">
+        <div className="brand brand-large">
+          OC <span>FILES</span>
+        </div>
+
+        <p className="muted center">
+          Your private fictional universe archive.
+        </p>
+
+        <div className="auth-tabs">
+          <button
+            className={
+              mode === "login"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              setMode("login");
+              setError("");
+            }}
+          >
+            Log in
+          </button>
+
+          <button
+            className={
+              mode === "register"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              setMode("register");
+              setError("");
+            }}
+          >
+            Register
+          </button>
+        </div>
+
+        <form onSubmit={submit}>
+          <Field label="Username">
+            <input
+              value={username}
+              onChange={(event) =>
+                setUsername(
+                  event.target.value
+                )
+              }
+              autoComplete="username"
+            />
+          </Field>
+
+          <Field label="Password">
+            <input
+              type="password"
+              value={password}
+              onChange={(event) =>
+                setPassword(
+                  event.target.value
+                )
+              }
+              autoComplete={
+                mode === "register"
+                  ? "new-password"
+                  : "current-password"
+              }
+            />
+          </Field>
+
+          {error && (
+            <div className="error">
+              {error}
+            </div>
+          )}
+
+          <button className="primary full">
+            {mode === "login"
+              ? "Enter archive"
+              : "Create archive"}
+          </button>
+        </form>
+
+        <small className="muted center">
+          This is a personal local archive.
+          Your data is saved in this browser.
+        </small>
       </div>
-      {children}
+    </div>
+  );
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function Dashboard({
+  database,
+  updateDatabase,
+  setSelectedCharacter
+}) {
+  const alive = database.characters.filter(
+    (character) =>
+      character.status === "Alive"
+  ).length;
+
+  const quickCharacter = () => {
+    const character = blankCharacter();
+
+    updateDatabase((db) => {
+      db.characters.unshift(character);
+      db.activeTab = "characters";
+    });
+
+    setSelectedCharacter(character.id);
+  };
+
+  return (
+    <section className="page">
+      <div className="hero card">
+        <div>
+          <div className="eyebrow">
+            WELCOME BACK
+          </div>
+
+          <h2>
+            Build your universe.
+          </h2>
+
+          <p>
+            Create characters, connect their
+            stories, investigate mysteries,
+            organize factions and keep your
+            lore together.
+          </p>
+        </div>
+
+        <div className="hero-symbol">
+          ✦
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <Stat
+          number={database.characters.length}
+          label="Characters"
+        />
+
+        <Stat
+          number={
+            database.organizations.length
+          }
+          label="Organizations"
+        />
+
+        <Stat
+          number={
+            database.investigations.length
+          }
+          label="Cases"
+        />
+
+        <Stat
+          number={alive}
+          label="Alive"
+        />
+      </div>
+
+      <div className="two-columns">
+        <section className="card">
+          <div className="section-title">
+            <h3>Recent characters</h3>
+
+            <span className="counter">
+              {database.characters.length}
+            </span>
+          </div>
+
+          {database.characters
+            .slice(0, 6)
+            .map((character) => (
+              <button
+                className="character-row"
+                key={character.id}
+                onClick={() => {
+                  updateDatabase(
+                    (db) => {
+                      db.activeTab =
+                        "characters";
+                    }
+                  );
+
+                  setSelectedCharacter(
+                    character.id
+                  );
+                }}
+              >
+                <Avatar
+                  character={character}
+                />
+
+                <span>
+                  <b>
+                    {character.name ||
+                      "Unnamed"}
+                    {" "}
+                    {character.lastName}
+                  </b>
+
+                  <small>
+                    {character.affiliation ||
+                      "Independent"}
+                  </small>
+                </span>
+
+                <i>›</i>
+              </button>
+            ))}
+
+          {!database.characters.length && (
+            <Empty text="No characters yet." />
+          )}
+        </section>
+
+        <section className="card">
+          <div className="section-title">
+            <h3>Quick creation</h3>
+          </div>
+
+          <div className="quick-grid">
+            <button
+              onClick={quickCharacter}
+            >
+              ♙
+              <span>Character</span>
+            </button>
+
+            <button
+              onClick={() =>
+                updateDatabase((db) => {
+                  db.organizations.unshift(
+                    blankOrganization()
+                  );
+
+                  db.activeTab =
+                    "organizations";
+                })
+              }
+            >
+              ♜
+              <span>Organization</span>
+            </button>
+
+            <button
+              onClick={() =>
+                updateDatabase((db) => {
+                  db.investigations.unshift(
+                    blankCase()
+                  );
+
+                  db.activeTab =
+                    "investigations";
+                })
+              }
+            >
+              ⌕
+              <span>Investigation</span>
+            </button>
+
+            <button
+              onClick={() =>
+                updateDatabase((db) => {
+                  db.lore.unshift(
+                    blankLore()
+                  );
+
+                  db.activeTab =
+                    "lore";
+                })
+              }
+            >
+              ☾
+              <span>Lore</span>
+            </button>
+          </div>
+        </section>
+      </div>
     </section>
   );
 }
 
-function FiveLevel({ value = 3, onChange }) {
-  return (
-    <div className="levels">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          type="button"
-          key={n}
-          className={n <= value ? "level active" : "level"}
-          onClick={() => onChange(n)}
-        >
-          {n}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function PersonalitySlider({ left, right, value = 3, onChange }) {
-  return (
-    <div className="personality-row">
-      <span>{left}</span>
-
-      <div className="slider-wrap">
-        <input
-          type="range"
-          min="1"
-          max="5"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-        />
-
-        <div className="slider-labels">
-          <small>1</small>
-          <small>2</small>
-          <small>3</small>
-          <small>4</small>
-          <small>5</small>
-        </div>
-      </div>
-
-      <span>{right}</span>
-    </div>
-  );
-}
-
-function LoginScreen({ onLogin }) {
-  const [mode, setMode] = useState("login");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  function submit(e) {
-    e.preventDefault();
-
-    const saved = localStorage.getItem(USER_KEY);
-
-    if (mode === "register") {
-      if (!username.trim() || !password) {
-        setError("Please enter a username and password.");
-        return;
-      }
-
-      localStorage.setItem(
-        USER_KEY,
-        JSON.stringify({
-          username: username.trim(),
-          password
-        })
-      );
-
-      onLogin(username.trim());
-      return;
-    }
-
-    if (!saved) {
-      setError("No account exists yet. Please register first.");
-      return;
-    }
-
-    const user = JSON.parse(saved);
-
-    if (
-      user.username !== username.trim() ||
-      user.password !== password
-    ) {
-      setError("Incorrect username or password.");
-      return;
-    }
-
-    onLogin(user.username);
-  }
-
-  return (
-    <div className="login-page">
-      <div className="login-symbol">✦</div>
-
-      <Card className="login-card">
-        <div className="brand large">
-          <span>✦</span>
-          <div>
-            <strong>OC ARCHIVE</strong>
-            <small>Personal Character Database</small>
-          </div>
-        </div>
-
-        <h1>{mode === "login" ? "Welcome back" : "Create your archive"}</h1>
-
-        <p className="muted">
-          {mode === "login"
-            ? "Enter your local archive account."
-            : "Your account stays on this device."}
-        </p>
-
-        <form onSubmit={submit}>
-          <Input
-            label="Username"
-            value={username}
-            onChange={setUsername}
-            placeholder="Your username"
-          />
-
-          <Input
-            label="Password"
-            value={password}
-            onChange={setPassword}
-            type="password"
-            placeholder="Your password"
-          />
-
-          {error && <div className="error-box">{error}</div>}
-
-          <Button type="submit">
-            {mode === "login" ? "Log in" : "Register"}
-          </Button>
-        </form>
-
-        <button
-          className="text-button"
-          onClick={() => {
-            setMode(mode === "login" ? "register" : "login");
-            setError("");
-          }}
-        >
-          {mode === "login"
-            ? "Create a new account"
-            : "Already have an account? Log in"}
-        </button>
-
-        <p className="tiny-note">
-          This is a local personal account system. It does not send your
-          information to a server.
-        </p>
-      </Card>
-    </div>
-  );
-}
-
-function Sidebar({
-  page,
-  setPage,
-  theme,
-  setTheme,
-  username,
-  onLogout
+function Stat({
+  number,
+  label
 }) {
-  const items = [
-    ["dashboard", "⌂", "Dashboard"],
-    ["characters", "♙", "Characters"],
-    ["organizations", "♜", "Organizations"],
-    ["investigations", "⌕", "Investigations"],
-    ["lore", "✧", "Lore"],
-    ["posts", "✎", "Posts"]
-  ];
+  return (
+    <div className="stat-card card">
+      <strong>{number}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+/* =========================================================
+   CHARACTERS
+========================================================= */
+
+function CharactersPage({
+  database,
+  characters,
+  updateDatabase,
+  selectedCharacter,
+  setSelectedCharacter
+}) {
+  const character =
+    characters.find(
+      (item) =>
+        item.id === selectedCharacter
+    );
 
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <span>✦</span>
-        <div>
-          <strong>OC ARCHIVE</strong>
-          <small>Personal Database</small>
-        </div>
-      </div>
+    <section className="page split-layout">
+      <div className="card character-list">
+        <div className="section-title">
+          <h3>Character archive</h3>
 
-      <nav>
-        {items.map(([id, icon, label]) => (
+          <span className="counter">
+            {characters.length}
+          </span>
+        </div>
+
+        {characters.map((item) => (
           <button
-            key={id}
-            className={page === id ? "nav-item active" : "nav-item"}
-            onClick={() => setPage(id)}
+            key={item.id}
+            className={
+              selectedCharacter === item.id
+                ? "character-select active"
+                : "character-select"
+            }
+            onClick={() =>
+              setSelectedCharacter(
+                item.id
+              )
+            }
           >
-            <span>{icon}</span>
-            {label}
+            <Avatar character={item} />
+
+            <span>
+              <b>
+                {item.name ||
+                  "Unnamed character"}
+                {" "}
+                {item.lastName}
+              </b>
+
+              <small>
+                {item.nickname ||
+                  item.species}
+              </small>
+
+              <small>
+                {item.status}
+                {" · "}
+                {item.affiliation ||
+                  "Independent"}
+              </small>
+            </span>
           </button>
         ))}
-      </nav>
 
-      <div className="sidebar-bottom">
-        <label className="theme-select">
-          <span>Theme</span>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-          >
-            {Object.entries(themes).map(([id, value]) => (
-              <option key={id} value={id}>
-                {value.icon} {value.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="user-box">
-          <span>◈</span>
-          <div>
-            <strong>{username}</strong>
-            <small>Local account</small>
-          </div>
-        </div>
-
-        <Button secondary small onClick={onLogout}>
-          Log out
-        </Button>
-      </div>
-    </aside>
-  );
-}
-
-function Topbar({
-  page,
-  search,
-  setSearch,
-  onExport,
-  onImport,
-  fileInput
-}) {
-  const titles = {
-    dashboard: "Dashboard",
-    characters: "Characters",
-    organizations: "Organizations",
-    investigations: "Investigations",
-    lore: "Lore",
-    posts: "Posts"
-  };
-
-  return (
-    <header className="topbar">
-      <div>
-        <div className="eyebrow">ARCHIVE / {page.toUpperCase()}</div>
-        <h1>{titles[page]}</h1>
+        {!characters.length && (
+          <Empty text="No matching characters." />
+        )}
       </div>
 
-      <div className="top-actions">
-        <input
-          className="global-search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search archive..."
-        />
-
-        <Button small secondary onClick={onExport}>
-          Export
-        </Button>
-
-        <Button
-          small
-          secondary
-          onClick={() => fileInput.current?.click()}
-        >
-          Import
-        </Button>
-      </div>
-    </header>
-  );
-}
-
-function Dashboard({ db, setPage }) {
-  const alive = db.characters.filter((c) => c.status === "Alive").length;
-
-  return (
-    <div className="page-content">
-      <div className="hero-card">
-        <div>
-          <div className="eyebrow">WELCOME TO YOUR ARCHIVE</div>
-          <h2>Build your universe.</h2>
-          <p>
-            Keep your characters, organizations, investigations and lore
-            connected in one personal database.
-          </p>
-        </div>
-
-        <div className="hero-symbol">✦</div>
-      </div>
-
-      <div className="stats-grid">
-        <Stat title="Characters" value={db.characters.length} icon="♙" />
-        <Stat title="Organizations" value={db.organizations.length} icon="♜" />
-        <Stat title="Investigations" value={db.investigations.length} icon="⌕" />
-        <Stat title="Lore entries" value={db.lore.length} icon="✧" />
-        <Stat title="Posts" value={db.posts.length} icon="✎" />
-        <Stat title="Alive characters" value={alive} icon="♥" />
-      </div>
-
-      <div className="two-columns">
-        <Card>
-          <h3>Quick actions</h3>
-          <div className="quick-actions">
-            <Button onClick={() => setPage("characters")}>
-              + Character
-            </Button>
-
-            <Button
-              secondary
-              onClick={() => setPage("organizations")}
-            >
-              + Organization
-            </Button>
-
-            <Button
-              secondary
-              onClick={() => setPage("investigations")}
-            >
-              + Investigation
-            </Button>
-
-            <Button
-              secondary
-              onClick={() => setPage("lore")}
-            >
-              + Lore
-            </Button>
-          </div>
-        </Card>
-
-        <Card>
-          <h3>Archive status</h3>
-          <div className="status-list">
-            <div>
-              <span>Automatic saving</span>
-              <strong className="green">ACTIVE</strong>
-            </div>
-
-            <div>
-              <span>Local storage</span>
-              <strong className="green">ACTIVE</strong>
-            </div>
-
-            <div>
-              <span>JSON backup</span>
-              <strong>AVAILABLE</strong>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function Stat({ title, value, icon }) {
-  return (
-    <Card className="stat-card">
-      <span className="stat-icon">{icon}</span>
-      <div>
-        <small>{title}</small>
-        <strong>{value}</strong>
-      </div>
-    </Card>
-  );
-}
-
-function CharacterList({
-  characters,
-  onNew,
-  onEdit,
-  onDelete
-}) {
-  return (
-    <div className="page-content">
-      <div className="page-actions">
-        <div>
-          <p className="muted">
-            {characters.length} character
-            {characters.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-
-        <Button onClick={onNew}>+ New character</Button>
-      </div>
-
-      {characters.length === 0 ? (
-        <Empty
-          title="No characters yet"
-          text="Create your first character and start building your universe."
-          button="+ Create character"
-          onClick={onNew}
+      {character ? (
+        <CharacterEditor
+          character={character}
+          database={database}
+          updateDatabase={
+            updateDatabase
+          }
+          close={() =>
+            setSelectedCharacter(null)
+          }
         />
       ) : (
-        <div className="character-grid">
-          {characters.map((character) => (
-            <Card key={character.id} className="character-card">
-              <div
-                className="character-image"
-                style={
-                  character.image
-                    ? { backgroundImage: `url(${character.image})` }
-                    : {}
-                }
-              >
-                {!character.image && (
-                  <span>{character.name?.[0] || "?"}</span>
-                )}
+        <div className="card empty-editor">
+          <div className="large-symbol">
+            ♙
+          </div>
 
-                <div className="status-badge">
-                  {character.status}
-                </div>
-              </div>
+          <h2>
+            Select a character
+          </h2>
 
-              <div className="character-body">
-                <div className="eyebrow">
-                  {character.species || "Unknown"}
-                </div>
-
-                <h2>
-                  {character.name || "Unnamed"}{" "}
-                  {character.lastName}
-                </h2>
-
-                {character.nickname && (
-                  <p className="nickname">
-                    "{character.nickname}"
-                  </p>
-                )}
-
-                <div className="character-meta">
-                  <span>{character.age || "?"} years</span>
-                  <span>{character.mbti || "MBTI ?"}</span>
-                  <span>{character.gender || "Gender ?"}</span>
-                </div>
-
-                <div className="card-buttons">
-                  <Button
-                    small
-                    onClick={() => onEdit(character)}
-                  >
-                    Open
-                  </Button>
-
-                  <Button
-                    small
-                    secondary
-                    onClick={() => onDelete(character.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+          <p>
+            Create a character or select
+            one from the archive.
+          </p>
         </div>
       )}
-    </div>
+    </section>
   );
 }
+
+const characterSections = [
+  {
+    title: "Identity",
+    fields: [
+      ["name", "Name"],
+      ["lastName", "Last name"],
+      ["nickname", "Nickname(s)"],
+      ["age", "Age"],
+      ["dob", "Date of birth"],
+      ["gender", "Gender"],
+      ["pronouns", "Pronouns"],
+      ["sexuality", "Sexuality"],
+      ["nationality", "Nationality"],
+      ["origins", "Origins"],
+      ["species", "Species / race"]
+    ]
+  },
+
+  {
+    title: "Appearance",
+    fields: [
+      ["height", "Height"],
+      ["weight", "Weight"],
+      ["eyeColor", "Eye color"],
+      ["hairColor", "Hair color"],
+      ["hairStyle", "Hair style"]
+    ]
+  },
+
+  {
+    title: "Occupation & affiliations",
+    fields: [
+      ["job", "Job"],
+      ["sideJob", "Side job"],
+      ["affiliation", "Affiliation"],
+      [
+        "pastAffiliation",
+        "Past affiliation"
+      ],
+      ["rank", "Rank"],
+      ["pastRank", "Past rank"]
+    ]
+  },
+
+  {
+    title: "Story & abilities",
+    fields: [
+      ["status", "Current status"],
+      ["laterStatus", "Later status"],
+      ["mbti", "MBTI"],
+      ["weapon", "Weapon"],
+      ["abilities", "Abilities"],
+      [
+        "abilityEffects",
+        "Effects / limitations of abilities"
+      ],
+      ["fears", "Fears"],
+      ["sickness", "Sickness"],
+      ["addictions", "Addiction(s)"]
+    ]
+  },
+
+  {
+    title: "Personal",
+    fields: [
+      ["likes", "Likes"],
+      ["dislikes", "Dislikes"],
+      [
+        "anecdotes",
+        "Anecdotes / trivia"
+      ],
+      ["songs", "Songs"],
+      ["lyrics", "Lyrics"],
+      ["quotes", "Quotes"],
+      ["notes", "Extra notes"]
+    ]
+  }
+];
+
+const traitPairs = [
+  ["nice", "Nice", "Mean"],
+  ["brave", "Brave", "Coward"],
+  ["pacifist", "Pacifist", "Violent"],
+  [
+    "thoughtful",
+    "Thoughtful",
+    "Impulsive"
+  ],
+  [
+    "agreeable",
+    "Agreeable",
+    "Contrary"
+  ],
+  [
+    "idealistic",
+    "Idealistic",
+    "Pragmatic"
+  ],
+  [
+    "frugal",
+    "Frugal",
+    "Big spender"
+  ],
+  [
+    "collected",
+    "Collected",
+    "Wild"
+  ],
+  [
+    "honest",
+    "Honest",
+    "Deceptive"
+  ],
+  ["polite", "Polite", "Rude"],
+  ["smart", "Smart", "Idiot"],
+  [
+    "confident",
+    "Confident",
+    "Insecure"
+  ],
+  ["calm", "Calm", "Anxious"],
+  [
+    "patient",
+    "Patient",
+    "Impatient"
+  ],
+  [
+    "gullible",
+    "Gullible",
+    "Skeptical"
+  ],
+  [
+    "reserved",
+    "Reserved",
+    "Flirty"
+  ]
+];
+
+const skillNames = [
+  ["perception", "Perception"],
+  ["communication", "Communication"],
+  ["persuasion", "Persuasion"],
+  ["mediation", "Mediation"],
+  ["literacy", "Literacy"],
+  ["creativity", "Creativity"],
+  ["cooking", "Cooking"],
+  ["tech", "Tech savvy"],
+  ["combat", "Combat"],
+  ["survival", "Survival"],
+  ["stealth", "Stealth"],
+  ["street", "Street smarts"],
+  ["seduction", "Seduction"],
+  ["luck", "Luck"],
+  ["animals", "Handling animals"],
+  ["children", "Pacifying children"],
+  ["reflexes", "Reflexes"],
+  ["strength", "Strength"],
+  ["speed", "Speed"],
+  ["battleIQ", "Battle IQ"],
+  ["resistance", "Resistance"],
+  ["flexibility", "Flexibility"]
+];
+
+const socialNames = [
+  ["charisma", "Charisma"],
+  ["empathy", "Empathy"],
+  ["generosity", "Generosity"],
+  ["wealth", "Wealth"],
+  ["aggression", "Aggression"],
+  ["libido", "Libido"]
+];
 
 function CharacterEditor({
   character,
-  db,
-  onSave,
-  onCancel
+  database,
+  updateDatabase,
+  close
 }) {
-  const [form, setForm] = useState({
-    ...emptyCharacter,
-    ...character,
-    personality: {
-      ...character.personality
-    },
-    skills: {
-      ...character.skills
-    },
-    socials: {
-      ...character.socials
-    },
-    moodboard: [...(character.moodboard || [])]
-  });
+  const set = (key, value) => {
+    updateDatabase((db) => {
+      const item =
+        db.characters.find(
+          (x) => x.id === character.id
+        );
 
-  const update = (key, value) => {
-    setForm((old) => ({
-      ...old,
-      [key]: value
-    }));
-  };
-
-  const updateNested = (category, key, value) => {
-    setForm((old) => ({
-      ...old,
-      [category]: {
-        ...old[category],
-        [key]: value
+      if (item) {
+        item[key] = value;
       }
-    }));
+    });
   };
 
-  function uploadImage(event) {
-    const file = event.target.files?.[0];
+  const setNested = (
+    section,
+    key,
+    value
+  ) => {
+    updateDatabase((db) => {
+      const item =
+        db.characters.find(
+          (x) => x.id === character.id
+        );
+
+      if (item) {
+        item[section][key] = value;
+      }
+    });
+  };
+
+  const deleteCharacter = () => {
+    if (
+      !window.confirm(
+        "Delete this character permanently?"
+      )
+    ) {
+      return;
+    }
+
+    updateDatabase((db) => {
+      db.characters =
+        db.characters.filter(
+          (x) =>
+            x.id !== character.id
+        );
+
+      db.posts.forEach((post) => {
+        post.characters =
+          post.characters.filter(
+            (id) =>
+              id !== character.id
+          );
+      });
+
+      db.investigations.forEach(
+        (investigation) => {
+          investigation.linkedCharacters =
+            investigation.linkedCharacters.filter(
+              (id) =>
+                id !== character.id
+            );
+        }
+      );
+    });
+
+    close();
+  };
+
+  const uploadImage = (event) => {
+    const file =
+      event.target.files?.[0];
 
     if (!file) return;
 
-    const reader = new FileReader();
+    const reader =
+      new FileReader();
 
-    reader.onload = () => {
-      update("image", reader.result);
-    };
+    reader.onload = () =>
+      set("image", reader.result);
 
     reader.readAsDataURL(file);
-  }
+  };
 
-  function uploadMoodboard(event) {
-    const files = [...(event.target.files || [])];
+  const uploadMoodboard = (
+    event
+  ) => {
+    const files = [
+      ...(event.target.files || [])
+    ];
 
     files.forEach((file) => {
-      const reader = new FileReader();
+      const reader =
+        new FileReader();
 
       reader.onload = () => {
-        setForm((old) => ({
-          ...old,
-          moodboard: [...old.moodboard, reader.result]
-        }));
+        updateDatabase((db) => {
+          const item =
+            db.characters.find(
+              (x) =>
+                x.id === character.id
+            );
+
+          if (item) {
+            item.moodboard.push(
+              reader.result
+            );
+          }
+        });
       };
 
       reader.readAsDataURL(file);
     });
-  }
+  };
 
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("character"),
-      createdAt: form.createdAt || new Date().toISOString()
-    });
-  }
+  const multiline = [
+    "abilities",
+    "abilityEffects",
+    "fears",
+    "sickness",
+    "addictions",
+    "likes",
+    "dislikes",
+    "anecdotes",
+    "songs",
+    "lyrics",
+    "quotes",
+    "notes"
+  ];
 
   return (
-    <div className="page-content editor-page">
-      <div className="editor-top">
-        <Button secondary onClick={onCancel}>
-          ← Back
-        </Button>
+    <div className="card editor">
+      <div className="editor-header">
+        <div className="portrait-area">
+          <Avatar character={character} />
 
-        <div>
-          <div className="eyebrow">CHARACTER FILE</div>
-          <h1>
-            {form.name || "New character"}{" "}
-            {form.lastName}
-          </h1>
+          <label className="upload">
+            Upload picture
+            <input
+              type="file"
+              accept="image/*"
+              onChange={uploadImage}
+            />
+          </label>
         </div>
 
-        <Button onClick={save}>Save character</Button>
-      </div>
-
-      <Section title="Identity">
-        <div className="form-grid">
-          <Input
-            label="Name"
-            value={form.name}
-            onChange={(v) => update("name", v)}
+        <div className="editor-heading">
+          <input
+            className="big-input"
+            placeholder="Character name"
+            value={character.name}
+            onChange={(event) =>
+              set(
+                "name",
+                event.target.value
+              )
+            }
           />
-
-          <Input
-            label="Last name"
-            value={form.lastName}
-            onChange={(v) => update("lastName", v)}
-          />
-
-          <Input
-            label="Nickname(s)"
-            value={form.nickname}
-            onChange={(v) => update("nickname", v)}
-          />
-
-          <Input
-            label="Age"
-            value={form.age}
-            onChange={(v) => update("age", v)}
-          />
-
-          <Input
-            label="Date of birth"
-            type="date"
-            value={form.dateOfBirth}
-            onChange={(v) => update("dateOfBirth", v)}
-          />
-
-          <Input
-            label="Gender"
-            value={form.gender}
-            onChange={(v) => update("gender", v)}
-          />
-
-          <Input
-            label="Pronouns"
-            value={form.pronouns}
-            onChange={(v) => update("pronouns", v)}
-          />
-
-          <Input
-            label="Sexuality"
-            value={form.sexuality}
-            onChange={(v) => update("sexuality", v)}
-          />
-
-          <Input
-            label="Nationality"
-            value={form.nationality}
-            onChange={(v) => update("nationality", v)}
-          />
-
-          <Input
-            label="Origins"
-            value={form.origins}
-            onChange={(v) => update("origins", v)}
-          />
-
-          <Input
-            label="Species / race"
-            value={form.species}
-            onChange={(v) => update("species", v)}
-          />
-
-          <Input
-            label="MBTI"
-            value={form.mbti}
-            onChange={(v) => update("mbti", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Status & affiliations">
-        <div className="form-grid">
-          <Select
-            label="Current status"
-            value={form.status}
-            onChange={(v) => update("status", v)}
-            options={["Alive", "Dead", "Unknown", "Missing"]}
-          />
-
-          <Select
-            label="Later status"
-            value={form.laterStatus}
-            onChange={(v) => update("laterStatus", v)}
-            options={["Alive", "Dead", "Unknown", "Missing"]}
-          />
-
-          <Input
-            label="Affiliation"
-            value={form.affiliation}
-            onChange={(v) => update("affiliation", v)}
-          />
-
-          <Input
-            label="Past affiliation"
-            value={form.pastAffiliation}
-            onChange={(v) => update("pastAffiliation", v)}
-          />
-
-          <Input
-            label="Rank"
-            value={form.rank}
-            onChange={(v) => update("rank", v)}
-          />
-
-          <Input
-            label="Past rank"
-            value={form.pastRank}
-            onChange={(v) => update("pastRank", v)}
-          />
-
-          <Input
-            label="Job"
-            value={form.job}
-            onChange={(v) => update("job", v)}
-          />
-
-          <Input
-            label="Side job"
-            value={form.sideJob}
-            onChange={(v) => update("sideJob", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Appearance">
-        <div className="form-grid">
-          <Input
-            label="Height"
-            value={form.height}
-            onChange={(v) => update("height", v)}
-          />
-
-          <Input
-            label="Weight"
-            value={form.weight}
-            onChange={(v) => update("weight", v)}
-          />
-
-          <Input
-            label="Eye color"
-            value={form.eyeColor}
-            onChange={(v) => update("eyeColor", v)}
-          />
-
-          <Input
-            label="Hair color"
-            value={form.hairColor}
-            onChange={(v) => update("hairColor", v)}
-          />
-
-          <Input
-            label="Hair style"
-            value={form.hairStyle}
-            onChange={(v) => update("hairStyle", v)}
-          />
-        </div>
-
-        <div className="upload-box">
-          <strong>Character picture</strong>
 
           <input
-            type="file"
-            accept="image/*"
-            onChange={uploadImage}
+            className="subtitle-input"
+            placeholder="Last name / title"
+            value={character.lastName}
+            onChange={(event) =>
+              set(
+                "lastName",
+                event.target.value
+              )
+            }
           />
 
-          {form.image && (
-            <div
-              className="uploaded-preview"
-              style={{
-                backgroundImage: `url(${form.image})`
-              }}
-            />
+          <div className="badges">
+            <span>
+              {character.status}
+            </span>
+
+            <span>
+              {character.affiliation ||
+                "Independent"}
+            </span>
+
+            <span>
+              {character.mbti ||
+                "MBTI —"}
+            </span>
+          </div>
+        </div>
+
+        <button
+          className="icon-button"
+          onClick={close}
+        >
+          ×
+        </button>
+      </div>
+
+      {characterSections.map(
+        (section) => (
+          <fieldset key={section.title}>
+            <legend>
+              {section.title}
+            </legend>
+
+            <div className="form-grid">
+              {section.fields.map(
+                ([key, label]) => (
+                  <Field
+                    key={key}
+                    label={label}
+                  >
+                    {key ===
+                    "status" ? (
+                      <select
+                        value={
+                          character[key]
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          set(
+                            key,
+                            event.target
+                              .value
+                          )
+                        }
+                      >
+                        <option>
+                          Alive
+                        </option>
+                        <option>
+                          Dead
+                        </option>
+                        <option>
+                          Unknown
+                        </option>
+                      </select>
+                    ) : multiline.includes(
+                        key
+                      ) ? (
+                      <textarea
+                        value={
+                          character[key]
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          set(
+                            key,
+                            event.target
+                              .value
+                          )
+                        }
+                      />
+                    ) : (
+                      <input
+                        value={
+                          character[key]
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          set(
+                            key,
+                            event.target
+                              .value
+                          )
+                        }
+                      />
+                    )}
+                  </Field>
+                )
+              )}
+            </div>
+          </fieldset>
+        )
+      )}
+
+      <fieldset>
+        <legend>
+          Personality — cursor lines
+        </legend>
+
+        <div className="traits">
+          {traitPairs.map(
+            ([key, left, right]) => (
+              <label
+                className="trait"
+                key={key}
+              >
+                <div>
+                  <span>{left}</span>
+                  <span>{right}</span>
+                </div>
+
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={
+                    character.traits[key]
+                  }
+                  onChange={(event) =>
+                    setNested(
+                      "traits",
+                      key,
+                      Number(
+                        event.target.value
+                      )
+                    )
+                  }
+                />
+              </label>
+            )
           )}
         </div>
-      </Section>
+      </fieldset>
 
-      <Section title="Abilities & combat">
-        <div className="form-grid">
-          <Input
-            label="Abilities"
-            textarea
-            value={form.abilities}
-            onChange={(v) => update("abilities", v)}
-            placeholder="List abilities, powers, talents..."
-          />
+      <fieldset>
+        <legend>
+          Skills — 5 levels
+        </legend>
 
-          <Input
-            label="Effects of abilities"
-            textarea
-            value={form.abilityEffects}
-            onChange={(v) => update("abilityEffects", v)}
-            placeholder="Physical effects, consequences, limitations..."
-          />
-
-          <Input
-            label="Weapon"
-            value={form.weapon}
-            onChange={(v) => update("weapon", v)}
-          />
+        <div className="levels-grid">
+          {skillNames.map(
+            ([key, label]) => (
+              <Level
+                key={key}
+                label={label}
+                value={
+                  character.skills[key]
+                }
+                onChange={(value) =>
+                  setNested(
+                    "skills",
+                    key,
+                    value
+                  )
+                }
+              />
+            )
+          )}
         </div>
-      </Section>
+      </fieldset>
 
-      <Section title="Personality">
-        <div className="personality-list">
-          {personalityFields.map(([left, right]) => (
-            <PersonalitySlider
-              key={`${left}-${right}`}
-              left={left}
-              right={right}
-              value={form.personality[`${left}-${right}`] || 3}
-              onChange={(value) =>
-                updateNested(
-                  "personality",
-                  `${left}-${right}`,
-                  value
+      <fieldset>
+        <legend>
+          Socials — 5 levels
+        </legend>
+
+        <div className="levels-grid">
+          {socialNames.map(
+            ([key, label]) => (
+              <Level
+                key={key}
+                label={label}
+                value={
+                  character.socials[key]
+                }
+                onChange={(value) =>
+                  setNested(
+                    "socials",
+                    key,
+                    value
+                  )
+                }
+              />
+            )
+          )}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>
+          Relationships
+        </legend>
+
+        <Relationships
+          character={character}
+          database={database}
+          updateDatabase={
+            updateDatabase
+          }
+        />
+      </fieldset>
+
+      <fieldset>
+        <legend>
+          Linked organizations
+        </legend>
+
+        <LinkList
+          values={
+            character.linkedOrganizations
+          }
+          items={
+            database.organizations
+          }
+          placeholder="organization"
+          onAdd={(id) =>
+            updateDatabase((db) => {
+              const item =
+                db.characters.find(
+                  (x) =>
+                    x.id ===
+                    character.id
+                );
+
+              if (
+                item &&
+                !item.linkedOrganizations.includes(
+                  id
                 )
+              ) {
+                item.linkedOrganizations.push(
+                  id
+                );
               }
-            />
-          ))}
-        </div>
-      </Section>
+            })
+          }
+          onRemove={(id) =>
+            updateDatabase((db) => {
+              const item =
+                db.characters.find(
+                  (x) =>
+                    x.id ===
+                    character.id
+                );
 
-      <Section title="Skills — 5 levels">
-        <div className="stat-editor-grid">
-          {skillFields.map((skill) => (
-            <div className="stat-row" key={skill}>
-              <span>{skill}</span>
-
-              <FiveLevel
-                value={form.skills[skill] || 0}
-                onChange={(value) =>
-                  updateNested("skills", skill, value)
-                }
-              />
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Social attributes — 5 levels">
-        <div className="stat-editor-grid">
-          {socialFields.map((skill) => (
-            <div className="stat-row" key={skill}>
-              <span>{skill}</span>
-
-              <FiveLevel
-                value={form.socials[skill] || 0}
-                onChange={(value) =>
-                  updateNested("socials", skill, value)
-                }
-              />
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Psychology & personal details">
-        <div className="form-grid">
-          <Input
-            label="Fears"
-            textarea
-            value={form.fears}
-            onChange={(v) => update("fears", v)}
-          />
-
-          <Input
-            label="Sickness / medical information"
-            textarea
-            value={form.sickness}
-            onChange={(v) => update("sickness", v)}
-          />
-
-          <Input
-            label="Addictions"
-            textarea
-            value={form.addictions}
-            onChange={(v) => update("addictions", v)}
-          />
-
-          <Input
-            label="Likes"
-            textarea
-            value={form.likes}
-            onChange={(v) => update("likes", v)}
-          />
-
-          <Input
-            label="Dislikes"
-            textarea
-            value={form.dislikes}
-            onChange={(v) => update("dislikes", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Relationships">
-        <div className="form-grid">
-          <Input
-            label="Family"
-            textarea
-            value={form.family}
-            onChange={(v) => update("family", v)}
-            placeholder="Parents, siblings, children..."
-          />
-
-          <Input
-            label="Friends"
-            textarea
-            value={form.friends}
-            onChange={(v) => update("friends", v)}
-          />
-
-          <Input
-            label="Pets"
-            textarea
-            value={form.pets}
-            onChange={(v) => update("pets", v)}
-          />
-        </div>
-
-        <RelationshipPicker
-          title="Linked characters"
-          selected={form.relatedCharacterIds}
-          items={db.characters.filter((c) => c.id !== form.id)}
-          onChange={(value) =>
-            update("relatedCharacterIds", value)
+              if (item) {
+                item.linkedOrganizations =
+                  item.linkedOrganizations.filter(
+                    (x) => x !== id
+                  );
+              }
+            })
           }
         />
+      </fieldset>
 
-        <RelationshipPicker
-          title="Linked organizations"
-          selected={form.organizationIds}
-          items={db.organizations}
-          onChange={(value) =>
-            update("organizationIds", value)
-          }
-        />
-      </Section>
+      <fieldset>
+        <legend>
+          Mood board
+        </legend>
 
-      <Section title="Writing & atmosphere">
-        <div className="form-grid">
-          <Input
-            label="Anecdotes"
-            textarea
-            value={form.anecdotes}
-            onChange={(v) => update("anecdotes", v)}
-            placeholder="Funny, strange, memorable or important stories..."
-          />
-
-          <Input
-            label="Lore"
-            textarea
-            value={form.lore}
-            onChange={(v) => update("lore", v)}
-          />
-
-          <Input
-            label="Song"
-            value={form.song}
-            onChange={(v) => update("song", v)}
-          />
-
-          <Input
-            label="Lyrics"
-            textarea
-            value={form.lyrics}
-            onChange={(v) => update("lyrics", v)}
-          />
-
-          <Input
-            label="Quotes"
-            textarea
-            value={form.quotes}
-            onChange={(v) => update("quotes", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Moodboard">
-        <div className="upload-box">
-          <strong>Upload moodboard images</strong>
+        <label className="upload mood-upload">
+          + Upload moodboard images
 
           <input
             type="file"
             accept="image/*"
             multiple
-            onChange={uploadMoodboard}
+            onChange={
+              uploadMoodboard
+            }
           />
+        </label>
 
-          <div className="moodboard">
-            {form.moodboard.map((image, index) => (
+        <div className="moodboard">
+          {character.moodboard.map(
+            (image, index) => (
               <div
-                className="mood-image"
-                key={`${image}-${index}`}
-                style={{
-                  backgroundImage: `url(${image})`
-                }}
+                className="mood-item"
+                key={index}
               >
+                <img
+                  src={image}
+                  alt=""
+                />
+
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      "moodboard",
-                      form.moodboard.filter(
-                        (_, i) => i !== index
-                      )
+                    updateDatabase(
+                      (db) => {
+                        const item =
+                          db.characters.find(
+                            (x) =>
+                              x.id ===
+                              character.id
+                          );
+
+                        item.moodboard.splice(
+                          index,
+                          1
+                        );
+                      }
+                    )
+                  }
+                >
+                  ×
+                </button>
+              </div>
+            )
+          )}
+        </div>
+      </fieldset>
+
+      <div className="editor-footer">
+        <button
+          className="danger"
+          onClick={
+            deleteCharacter
+          }
+        >
+          Delete character
+        </button>
+
+        <span className="autosave">
+          ✓ Automatically saved
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Level({
+  label,
+  value,
+  onChange
+}) {
+  return (
+    <div className="level">
+      <div className="level-title">
+        <span>{label}</span>
+
+        <b>{value}/5</b>
+      </div>
+
+      <div className="pips">
+        {[1, 2, 3, 4, 5].map(
+          (number) => (
+            <button
+              type="button"
+              key={number}
+              className={
+                number <= value
+                  ? "pip active"
+                  : "pip"
+              }
+              onClick={() =>
+                onChange(number)
+              }
+            />
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Relationships({
+  character,
+  updateDatabase
+}) {
+  const groups = [
+    ["family", "Family"],
+    ["friends", "Friends"],
+    ["pets", "Pets"]
+  ];
+
+  return (
+    <div className="relationship-grid">
+      {groups.map(
+        ([key, label]) => (
+          <div
+            className="relationship-box"
+            key={key}
+          >
+            <h4>{label}</h4>
+
+            {character.relationships[
+              key
+            ].map((id) => (
+              <div
+                className="tag"
+                key={id}
+              >
+                {id}
+
+                <button
+                  onClick={() =>
+                    updateDatabase(
+                      (db) => {
+                        const item =
+                          db.characters.find(
+                            (x) =>
+                              x.id ===
+                              character.id
+                          );
+
+                        item.relationships[
+                          key
+                        ] =
+                          item.relationships[
+                            key
+                          ].filter(
+                            (x) =>
+                              x !== id
+                          );
+                      }
                     )
                   }
                 >
@@ -1286,1370 +1821,1491 @@ function CharacterEditor({
                 </button>
               </div>
             ))}
+
+            <button
+              className="secondary small"
+              onClick={() => {
+                const value =
+                  window.prompt(
+                    `Enter ${label.toLowerCase()} name or character ID:`
+                  );
+
+                if (!value) return;
+
+                updateDatabase(
+                  (db) => {
+                    const item =
+                      db.characters.find(
+                        (x) =>
+                          x.id ===
+                          character.id
+                      );
+
+                    item.relationships[
+                      key
+                    ].push(value);
+                  }
+                );
+              }}
+            >
+              + Link
+            </button>
           </div>
-        </div>
-      </Section>
-
-      <div className="save-bottom">
-        <Button secondary onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button onClick={save}>
-          Save character
-        </Button>
-      </div>
+        )
+      )}
     </div>
   );
 }
 
-function RelationshipPicker({
-  title,
-  selected,
-  items,
-  onChange
+/* =========================================================
+   ORGANIZATIONS
+========================================================= */
+
+function OrganizationsPage({
+  database,
+  updateDatabase,
+  selectedOrganization,
+  setSelectedOrganization
 }) {
-  function toggle(id) {
-    if (selected.includes(id)) {
-      onChange(selected.filter((item) => item !== id));
-    } else {
-      onChange([...selected, id]);
-    }
-  }
+  const organization =
+    database.organizations.find(
+      (item) =>
+        item.id ===
+        selectedOrganization
+    );
 
   return (
-    <div className="relationship-picker">
-      <h4>{title}</h4>
+    <section className="page split-layout">
+      <div className="card side-list">
+        <div className="section-title">
+          <h3>Organizations</h3>
 
-      {items.length === 0 ? (
-        <p className="muted">Nothing available yet.</p>
-      ) : (
-        <div className="picker-list">
-          {items.map((item) => (
+          <span className="counter">
+            {database.organizations.length}
+          </span>
+        </div>
+
+        {database.organizations.map(
+          (item) => (
             <button
-              type="button"
               key={item.id}
               className={
-                selected.includes(item.id)
-                  ? "picker-item selected"
-                  : "picker-item"
+                selectedOrganization ===
+                item.id
+                  ? "list-button active"
+                  : "list-button"
               }
-              onClick={() => toggle(item.id)}
+              onClick={() =>
+                setSelectedOrganization(
+                  item.id
+                )
+              }
             >
-              <span>
-                {item.name || item.title}
-                {item.lastName
-                  ? ` ${item.lastName}`
-                  : ""}
-              </span>
+              <b>
+                {item.name ||
+                  "Unnamed organization"}
+              </b>
 
-              {selected.includes(item.id) && <b>✓</b>}
+              <small>
+                {item.type ||
+                  "Organization"}
+              </small>
             </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+          )
+        )}
 
-function OrganizationList({
-  organizations,
-  onNew,
-  onEdit,
-  onDelete
-}) {
-  return (
-    <div className="page-content">
-      <div className="page-actions">
-        <p className="muted">
-          {organizations.length} organization
-          {organizations.length !== 1 ? "s" : ""}
-        </p>
-
-        <Button onClick={onNew}>+ New organization</Button>
+        {!database.organizations
+          .length && (
+          <Empty text="Create an organization above." />
+        )}
       </div>
 
-      {organizations.length === 0 ? (
-        <Empty
-          title="No organizations"
-          text="Create organizations and connect characters to them."
-          button="+ Create organization"
-          onClick={onNew}
+      {organization ? (
+        <OrganizationEditor
+          organization={organization}
+          database={database}
+          updateDatabase={
+            updateDatabase
+          }
+          close={() =>
+            setSelectedOrganization(
+              null
+            )
+          }
         />
       ) : (
-        <div className="organization-grid">
-          {organizations.map((organization) => (
-            <Card key={organization.id}>
-              <div className="org-symbol">♜</div>
+        <div className="card empty-editor">
+          <div className="large-symbol">
+            ♜
+          </div>
 
-              <div className="eyebrow">
-                {organization.type || "Organization"}
-              </div>
-
-              <h2>{organization.name || "Unnamed organization"}</h2>
-
-              <p>{organization.description || "No description."}</p>
-
-              <div className="character-meta">
-                <span>{organization.status}</span>
-                <span>{organization.characterIds.length} linked characters</span>
-              </div>
-
-              <div className="card-buttons">
-                <Button
-                  small
-                  onClick={() => onEdit(organization)}
-                >
-                  Open
-                </Button>
-
-                <Button
-                  small
-                  secondary
-                  onClick={() => onDelete(organization.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))}
+          <h2>
+            Select an organization
+          </h2>
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
 function OrganizationEditor({
   organization,
-  db,
-  onSave,
-  onCancel
+  database,
+  updateDatabase,
+  close
 }) {
-  const [form, setForm] = useState({
-    ...emptyOrganization,
-    ...organization
-  });
+  const set = (key, value) =>
+    updateDatabase((db) => {
+      const item =
+        db.organizations.find(
+          (x) =>
+            x.id === organization.id
+        );
 
-  function update(key, value) {
-    setForm((old) => ({
-      ...old,
-      [key]: value
-    }));
-  }
-
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("organization")
+      if (item) {
+        item[key] = value;
+      }
     });
-  }
+
+  const remove = () => {
+    if (
+      !window.confirm(
+        "Delete this organization?"
+      )
+    ) {
+      return;
+    }
+
+    updateDatabase((db) => {
+      db.organizations =
+        db.organizations.filter(
+          (x) =>
+            x.id !== organization.id
+        );
+
+      db.characters.forEach(
+        (character) => {
+          character.linkedOrganizations =
+            character.linkedOrganizations.filter(
+              (id) =>
+                id !== organization.id
+            );
+        }
+      );
+    });
+
+    close();
+  };
 
   return (
-    <div className="page-content editor-page">
-      <div className="editor-top">
-        <Button secondary onClick={onCancel}>
-          ← Back
-        </Button>
+    <div className="card editor">
+      <div className="editor-header">
+        <div className="editor-heading">
+          <input
+            className="big-input"
+            placeholder="Organization name"
+            value={organization.name}
+            onChange={(event) =>
+              set(
+                "name",
+                event.target.value
+              )
+            }
+          />
 
-        <div>
-          <div className="eyebrow">ORGANIZATION FILE</div>
-          <h1>{form.name || "New organization"}</h1>
+          <input
+            placeholder="Type / faction / ideology"
+            value={organization.type}
+            onChange={(event) =>
+              set(
+                "type",
+                event.target.value
+              )
+            }
+          />
         </div>
 
-        <Button onClick={save}>Save organization</Button>
+        <button
+          className="icon-button"
+          onClick={close}
+        >
+          ×
+        </button>
       </div>
 
-      <Section title="Organization information">
-        <div className="form-grid">
-          <Input
-            label="Name"
-            value={form.name}
-            onChange={(v) => update("name", v)}
+      <div className="form-grid">
+        <Field label="Headquarters">
+          <input
+            value={
+              organization.headquarters
+            }
+            onChange={(event) =>
+              set(
+                "headquarters",
+                event.target.value
+              )
+            }
           />
+        </Field>
 
-          <Input
-            label="Type"
-            value={form.type}
-            onChange={(v) => update("type", v)}
-            placeholder="Government, gang, company..."
+        <Field label="Leader">
+          <input
+            value={organization.leader}
+            onChange={(event) =>
+              set(
+                "leader",
+                event.target.value
+              )
+            }
           />
+        </Field>
 
-          <Select
-            label="Status"
-            value={form.status}
-            onChange={(v) => update("status", v)}
-            options={["Active", "Inactive", "Destroyed", "Unknown"]}
+        <Field label="Ideology">
+          <textarea
+            value={organization.ideology}
+            onChange={(event) =>
+              set(
+                "ideology",
+                event.target.value
+              )
+            }
           />
+        </Field>
 
-          <Input
-            label="Leader"
-            value={form.leader}
-            onChange={(v) => update("leader", v)}
+        <Field label="Description">
+          <textarea
+            value={
+              organization.description
+            }
+            onChange={(event) =>
+              set(
+                "description",
+                event.target.value
+              )
+            }
           />
+        </Field>
+      </div>
 
-          <Input
-            label="Headquarters"
-            value={form.headquarters}
-            onChange={(v) => update("headquarters", v)}
-          />
+      <fieldset>
+        <legend>
+          Branches
+        </legend>
 
-          <Input
-            label="Description"
-            textarea
-            value={form.description}
-            onChange={(v) => update("description", v)}
-          />
+        <EditableList
+          values={
+            organization.branches
+          }
+          addLabel="Add branch"
+          onAdd={(value) =>
+            updateDatabase((db) => {
+              db.organizations.find(
+                (x) =>
+                  x.id ===
+                  organization.id
+              ).branches.push(
+                value
+              );
+            })
+          }
+          onRemove={(index) =>
+            updateDatabase((db) => {
+              db.organizations.find(
+                (x) =>
+                  x.id ===
+                  organization.id
+              ).branches.splice(
+                index,
+                1
+              );
+            })
+          }
+        />
+      </fieldset>
 
-          <Input
-            label="Goals"
-            textarea
-            value={form.goals}
-            onChange={(v) => update("goals", v)}
-          />
+      <fieldset>
+        <legend>
+          Linked characters
+        </legend>
 
-          <Input
-            label="Methods"
-            textarea
-            value={form.methods}
-            onChange={(v) => update("methods", v)}
-          />
+        <LinkList
+          values={
+            organization.members
+          }
+          items={
+            database.characters
+          }
+          placeholder="character"
+          onAdd={(id) =>
+            updateDatabase((db) => {
+              const item =
+                db.organizations.find(
+                  (x) =>
+                    x.id ===
+                    organization.id
+                );
 
-          <Input
-            label="Lore"
-            textarea
-            value={form.lore}
-            onChange={(v) => update("lore", v)}
-          />
+              if (
+                !item.members.includes(
+                  id
+                )
+              ) {
+                item.members.push(
+                  id
+                );
+              }
+
+              const character =
+                db.characters.find(
+                  (x) => x.id === id
+                );
+
+              if (
+                character &&
+                !character.linkedOrganizations.includes(
+                  organization.id
+                )
+              ) {
+                character.linkedOrganizations.push(
+                  organization.id
+                );
+              }
+            })
+          }
+          onRemove={(id) =>
+            updateDatabase((db) => {
+              const item =
+                db.organizations.find(
+                  (x) =>
+                    x.id ===
+                    organization.id
+                );
+
+              item.members =
+                item.members.filter(
+                  (x) => x !== id
+                );
+
+              const character =
+                db.characters.find(
+                  (x) => x.id === id
+                );
+
+              if (character) {
+                character.linkedOrganizations =
+                  character.linkedOrganizations.filter(
+                    (x) =>
+                      x !==
+                      organization.id
+                  );
+              }
+            })
+          }
+        />
+      </fieldset>
+
+      <Field label="Notes">
+        <textarea
+          value={organization.notes}
+          onChange={(event) =>
+            set(
+              "notes",
+              event.target.value
+            )
+          }
+        />
+      </Field>
+
+      <div className="editor-footer">
+        <button
+          className="danger"
+          onClick={remove}
+        >
+          Delete organization
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   POSTS
+========================================================= */
+
+function PostsPage({
+  database,
+  updateDatabase
+}) {
+  const create = () =>
+    updateDatabase((db) => {
+      db.posts.unshift(
+        blankPost()
+      );
+    });
+
+  return (
+    <section className="page">
+      <div className="toolbar">
+        <div>
+          <div className="eyebrow">
+            ARCHIVE POSTS
+          </div>
+
+          <p className="muted">
+            Scenes, events, records,
+            announcements and character
+            moments.
+          </p>
         </div>
-      </Section>
 
-      <Section title="Branches">
-        <div className="branch-editor">
-          {(form.branches || []).map((branch, index) => (
-            <div className="branch-row" key={index}>
-              <Input
-                label={`Branch ${index + 1}`}
-                value={branch}
-                onChange={(value) => {
-                  const branches = [...form.branches];
-                  branches[index] = value;
-                  update("branches", branches);
-                }}
-              />
+        <button
+          className="primary"
+          onClick={create}
+        >
+          + New post
+        </button>
+      </div>
 
-              <Button
-                danger
-                small
-                onClick={() =>
-                  update(
-                    "branches",
-                    form.branches.filter(
-                      (_, i) => i !== index
-                    )
+      <div className="post-grid">
+        {database.posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            database={database}
+            updateDatabase={
+              updateDatabase
+            }
+          />
+        ))}
+      </div>
+
+      {!database.posts.length && (
+        <div className="card empty-editor">
+          <h2>No posts yet.</h2>
+
+          <p>
+            Create your first scene or
+            record.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function PostCard({
+  post,
+  database,
+  updateDatabase
+}) {
+  const set = (key, value) =>
+    updateDatabase((db) => {
+      const item =
+        db.posts.find(
+          (x) => x.id === post.id
+        );
+
+      item[key] = value;
+    });
+
+  const remove = () => {
+    if (
+      window.confirm(
+        "Delete this post?"
+      )
+    ) {
+      updateDatabase((db) => {
+        db.posts =
+          db.posts.filter(
+            (x) =>
+              x.id !== post.id
+          );
+      });
+    }
+  };
+
+  return (
+    <article className="card post-card">
+      <input
+        className="card-title-input"
+        value={post.title}
+        onChange={(event) =>
+          set(
+            "title",
+            event.target.value
+          )
+        }
+      />
+
+      <small className="muted">
+        {post.date}
+      </small>
+
+      <textarea
+        placeholder="Write the post, scene or event..."
+        value={post.content}
+        onChange={(event) =>
+          set(
+            "content",
+            event.target.value
+          )
+        }
+      />
+
+      <Field label="Linked characters">
+        <input
+          value={
+            post.characters.join(", ")
+          }
+          onChange={(event) =>
+            set(
+              "characters",
+              event.target.value
+                .split(",")
+                .map((x) =>
+                  x.trim()
+                )
+                .filter(Boolean)
+            )
+          }
+          placeholder="Character names or IDs"
+        />
+      </Field>
+
+      <Field label="Linked organizations">
+        <input
+          value={
+            post.organizations.join(
+              ", "
+            )
+          }
+          onChange={(event) =>
+            set(
+              "organizations",
+              event.target.value
+                .split(",")
+                .map((x) =>
+                  x.trim()
+                )
+                .filter(Boolean)
+            )
+          }
+          placeholder="Organization names or IDs"
+        />
+      </Field>
+
+      <button
+        className="danger small"
+        onClick={remove}
+      >
+        Delete
+      </button>
+    </article>
+  );
+}
+
+/* =========================================================
+   LORE
+========================================================= */
+
+function LorePage({
+  database,
+  updateDatabase
+}) {
+  const create = () =>
+    updateDatabase((db) => {
+      db.lore.unshift(
+        blankLore()
+      );
+    });
+
+  return (
+    <section className="page">
+      <div className="toolbar">
+        <div>
+          <div className="eyebrow">
+            WORLD BUILDING
+          </div>
+
+          <p className="muted">
+            Canon, history, secrets,
+            locations, rules and timelines.
+          </p>
+        </div>
+
+        <button
+          className="primary"
+          onClick={create}
+        >
+          + Lore entry
+        </button>
+      </div>
+
+      <div className="lore-grid">
+        {database.lore.map((entry) => (
+          <LoreCard
+            key={entry.id}
+            entry={entry}
+            database={database}
+            updateDatabase={
+              updateDatabase
+            }
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LoreCard({
+  entry,
+  database,
+  updateDatabase
+}) {
+  const set = (key, value) =>
+    updateDatabase((db) => {
+      const item =
+        db.lore.find(
+          (x) => x.id === entry.id
+        );
+
+      item[key] = value;
+    });
+
+  return (
+    <article className="card lore-card">
+      <input
+        className="card-title-input"
+        value={entry.title}
+        onChange={(event) =>
+          set(
+            "title",
+            event.target.value
+          )
+        }
+      />
+
+      <input
+        value={entry.category}
+        placeholder="Category"
+        onChange={(event) =>
+          set(
+            "category",
+            event.target.value
+          )
+        }
+      />
+
+      <textarea
+        value={entry.content}
+        placeholder="Write your lore..."
+        onChange={(event) =>
+          set(
+            "content",
+            event.target.value
+          )
+        }
+      />
+
+      <Field label="Linked characters">
+        <input
+          value={
+            entry.linkedCharacters.join(
+              ", "
+            )
+          }
+          onChange={(event) =>
+            set(
+              "linkedCharacters",
+              event.target.value
+                .split(",")
+                .map((x) =>
+                  x.trim()
+                )
+                .filter(Boolean)
+            )
+          }
+        />
+      </Field>
+
+      <Field label="Linked organizations">
+        <input
+          value={
+            entry.linkedOrganizations.join(
+              ", "
+            )
+          }
+          onChange={(event) =>
+            set(
+              "linkedOrganizations",
+              event.target.value
+                .split(",")
+                .map((x) =>
+                  x.trim()
+                )
+                .filter(Boolean)
+            )
+          }
+        />
+      </Field>
+
+      <button
+        className="danger small"
+        onClick={() =>
+          updateDatabase((db) => {
+            db.lore =
+              db.lore.filter(
+                (x) =>
+                  x.id !== entry.id
+              );
+          })
+        }
+      >
+        Delete lore
+      </button>
+    </article>
+  );
+}
+
+/* =========================================================
+   INVESTIGATIONS
+========================================================= */
+
+function InvestigationsPage({
+  database,
+  updateDatabase
+}) {
+  const create = () =>
+    updateDatabase((db) => {
+      db.investigations.unshift(
+        blankCase()
+      );
+    });
+
+  return (
+    <section className="page">
+      <div className="toolbar">
+        <div>
+          <div className="eyebrow">
+            DETECTIVE ARCHIVE
+          </div>
+
+          <p className="muted">
+            What. Who. How. Why. Where.
+            When. Evidence. Motive.
+          </p>
+        </div>
+
+        <button
+          className="primary"
+          onClick={create}
+        >
+          + New case
+        </button>
+      </div>
+
+      {database.investigations.map(
+        (item) => (
+          <InvestigationCard
+            key={item.id}
+            investigation={item}
+            database={database}
+            updateDatabase={
+              updateDatabase
+            }
+          />
+        )
+      )}
+
+      {!database.investigations
+        .length && (
+        <div className="card empty-editor">
+          <div className="large-symbol">
+            ⌕
+          </div>
+
+          <h2>
+            No investigations yet.
+          </h2>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function InvestigationCard({
+  investigation,
+  database,
+  updateDatabase
+}) {
+  const set = (key, value) =>
+    updateDatabase((db) => {
+      const item =
+        db.investigations.find(
+          (x) =>
+            x.id ===
+            investigation.id
+        );
+
+      item[key] = value;
+    });
+
+  const remove = () => {
+    if (
+      window.confirm(
+        "Delete this investigation?"
+      )
+    ) {
+      updateDatabase((db) => {
+        db.investigations =
+          db.investigations.filter(
+            (x) =>
+              x.id !==
+              investigation.id
+          );
+      });
+    }
+  };
+
+  return (
+    <article className="card case-card">
+      <div className="case-header">
+        <input
+          className="big-input"
+          value={
+            investigation.title
+          }
+          onChange={(event) =>
+            set(
+              "title",
+              event.target.value
+            )
+          }
+        />
+
+        <select
+          value={
+            investigation.status
+          }
+          onChange={(event) =>
+            set(
+              "status",
+              event.target.value
+            )
+          }
+        >
+          <option>Open</option>
+          <option>In progress</option>
+          <option>Solved</option>
+          <option>Cold</option>
+          <option>Redacted</option>
+        </select>
+      </div>
+
+      <div className="case-grid">
+        {[
+          ["what", "WHAT happened?"],
+          ["who", "WHO?"],
+          ["how", "HOW?"],
+          ["why", "WHY?"],
+          ["where", "WHERE?"],
+          ["when", "WHEN?"]
+        ].map(
+          ([key, label]) => (
+            <Field
+              label={label}
+              key={key}
+            >
+              <textarea
+                value={
+                  investigation[key]
+                }
+                onChange={(event) =>
+                  set(
+                    key,
+                    event.target.value
                   )
                 }
-              >
-                Delete
-              </Button>
-            </div>
-          ))}
+              />
+            </Field>
+          )
+        )}
 
-          <Button
-            secondary
-            onClick={() =>
-              update("branches", [...form.branches, ""])
+        <Field label="WHO is involved?">
+          <textarea
+            value={investigation.involved.join(
+              ", "
+            )}
+            onChange={(event) =>
+              set(
+                "involved",
+                event.target.value
+                  .split(",")
+                  .map((x) =>
+                    x.trim()
+                  )
+                  .filter(Boolean)
+              )
             }
-          >
-            + Add branch
-          </Button>
-        </div>
-      </Section>
+          />
+        </Field>
+      </div>
 
-      <Section title="Linked characters">
-        <RelationshipPicker
-          title="Characters belonging to this organization"
-          selected={form.characterIds}
-          items={db.characters}
-          onChange={(value) =>
-            update("characterIds", value)
+      <div className="two-columns">
+        <Field label="Evidence">
+          <textarea
+            value={
+              investigation.evidence
+            }
+            onChange={(event) =>
+              set(
+                "evidence",
+                event.target.value
+              )
+            }
+          />
+        </Field>
+
+        <Field label="Theory">
+          <textarea
+            value={
+              investigation.theory
+            }
+            onChange={(event) =>
+              set(
+                "theory",
+                event.target.value
+              )
+            }
+          />
+        </Field>
+
+        <Field label="Motive">
+          <textarea
+            value={
+              investigation.motive
+            }
+            onChange={(event) =>
+              set(
+                "motive",
+                event.target.value
+              )
+            }
+          />
+        </Field>
+
+        <Field label="Solution / reveal">
+          <textarea
+            value={
+              investigation.solution
+            }
+            onChange={(event) =>
+              set(
+                "solution",
+                event.target.value
+              )
+            }
+          />
+        </Field>
+      </div>
+
+      <Field label="Investigator notes">
+        <textarea
+          value={
+            investigation.notes
+          }
+          onChange={(event) =>
+            set(
+              "notes",
+              event.target.value
+            )
           }
         />
-      </Section>
+      </Field>
 
-      <div className="save-bottom">
-        <Button secondary onClick={onCancel}>
-          Cancel
-        </Button>
+      <div className="two-columns">
+        <Field label="Linked characters">
+          <input
+            value={
+              investigation.linkedCharacters.join(
+                ", "
+              )
+            }
+            onChange={(event) =>
+              set(
+                "linkedCharacters",
+                event.target.value
+                  .split(",")
+                  .map((x) =>
+                    x.trim()
+                  )
+                  .filter(Boolean)
+              )
+            }
+          />
+        </Field>
 
-        <Button onClick={save}>
-          Save organization
-        </Button>
+        <Field label="Linked organizations">
+          <input
+            value={
+              investigation.linkedOrganizations.join(
+                ", "
+              )
+            }
+            onChange={(event) =>
+              set(
+                "linkedOrganizations",
+                event.target.value
+                  .split(",")
+                  .map((x) =>
+                    x.trim()
+                  )
+                  .filter(Boolean)
+              )
+            }
+          />
+        </Field>
       </div>
-    </div>
+
+      <button
+        className="danger small"
+        onClick={remove}
+      >
+        Delete case
+      </button>
+    </article>
   );
 }
 
-function InvestigationList({
-  investigations,
-  onNew,
-  onEdit,
-  onDelete
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function SettingsPage({
+  database,
+  updateDatabase,
+  setDatabase
 }) {
-  return (
-    <div className="page-content">
-      <div className="page-actions">
-        <p className="muted">
-          Detective case database
-        </p>
-
-        <Button onClick={onNew}>
-          + New investigation
-        </Button>
-      </div>
-
-      {investigations.length === 0 ? (
-        <Empty
-          title="No investigations"
-          text="Create a detective case and document everything surrounding it."
-          button="+ New case"
-          onClick={onNew}
-        />
-      ) : (
-        <div className="investigation-grid">
-          {investigations.map((item) => (
-            <Card key={item.id}>
-              <div className="case-header">
-                <span className="case-number">
-                  {item.caseNumber || "CASE"}
-                </span>
-
-                <span className="status-badge">
-                  {item.status}
-                </span>
-              </div>
-
-              <h2>{item.title || "Untitled case"}</h2>
-
-              <p>{item.what || "No case summary."}</p>
-
-              <div className="case-fields">
-                <span>
-                  <b>Who:</b> {item.who || "—"}
-                </span>
-
-                <span>
-                  <b>Where:</b> {item.where || "—"}
-                </span>
-
-                <span>
-                  <b>Why:</b> {item.why || "—"}
-                </span>
-              </div>
-
-              <div className="card-buttons">
-                <Button
-                  small
-                  onClick={() => onEdit(item)}
-                >
-                  Open case
-                </Button>
-
-                <Button
-                  small
-                  secondary
-                  onClick={() => onDelete(item.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function InvestigationEditor({
-  investigation,
-  db,
-  onSave,
-  onCancel
-}) {
-  const [form, setForm] = useState({
-    ...emptyInvestigation,
-    ...investigation
-  });
-
-  function update(key, value) {
-    setForm((old) => ({
-      ...old,
-      [key]: value
-    }));
-  }
-
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("case")
-    });
-  }
-
-  return (
-    <div className="page-content editor-page">
-      <div className="editor-top">
-        <Button secondary onClick={onCancel}>
-          ← Back
-        </Button>
-
-        <div>
-          <div className="eyebrow">INVESTIGATION FILE</div>
-          <h1>{form.title || "New investigation"}</h1>
-        </div>
-
-        <Button onClick={save}>Save case</Button>
-      </div>
-
-      <Section title="Case identification">
-        <div className="form-grid">
-          <Input
-            label="Case title"
-            value={form.title}
-            onChange={(v) => update("title", v)}
-          />
-
-          <Input
-            label="Case number"
-            value={form.caseNumber}
-            onChange={(v) => update("caseNumber", v)}
-          />
-
-          <Select
-            label="Status"
-            value={form.status}
-            onChange={(v) => update("status", v)}
-            options={[
-              "Open",
-              "Solved",
-              "Cold",
-              "Unsolved",
-              "Classified"
-            ]}
-          />
-        </div>
-      </Section>
-
-      <Section title="What / Who / When / Where / How / Why">
-        <div className="form-grid">
-          <Input
-            label="What happened?"
-            textarea
-            value={form.what}
-            onChange={(v) => update("what", v)}
-          />
-
-          <Input
-            label="Who?"
-            textarea
-            value={form.who}
-            onChange={(v) => update("who", v)}
-          />
-
-          <Input
-            label="When?"
-            value={form.when}
-            onChange={(v) => update("when", v)}
-          />
-
-          <Input
-            label="Where?"
-            textarea
-            value={form.where}
-            onChange={(v) => update("where", v)}
-          />
-
-          <Input
-            label="How?"
-            textarea
-            value={form.how}
-            onChange={(v) => update("how", v)}
-          />
-
-          <Input
-            label="Why?"
-            textarea
-            value={form.why}
-            onChange={(v) => update("why", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="People involved">
-        <div className="form-grid">
-          <Input
-            label="Culprit"
-            value={form.culprit}
-            onChange={(v) => update("culprit", v)}
-          />
-
-          <Input
-            label="Victims"
-            textarea
-            value={form.victims}
-            onChange={(v) => update("victims", v)}
-          />
-
-          <Input
-            label="Witnesses"
-            textarea
-            value={form.witnesses}
-            onChange={(v) => update("witnesses", v)}
-          />
-
-          <Input
-            label="Suspects"
-            textarea
-            value={form.suspects}
-            onChange={(v) => update("suspects", v)}
-          />
-
-          <Input
-            label="Investigators"
-            textarea
-            value={form.investigators}
-            onChange={(v) => update("investigators", v)}
-          />
-        </div>
-
-        <RelationshipPicker
-          title="Characters involved"
-          selected={form.involvedCharacterIds}
-          items={db.characters}
-          onChange={(value) =>
-            update("involvedCharacterIds", value)
-          }
-        />
-
-        <RelationshipPicker
-          title="Organizations involved"
-          selected={form.organizationIds}
-          items={db.organizations}
-          onChange={(value) =>
-            update("organizationIds", value)
-          }
-        />
-      </Section>
-
-      <Section title="Evidence & conclusion">
-        <div className="form-grid">
-          <Input
-            label="Evidence"
-            textarea
-            value={form.evidence}
-            onChange={(v) => update("evidence", v)}
-          />
-
-          <Input
-            label="Notes"
-            textarea
-            value={form.notes}
-            onChange={(v) => update("notes", v)}
-          />
-
-          <Input
-            label="Conclusion"
-            textarea
-            value={form.conclusion}
-            onChange={(v) => update("conclusion", v)}
-          />
-        </div>
-      </Section>
-
-      <div className="save-bottom">
-        <Button secondary onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button onClick={save}>
-          Save investigation
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function LoreList({ lore, onNew, onEdit, onDelete }) {
-  return (
-    <div className="page-content">
-      <div className="page-actions">
-        <p className="muted">Worldbuilding and historical records</p>
-
-        <Button onClick={onNew}>+ New lore entry</Button>
-      </div>
-
-      {lore.length === 0 ? (
-        <Empty
-          title="No lore yet"
-          text="Create the history behind your world."
-          button="+ Add lore"
-          onClick={onNew}
-        />
-      ) : (
-        <div className="lore-grid">
-          {lore.map((entry) => (
-            <Card key={entry.id}>
-              <div className="eyebrow">
-                {entry.category || "Lore"}
-              </div>
-
-              <h2>{entry.title || "Untitled"}</h2>
-
-              <p>{entry.summary || entry.content || "No content."}</p>
-
-              <div className="character-meta">
-                {entry.era && <span>{entry.era}</span>}
-              </div>
-
-              <div className="card-buttons">
-                <Button
-                  small
-                  onClick={() => onEdit(entry)}
-                >
-                  Open
-                </Button>
-
-                <Button
-                  small
-                  secondary
-                  onClick={() => onDelete(entry.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function LoreEditor({ lore, db, onSave, onCancel }) {
-  const [form, setForm] = useState({
-    ...emptyLore,
-    ...lore
-  });
-
-  function update(key, value) {
-    setForm((old) => ({
-      ...old,
-      [key]: value
-    }));
-  }
-
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("lore")
-    });
-  }
-
-  return (
-    <div className="page-content editor-page">
-      <div className="editor-top">
-        <Button secondary onClick={onCancel}>
-          ← Back
-        </Button>
-
-        <div>
-          <div className="eyebrow">LORE FILE</div>
-          <h1>{form.title || "New lore"}</h1>
-        </div>
-
-        <Button onClick={save}>Save lore</Button>
-      </div>
-
-      <Section title="Lore information">
-        <div className="form-grid">
-          <Input
-            label="Title"
-            value={form.title}
-            onChange={(v) => update("title", v)}
-          />
-
-          <Input
-            label="Category"
-            value={form.category}
-            onChange={(v) => update("category", v)}
-            placeholder="History, mythology, event..."
-          />
-
-          <Input
-            label="Era / date"
-            value={form.era}
-            onChange={(v) => update("era", v)}
-          />
-
-          <Input
-            label="Summary"
-            textarea
-            value={form.summary}
-            onChange={(v) => update("summary", v)}
-          />
-
-          <Input
-            label="Full lore"
-            textarea
-            value={form.content}
-            onChange={(v) => update("content", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Connected characters">
-        <RelationshipPicker
-          title="Characters"
-          selected={form.relatedCharacterIds}
-          items={db.characters}
-          onChange={(value) =>
-            update("relatedCharacterIds", value)
-          }
-        />
-      </Section>
-
-      <Section title="Connected organizations">
-        <RelationshipPicker
-          title="Organizations"
-          selected={form.organizationIds}
-          items={db.organizations}
-          onChange={(value) =>
-            update("organizationIds", value)
-          }
-        />
-      </Section>
-
-      <div className="save-bottom">
-        <Button secondary onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button onClick={save}>Save lore</Button>
-      </div>
-    </div>
-  );
-}
-
-function PostList({ posts, onNew, onEdit, onDelete }) {
-  return (
-    <div className="page-content">
-      <div className="page-actions">
-        <p className="muted">Archive notes and posts</p>
-
-        <Button onClick={onNew}>+ New post</Button>
-      </div>
-
-      {posts.length === 0 ? (
-        <Empty
-          title="No posts"
-          text="Create notes, announcements, theories or story fragments."
-          button="+ New post"
-          onClick={onNew}
-        />
-      ) : (
-        <div className="post-grid">
-          {posts.map((post) => (
-            <Card key={post.id}>
-              <div className="eyebrow">
-                {post.date || "No date"}
-              </div>
-
-              <h2>{post.title || "Untitled post"}</h2>
-
-              <p className="muted">
-                {post.author || "Unknown author"}
-              </p>
-
-              <p className="post-preview">
-                {post.content || "No content."}
-              </p>
-
-              <div className="card-buttons">
-                <Button
-                  small
-                  onClick={() => onEdit(post)}
-                >
-                  Open
-                </Button>
-
-                <Button
-                  small
-                  secondary
-                  onClick={() => onDelete(post.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function PostEditor({ post, db, onSave, onCancel }) {
-  const [form, setForm] = useState({
-    ...emptyPost,
-    ...post
-  });
-
-  function update(key, value) {
-    setForm((old) => ({
-      ...old,
-      [key]: value
-    }));
-  }
-
-  function save() {
-    onSave({
-      ...form,
-      id: form.id || uid("post")
-    });
-  }
-
-  return (
-    <div className="page-content editor-page">
-      <div className="editor-top">
-        <Button secondary onClick={onCancel}>
-          ← Back
-        </Button>
-
-        <div>
-          <div className="eyebrow">POST</div>
-          <h1>{form.title || "New post"}</h1>
-        </div>
-
-        <Button onClick={save}>Save post</Button>
-      </div>
-
-      <Section title="Post">
-        <div className="form-grid">
-          <Input
-            label="Title"
-            value={form.title}
-            onChange={(v) => update("title", v)}
-          />
-
-          <Input
-            label="Author"
-            value={form.author}
-            onChange={(v) => update("author", v)}
-          />
-
-          <Input
-            label="Date"
-            value={form.date}
-            onChange={(v) => update("date", v)}
-          />
-
-          <Input
-            label="Tags"
-            value={form.tags}
-            onChange={(v) => update("tags", v)}
-          />
-
-          <Input
-            label="Content"
-            textarea
-            value={form.content}
-            onChange={(v) => update("content", v)}
-          />
-        </div>
-      </Section>
-
-      <Section title="Connected characters">
-        <RelationshipPicker
-          title="Characters"
-          selected={form.characterIds}
-          items={db.characters}
-          onChange={(value) =>
-            update("characterIds", value)
-          }
-        />
-      </Section>
-
-      <Section title="Connected organizations">
-        <RelationshipPicker
-          title="Organizations"
-          selected={form.organizationIds}
-          items={db.organizations}
-          onChange={(value) =>
-            update("organizationIds", value)
-          }
-        />
-      </Section>
-
-      <div className="save-bottom">
-        <Button secondary onClick={onCancel}>
-          Cancel
-        </Button>
-
-        <Button onClick={save}>Save post</Button>
-      </div>
-    </div>
-  );
-}
-
-function Empty({ title, text, button, onClick }) {
-  return (
-    <Card className="empty-state">
-      <div className="empty-symbol">✦</div>
-      <h2>{title}</h2>
-      <p>{text}</p>
-      <Button onClick={onClick}>{button}</Button>
-    </Card>
-  );
-}
-
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [db, setDb] = useState(loadDatabase);
-  const [page, setPage] = useState("dashboard");
-  const [search, setSearch] = useState("");
-  const [editing, setEditing] = useState(null);
-  const [mobileMenu, setMobileMenu] = useState(false);
-
-  const fileInput = React.useRef(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem(USER_KEY);
-
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser).username);
-      } catch {}
-    }
-  }, []);
-
-  useEffect(() => {
-    saveDatabase(db);
-    applyTheme(db.settings.theme);
-  }, [db]);
-
-  function changeTheme(theme) {
-    setDb((old) => ({
-      ...old,
-      settings: {
-        ...old.settings,
-        theme
+  const exportDatabase = () => {
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          database,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
       }
-    }));
-  }
-
-  function logout() {
-    setUser(null);
-    setPage("dashboard");
-    setEditing(null);
-  }
-
-  function exportDatabase() {
-    downloadFile(
-      `oc-archive-${new Date().toISOString().slice(0, 10)}.json`,
-      JSON.stringify(db, null, 2)
     );
-  }
 
-  function importDatabase(event) {
-    const file = event.target.files?.[0];
+    const url =
+      URL.createObjectURL(blob);
+
+    const anchor =
+      document.createElement("a");
+
+    anchor.href = url;
+
+    anchor.download =
+      "ocfiles-backup.json";
+
+    anchor.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const importDatabase = (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
 
     if (!file) return;
 
-    const reader = new FileReader();
+    const reader =
+      new FileReader();
 
     reader.onload = () => {
       try {
-        const imported = JSON.parse(reader.result);
+        const imported =
+          JSON.parse(
+            reader.result
+          );
 
-        if (!imported.characters) {
-          throw new Error("Invalid archive");
+        if (
+          !imported.characters ||
+          !imported.organizations
+        ) {
+          throw new Error();
         }
 
-        setDb({
-          ...blankDatabase(),
+        setDatabase({
+          ...initialDatabase,
           ...imported
         });
 
-        alert("Archive imported successfully.");
+        alert(
+          "OC Files backup imported successfully."
+        );
       } catch {
-        alert("This file is not a valid OC Archive backup.");
+        alert(
+          "That file is not a valid OC Files backup."
+        );
       }
     };
 
     reader.readAsText(file);
-    event.target.value = "";
-  }
 
-  function confirmDelete(type, id) {
-    if (!window.confirm("Delete this entry permanently?")) {
+    event.target.value = "";
+  };
+
+  const erase = () => {
+    if (
+      !window.confirm(
+        "This will erase the complete local archive. Continue?"
+      )
+    ) {
       return;
     }
 
-    setDb((old) => ({
-      ...old,
-      [type]: old[type].filter((item) => item.id !== id)
-    }));
-  }
+    localStorage.removeItem(
+      STORAGE_KEY
+    );
 
-  function saveItem(type, item) {
-    setDb((old) => {
-      const exists = old[type].some(
-        (entry) => entry.id === item.id
-      );
+    window.location.reload();
+  };
 
-      return {
-        ...old,
-        [type]: exists
-          ? old[type].map((entry) =>
-              entry.id === item.id ? item : entry
+  return (
+    <section className="page">
+      <div className="card settings-card">
+        <div className="eyebrow">
+          CUSTOMIZATION
+        </div>
+
+        <h2>
+          Choose your universe aesthetic
+        </h2>
+
+        <p className="muted">
+          Every theme changes the entire
+          visual atmosphere.
+        </p>
+
+        <div className="theme-grid">
+          {Object.entries(
+            THEMES
+          ).map(
+            ([id, theme]) => (
+              <button
+                key={id}
+                className={
+                  database.theme ===
+                  id
+                    ? "theme-card active"
+                    : "theme-card"
+                }
+                onClick={() =>
+                  updateDatabase(
+                    (db) => {
+                      db.theme =
+                        id;
+                    }
+                  )
+                }
+              >
+                <strong>
+                  {theme.icon}{" "}
+                  {theme.name}
+                </strong>
+
+                <span>
+                  Custom visual motif
+                </span>
+              </button>
             )
-          : [...old[type], item]
-      };
-    });
+          )}
+        </div>
 
-    setEditing(null);
-  }
+        <hr />
 
-  const filteredCharacters = useMemo(() => {
-    const q = search.trim().toLowerCase();
+        <div className="eyebrow">
+          BACKUP
+        </div>
 
-    if (!q) return db.characters;
+        <h2>
+          Protect your archive
+        </h2>
 
-    return db.characters.filter((character) =>
-      JSON.stringify(character)
-        .toLowerCase()
-        .includes(q)
+        <p className="muted">
+          Your data is automatically saved
+          to this browser. Export a JSON
+          backup regularly so you can restore
+          your universe later.
+        </p>
+
+        <div className="backup-actions">
+          <button
+            className="primary"
+            onClick={
+              exportDatabase
+            }
+          >
+            Export JSON
+          </button>
+
+          <label className="upload-button">
+            Import JSON
+
+            <input
+              type="file"
+              accept="application/json"
+              onChange={
+                importDatabase
+              }
+            />
+          </label>
+
+          <button
+            className="danger"
+            onClick={erase}
+          >
+            Erase local archive
+          </button>
+        </div>
+
+        <hr />
+
+        <h3>
+          Current archive
+        </h3>
+
+        <div className="backup-stats">
+          <span>
+            Characters:{" "}
+            <b>
+              {database.characters.length}
+            </b>
+          </span>
+
+          <span>
+            Organizations:{" "}
+            <b>
+              {
+                database.organizations
+                  .length
+              }
+            </b>
+          </span>
+
+          <span>
+            Posts:{" "}
+            <b>
+              {database.posts.length}
+            </b>
+          </span>
+
+          <span>
+            Lore:{" "}
+            <b>
+              {database.lore.length}
+            </b>
+          </span>
+
+          <span>
+            Cases:{" "}
+            <b>
+              {
+                database.investigations
+                  .length
+              }
+            </b>
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   GENERIC COMPONENTS
+========================================================= */
+
+function Field({
+  label,
+  children
+}) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+
+      {children}
+    </label>
+  );
+}
+
+function Avatar({
+  character
+}) {
+  if (character.image) {
+    return (
+      <img
+        className="avatar"
+        src={character.image}
+        alt=""
+      />
     );
-  }, [db.characters, search]);
-
-  const filteredOrganizations = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    if (!q) return db.organizations;
-
-    return db.organizations.filter((organization) =>
-      JSON.stringify(organization)
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [db.organizations, search]);
-
-  const filteredInvestigations = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    if (!q) return db.investigations;
-
-    return db.investigations.filter((item) =>
-      JSON.stringify(item)
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [db.investigations, search]);
-
-  const filteredLore = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    if (!q) return db.lore;
-
-    return db.lore.filter((item) =>
-      JSON.stringify(item)
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [db.lore, search]);
-
-  const filteredPosts = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    if (!q) return db.posts;
-
-    return db.posts.filter((item) =>
-      JSON.stringify(item)
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [db.posts, search]);
-
-  if (!user) {
-    return <LoginScreen onLogin={setUser} />;
-  }
-
-  function renderPage() {
-    if (editing?.type === "character") {
-      return (
-        <CharacterEditor
-          character={editing.item}
-          db={db}
-          onSave={(item) =>
-            saveItem("characters", item)
-          }
-          onCancel={() => setEditing(null)}
-        />
-      );
-    }
-
-    if (editing?.type === "organization") {
-      return (
-        <OrganizationEditor
-          organization={editing.item}
-          db={db}
-          onSave={(item) =>
-            saveItem("organizations", item)
-          }
-          onCancel={() => setEditing(null)}
-        />
-      );
-    }
-
-    if (editing?.type === "investigation") {
-      return (
-        <InvestigationEditor
-          investigation={editing.item}
-          db={db}
-          onSave={(item) =>
-            saveItem("investigations", item)
-          }
-          onCancel={() => setEditing(null)}
-        />
-      );
-    }
-
-    if (editing?.type === "lore") {
-      return (
-        <LoreEditor
-          lore={editing.item}
-          db={db}
-          onSave={(item) => saveItem("lore", item)}
-          onCancel={() => setEditing(null)}
-        />
-      );
-    }
-
-    if (editing?.type === "post") {
-      return (
-        <PostEditor
-          post={editing.item}
-          db={db}
-          onSave={(item) => saveItem("posts", item)}
-          onCancel={() => setEditing(null)}
-        />
-      );
-    }
-
-    switch (page) {
-      case "characters":
-        return (
-          <CharacterList
-            characters={filteredCharacters}
-            onNew={() =>
-              setEditing({
-                type: "character",
-                item: {
-                  ...emptyCharacter,
-                  id: ""
-                }
-              })
-            }
-            onEdit={(item) =>
-              setEditing({
-                type: "character",
-                item
-              })
-            }
-            onDelete={(id) =>
-              confirmDelete("characters", id)
-            }
-          />
-        );
-
-      case "organizations":
-        return (
-          <OrganizationList
-            organizations={filteredOrganizations}
-            onNew={() =>
-              setEditing({
-                type: "organization",
-                item: {
-                  ...emptyOrganization,
-                  id: "",
-                  characterIds: [],
-                  branches: []
-                }
-              })
-            }
-            onEdit={(item) =>
-              setEditing({
-                type: "organization",
-                item
-              })
-            }
-            onDelete={(id) =>
-              confirmDelete("organizations", id)
-            }
-          />
-        );
-
-      case "investigations":
-        return (
-          <InvestigationList
-            investigations={filteredInvestigations}
-            onNew={() =>
-              setEditing({
-                type: "investigation",
-                item: {
-                  ...emptyInvestigation,
-                  id: "",
-                  involvedCharacterIds: [],
-                  organizationIds: []
-                }
-              })
-            }
-            onEdit={(item) =>
-              setEditing({
-                type: "investigation",
-                item
-              })
-            }
-            onDelete={(id) =>
-              confirmDelete("investigations", id)
-            }
-          />
-        );
-
-      case "lore":
-        return (
-          <LoreList
-            lore={filteredLore}
-            onNew={() =>
-              setEditing({
-                type: "lore",
-                item: {
-                  ...emptyLore,
-                  id: "",
-                  relatedCharacterIds: [],
-                  organizationIds: []
-                }
-              })
-            }
-            onEdit={(item) =>
-              setEditing({
-                type: "lore",
-                item
-              })
-            }
-            onDelete={(id) =>
-              confirmDelete("lore", id)
-            }
-          />
-        );
-
-      case "posts":
-        return (
-          <PostList
-            posts={filteredPosts}
-            onNew={() =>
-              setEditing({
-                type: "post",
-                item: {
-                  ...emptyPost,
-                  id: "",
-                  characterIds: [],
-                  organizationIds: []
-                }
-              })
-            }
-            onEdit={(item) =>
-              setEditing({
-                type: "post",
-                item
-              })
-            }
-            onDelete={(id) =>
-              confirmDelete("posts", id)
-            }
-          />
-        );
-
-      default:
-        return (
-          <Dashboard
-            db={db}
-            setPage={setPage}
-          />
-        );
-    }
   }
 
   return (
-    <div className="app">
-      <input
-        ref={fileInput}
-        type="file"
-        accept=".json,application/json"
-        hidden
-        onChange={importDatabase}
-      />
-
-      <button
-        className="mobile-menu-button"
-        onClick={() => setMobileMenu(!mobileMenu)}
-      >
-        ☰
-      </button>
-
-      <div
-        className={
-          mobileMenu
-            ? "mobile-overlay visible"
-            : "mobile-overlay"
-        }
-        onClick={() => setMobileMenu(false)}
-      />
-
-      <div
-        className={
-          mobileMenu
-            ? "sidebar-container open"
-            : "sidebar-container"
-        }
-        onClick={() => setMobileMenu(false)}
-      >
-        <Sidebar
-          page={page}
-          setPage={(value) => {
-            setPage(value);
-            setEditing(null);
-          }}
-          theme={db.settings.theme}
-          setTheme={changeTheme}
-          username={user}
-          onLogout={logout}
-        />
-      </div>
-
-      <main className="main">
-        {!editing && (
-          <Topbar
-            page={page}
-            search={search}
-            setSearch={setSearch}
-            onExport={exportDatabase}
-            onImport={importDatabase}
-            fileInput={fileInput}
-          />
-        )}
-
-        {renderPage()}
-      </main>
+    <div className="avatar placeholder">
+      {(
+        character.name ||
+        "?"
+      )
+        .charAt(0)
+        .toUpperCase()}
     </div>
   );
 }
+
+function Empty({
+  text
+}) {
+  return (
+    <div className="empty">
+      {text}
+    </div>
+  );
+}
+
+function EditableList({
+  values,
+  onAdd,
+  onRemove,
+  addLabel
+}) {
+  return (
+    <div>
+      <div className="tag-list">
+        {values.map(
+          (value, index) => (
+            <span
+              className="tag"
+              key={`${value}-${index}`}
+            >
+              {value}
+
+              <button
+                onClick={() =>
+                  onRemove(index)
+                }
+              >
+                ×
+              </button>
+            </span>
+          )
+        )}
+      </div>
+
+      <button
+        className="secondary small"
+        onClick={() => {
+          const value =
+            window.prompt(
+              addLabel
+            );
+
+          if (
+            value?.trim()
+          ) {
+            onAdd(value.trim());
+          }
+        }}
+      >
+        + {addLabel}
+      </button>
+    </div>
+  );
+}
+
+function LinkList({
+  values,
+  items,
+  onAdd,
+  onRemove,
+  placeholder
+}) {
+  return (
+    <div>
+      <div className="tag-list">
+        {values.map((id) => {
+          const item =
+            items.find(
+              (x) =>
+                x.id === id
+            );
+
+          return (
+            <span
+              className="tag"
+              key={id}
+            >
+              {item
+                ? item.name ||
+                  "Unnamed"
+                : id}
+
+              <button
+                onClick={() =>
+                  onRemove(id)
+                }
+              >
+                ×
+              </button>
+            </span>
+          );
+        })}
+      </div>
+
+      <select
+        className="link-select"
+        value=""
+        onChange={(event) => {
+          if (
+            event.target.value
+          ) {
+            onAdd(
+              event.target.value
+            );
+          }
+        }}
+      >
+        <option value="">
+          + Link {placeholder}
+        </option>
+
+        {items
+          .filter(
+            (item) =>
+              !values.includes(
+                item.id
+              )
+          )
+          .map((item) => (
+            <option
+              value={item.id}
+              key={item.id}
+            >
+              {item.name ||
+                "Unnamed"}
+            </option>
+          ))}
+      </select>
+    </div>
+  );
+}
+
+export default App;
