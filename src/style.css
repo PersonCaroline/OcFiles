@@ -7504,3 +7504,452 @@ body.theme-asylum .hero-symbol {
     background-size: 18px 18px;
   }
 }
+
+/* =========================================================
+   OCFILES — FULL THEME BACKGROUNDS & CARD TEXTURES
+   Append this to the VERY END of src/style.css
+   ========================================================= */
+
+/* Shared background behavior */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg, #06040a);
+  background-attachment: fixed;
+  background-repeat: repeat;
+  transition:
+    background-color 0.4s ease,
+    background-image 0.4s ease;
+}
+
+/* Keep the actual app content above the background */
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Shared surfaces: cards, panels, navigation and inputs */
+.card,
+.panel,
+.stat-card,
+.hero-panel,
+.quick-card,
+.character-card,
+.character-item,
+.organization-card,
+.case-card,
+.lore-card,
+.post-card,
+.relationship-card,
+.modal,
+.sidebar,
+.topbar,
+header,
+.navigation,
+.nav-item,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* =========================================================
+   🖤 GOTH — PURPLE CIRCLES & OCCULT ATMOSPHERE
+   ========================================================= */
+
+body.theme-goth {
+  background-color: #06040a;
+  background-image:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(168, 85, 247, 0.15) 0,
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      rgba(217, 70, 239, 0.10) 0,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle,
+      transparent 0 35px,
+      rgba(168, 85, 247, 0.09) 36px 37px,
+      transparent 38px 70px,
+      rgba(168, 85, 247, 0.06) 71px 72px,
+      transparent 73px
+    );
+  background-size:
+    auto,
+    auto,
+    180px 180px;
+}
+
+body.theme-goth .card,
+body.theme-goth .panel,
+body.theme-goth .stat-card,
+body.theme-goth .hero-panel,
+body.theme-goth .quick-card,
+body.theme-goth .character-card,
+body.theme-goth .organization-card,
+body.theme-goth .case-card,
+body.theme-goth .lore-card,
+body.theme-goth .post-card {
+  background-color: rgba(13, 9, 19, 0.88);
+  background-image:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(168, 85, 247, 0.10),
+      transparent 45%
+    );
+  border-color: rgba(168, 85, 247, 0.22);
+  border-radius: 20px;
+}
+
+/* =========================================================
+   🎪 CIRCUS — VISIBLE DIAGONAL STRIPES
+   ========================================================= */
+
+body.theme-circus {
+  background-color: #0b0505;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgba(220, 38, 38, 0.13) 0px,
+      rgba(220, 38, 38, 0.13) 2px,
+      transparent 2px,
+      transparent 34px
+    ),
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(220, 38, 38, 0.18),
+      transparent 60%
+    );
+  background-size: 100% 100%, auto;
+  background-attachment: fixed;
+}
+
+body.theme-circus .card,
+body.theme-circus .panel,
+body.theme-circus .stat-card,
+body.theme-circus .hero-panel,
+body.theme-circus .quick-card,
+body.theme-circus .character-card,
+body.theme-circus .organization-card,
+body.theme-circus .case-card,
+body.theme-circus .lore-card,
+body.theme-circus .post-card {
+  background-color: rgba(22, 9, 9, 0.94);
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgba(220, 38, 38, 0.11) 0px,
+      rgba(220, 38, 38, 0.11) 2px,
+      transparent 2px,
+      transparent 22px
+    ),
+    linear-gradient(
+      145deg,
+      rgba(245, 158, 11, 0.07),
+      transparent 65%
+    );
+  border-color: rgba(220, 38, 38, 0.35);
+  border-radius: 16px;
+}
+
+body.theme-circus .sidebar,
+body.theme-circus .topbar {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.07) 0px,
+    rgba(220, 38, 38, 0.07) 2px,
+    transparent 2px,
+    transparent 26px
+  );
+}
+
+/* =========================================================
+   🌲 FOREST — ORGANIC LINES & GREEN MIST
+   ========================================================= */
+
+body.theme-forest {
+  background-color: #030806;
+  background-image:
+    radial-gradient(
+      ellipse at 15% 15%,
+      rgba(34, 197, 94, 0.17),
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 85% 80%,
+      rgba(20, 83, 45, 0.25),
+      transparent 42%
+    ),
+    repeating-linear-gradient(
+      115deg,
+      transparent 0px,
+      transparent 45px,
+      rgba(74, 222, 128, 0.07) 46px,
+      transparent 48px,
+      transparent 90px
+    );
+  background-attachment: fixed;
+}
+
+body.theme-forest .card,
+body.theme-forest .panel,
+body.theme-forest .stat-card,
+body.theme-forest .hero-panel,
+body.theme-forest .quick-card,
+body.theme-forest .character-card,
+body.theme-forest .organization-card,
+body.theme-forest .case-card,
+body.theme-forest .lore-card,
+body.theme-forest .post-card {
+  background-color: rgba(7, 17, 11, 0.91);
+  background-image:
+    radial-gradient(
+      ellipse at 100% 0%,
+      rgba(74, 222, 128, 0.12),
+      transparent 55%
+    ),
+    repeating-linear-gradient(
+      115deg,
+      transparent 0px,
+      transparent 55px,
+      rgba(74, 222, 128, 0.035) 56px,
+      transparent 58px
+    );
+  border-color: rgba(74, 222, 128, 0.22);
+  border-radius: 22px 14px 22px 14px;
+}
+
+/* =========================================================
+   🕵️ DETECTIVE — OLD PAPER & INVESTIGATION GRID
+   ========================================================= */
+
+body.theme-detective {
+  background-color: #100c08;
+  background-image:
+    radial-gradient(
+      ellipse at 20% 10%,
+      rgba(192, 132, 87, 0.18),
+      transparent 45%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(192, 132, 87, 0.10) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(192, 132, 87, 0.08) 40px
+    );
+  background-attachment: fixed;
+}
+
+body.theme-detective .card,
+body.theme-detective .panel,
+body.theme-detective .stat-card,
+body.theme-detective .hero-panel,
+body.theme-detective .quick-card,
+body.theme-detective .character-card,
+body.theme-detective .organization-card,
+body.theme-detective .case-card,
+body.theme-detective .lore-card,
+body.theme-detective .post-card {
+  background-color: rgba(25, 18, 12, 0.94);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 31px,
+      rgba(192, 132, 87, 0.045) 32px
+    ),
+    linear-gradient(
+      135deg,
+      rgba(234, 182, 118, 0.08),
+      transparent 65%
+    );
+  border: 1px solid rgba(192, 132, 87, 0.32);
+  border-radius: 8px;
+}
+
+/* =========================================================
+   ♠️ MAFIA — BLACK PINSTRIPES & BURGUNDY
+   ========================================================= */
+
+body.theme-mafia {
+  background-color: #050505;
+  background-image:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(185, 28, 60, 0.15),
+      transparent 50%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 24px,
+      rgba(212, 175, 55, 0.055) 25px,
+      transparent 26px,
+      transparent 50px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 7px,
+      rgba(185, 28, 60, 0.045) 8px,
+      transparent 9px
+    );
+  background-attachment: fixed;
+}
+
+body.theme-mafia .card,
+body.theme-mafia .panel,
+body.theme-mafia .stat-card,
+body.theme-mafia .hero-panel,
+body.theme-mafia .quick-card,
+body.theme-mafia .character-card,
+body.theme-mafia .organization-card,
+body.theme-mafia .case-card,
+body.theme-mafia .lore-card,
+body.theme-mafia .post-card {
+  background-color: rgba(13, 13, 14, 0.95);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 27px,
+      rgba(212, 175, 55, 0.045) 28px,
+      transparent 29px
+    ),
+    linear-gradient(
+      135deg,
+      rgba(185, 28, 60, 0.11),
+      transparent 65%
+    );
+  border-color: rgba(185, 28, 60, 0.30);
+  border-radius: 12px;
+}
+
+/* =========================================================
+   🏥 ASYLUM — CLINICAL GRID & FLUORESCENT LIGHT
+   ========================================================= */
+
+body.theme-asylum {
+  background-color: #05090a;
+  background-image:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(85, 214, 190, 0.14),
+      transparent 48%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(85, 214, 190, 0.09) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(114, 167, 255, 0.07) 40px
+    );
+  background-attachment: fixed;
+}
+
+body.theme-asylum .card,
+body.theme-asylum .panel,
+body.theme-asylum .stat-card,
+body.theme-asylum .hero-panel,
+body.theme-asylum .quick-card,
+body.theme-asylum .character-card,
+body.theme-asylum .organization-card,
+body.theme-asylum .case-card,
+body.theme-asylum .lore-card,
+body.theme-asylum .post-card {
+  background-color: rgba(9, 17, 19, 0.95);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 29px,
+      rgba(85, 214, 190, 0.045) 30px
+    ),
+    linear-gradient(
+      135deg,
+      rgba(114, 167, 255, 0.08),
+      transparent 65%
+    );
+  border-color: rgba(85, 214, 190, 0.24);
+  border-radius: 10px;
+}
+
+/* =========================================================
+   ALL THEMES — VISIBLE GLOW ON HOVER
+   ========================================================= */
+
+body.theme-goth .card:hover,
+body.theme-goth .panel:hover,
+body.theme-goth .character-card:hover,
+body.theme-circus .card:hover,
+body.theme-circus .panel:hover,
+body.theme-circus .character-card:hover,
+body.theme-forest .card:hover,
+body.theme-forest .panel:hover,
+body.theme-forest .character-card:hover,
+body.theme-detective .card:hover,
+body.theme-detective .panel:hover,
+body.theme-detective .character-card:hover,
+body.theme-mafia .card:hover,
+body.theme-mafia .panel:hover,
+body.theme-mafia .character-card:hover,
+body.theme-asylum .card:hover,
+body.theme-asylum .panel:hover,
+body.theme-asylum .character-card:hover {
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Make sure the page background stays visible around content */
+.content,
+.page-stack,
+main {
+  background-color: transparent;
+}
+
+/* Keep forms readable while matching the selected theme */
+body.theme-goth input,
+body.theme-goth textarea,
+body.theme-goth select,
+body.theme-circus input,
+body.theme-circus textarea,
+body.theme-circus select,
+body.theme-forest input,
+body.theme-forest textarea,
+body.theme-forest select,
+body.theme-detective input,
+body.theme-detective textarea,
+body.theme-detective select,
+body.theme-mafia input,
+body.theme-mafia textarea,
+body.theme-mafia select,
+body.theme-asylum input,
+body.theme-asylum textarea,
+body.theme-asylum select {
+  background-color: var(--surface, #0d0913);
+  color: var(--text, #f5efff);
+  border-color: var(--border, rgba(168, 85, 247, 0.22));
+}
