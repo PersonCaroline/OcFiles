@@ -1,232 +1,132 @@
-export const THEMES = {
-  goth: {
+// =========================================================
+// OcFiles — themes.jsx
+// Six complete visual themes
+// =========================================================
+
+export const THEMES = [
+  {
     id: "goth",
     name: "Goth",
     icon: "🖤",
-    description: "Dark velvet, purple glow and occult circles",
+    description:
+      "Black, purple, circles, shadows and supernatural glow.",
+    colors: {
+      accent: "#a855f7",
+      accent2: "#d946ef",
+      background: "#07050a",
+    },
   },
 
-  circus: {
+  {
     id: "circus",
     name: "Circus",
     icon: "🎪",
-    description: "Dark carnival, gold, red and diagonal stripes",
+    description:
+      "Dark carnival atmosphere with red, gold, stripes and diamonds.",
+    colors: {
+      accent: "#dc2626",
+      accent2: "#eab308",
+      background: "#100708",
+    },
   },
 
-  forest: {
+  {
     id: "forest",
     name: "Forest",
     icon: "🌲",
-    description: "Deep woodland, moss and natural patterns",
+    description:
+      "Deep green atmosphere with organic lines and natural motifs.",
+    colors: {
+      accent: "#4ade80",
+      accent2: "#84cc16",
+      background: "#06100a",
+    },
   },
 
-  detective: {
+  {
     id: "detective",
     name: "Detective",
     icon: "🕵️",
-    description: "Ancient paper, investigation boards and grids",
+    description:
+      "Old investigation files, brown paper, grids and evidence-board aesthetics.",
+    colors: {
+      accent: "#c59b61",
+      accent2: "#8b5e34",
+      background: "#17120d",
+    },
   },
 
-  mafia: {
+  {
     id: "mafia",
     name: "Mafia",
     icon: "♠️",
-    description: "Noir, pinstripes and luxurious crime-family colors",
+    description:
+      "Dark pinstripes, crimson, gold and criminal-underworld atmosphere.",
+    colors: {
+      accent: "#b91c1c",
+      accent2: "#f59e0b",
+      background: "#090909",
+    },
   },
 
-  asylum: {
+  {
     id: "asylum",
     name: "Asylum",
     icon: "🏥",
-    description: "Institutional grids, cold greens and unsettling atmosphere",
+    description:
+      "Institutional grids, cold green-blue lighting and unsettling atmosphere.",
+    colors: {
+      accent: "#4ade80",
+      accent2: "#38bdf8",
+      background: "#071011",
+    },
   },
-};
-
-export const defaultTheme = "goth";
-
-export const personalitySliders = [
-  ["Nice", "Mean"],
-  ["Brave", "Coward"],
-  ["Pacifist", "Violent"],
-  ["Thoughtful", "Impulsive"],
-  ["Agreeable", "Contrary"],
-  ["Idealistic", "Pragmatic"],
-  ["Frugal", "Big spender"],
-  ["Collected", "Wild"],
-  ["Honest", "Deceptive"],
-  ["Polite", "Rude"],
-  ["Smart", "Idiot"],
-  ["Confident", "Insecure"],
-  ["Calm", "Anxious"],
-  ["Patient", "Impatient"],
-  ["Gullible", "Skeptical"],
-  ["Reserved", "Flirty"],
 ];
 
-export const skillGroups = {
-  Skills: [
-    "Perception",
-    "Communication",
-    "Persuasion",
-    "Mediation",
-    "Literacy",
-    "Creativity",
-    "Cooking",
-    "Tech savvy",
-    "Combat",
-    "Survival",
-    "Stealth",
-    "Street smarts",
-    "Seduction",
-    "Luck",
-    "Handling animals",
-    "Pacifying children",
-    "Reflexes",
-    "Strength",
-    "Speed",
-    "Battle IQ",
-    "Resistance",
-    "Flexibility",
-  ],
+export const DEFAULT_THEME = "goth";
 
-  Socials: [
-    "Charisma",
-    "Empathy",
-    "Generosity",
-    "Wealth",
-    "Aggression",
-    "Libido",
-  ],
-};
+export function getTheme(themeId) {
+  return (
+    THEMES.find((theme) => theme.id === themeId) ||
+    THEMES.find((theme) => theme.id === DEFAULT_THEME)
+  );
+}
 
-export const emptyCharacter = {
-  id: "",
-  firstName: "",
-  lastName: "",
-  nickname: "",
-  pronouns: "",
-  gender: "",
-  sexuality: "",
-  age: "",
-  dateOfBirth: "",
-  nationality: "",
-  origins: "",
-  species: "",
-  height: "",
-  weight: "",
-  eyeColor: "",
-  hairColor: "",
-  hairStyle: "",
+export function applyTheme(themeId) {
+  const theme = getTheme(themeId);
 
-  status: "Alive",
-  laterStatus: "",
-  job: "",
-  sideJob: "",
+  document.body.classList.remove(
+    "theme-goth",
+    "theme-circus",
+    "theme-forest",
+    "theme-detective",
+    "theme-mafia",
+    "theme-asylum"
+  );
 
-  affiliation: "",
-  pastAffiliation: "",
-  rank: "",
-  pastRank: "",
+  document.body.classList.add(
+    `theme-${theme.id}`
+  );
 
-  abilities: "",
-  weapon: "",
-  abilityEffects: "",
-  weaknesses: "",
+  document.documentElement.style.setProperty(
+    "--accent",
+    theme.colors.accent
+  );
 
-  mbti: "",
+  document.documentElement.style.setProperty(
+    "--accent-2",
+    theme.colors.accent2
+  );
 
-  fears: "",
-  sickness: "",
-  addictions: "",
+  document.documentElement.style.setProperty(
+    "--bg",
+    theme.colors.background
+  );
 
-  likes: "",
-  dislikes: "",
+  document.documentElement.dataset.theme =
+    theme.id;
 
-  anecdotes: "",
-  lore: "",
+  return theme;
+}
 
-  lyrics: "",
-  songs: "",
-  quotes: "",
-
-  picture: "",
-  moodboard: [],
-
-  personality: {},
-  skills: {},
-  socials: {},
-
-  family: [],
-  friends: [],
-  pets: [],
-
-  organizationIds: [],
-  branchIds: [],
-  postIds: [],
-
-  notes: "",
-  createdAt: "",
-  updatedAt: "",
-};
-
-export const emptyOrganization = {
-  id: "",
-  name: "",
-  description: "",
-  type: "",
-  status: "Active",
-  leader: "",
-  headquarters: "",
-  ideology: "",
-  members: [],
-  branchIds: [],
-  postIds: [],
-  notes: "",
-};
-
-export const emptyBranch = {
-  id: "",
-  organizationId: "",
-  name: "",
-  description: "",
-  location: "",
-  leader: "",
-  members: [],
-};
-
-export const emptyInvestigation = {
-  id: "",
-  title: "",
-  status: "Open",
-  date: "",
-  location: "",
-  summary: "",
-  what: "",
-  who: "",
-  how: "",
-  why: "",
-  when: "",
-  where: "",
-  suspects: [],
-  victims: [],
-  witnesses: [],
-  involvedCharacters: [],
-  organizations: [],
-  evidence: "",
-  clues: "",
-  timeline: "",
-  theories: "",
-  conclusion: "",
-  notes: "",
-};
-
-export const emptyPost = {
-  id: "",
-  title: "",
-  content: "",
-  authorId: "",
-  organizationId: "",
-  branchId: "",
-  date: "",
-  tags: [],
-};
+export default THEMES;
