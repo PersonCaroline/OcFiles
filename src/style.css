@@ -7613,58 +7613,61 @@ body.theme-goth .post-card {
 }
 
 /* =========================================================
-   🎪 CIRCUS — DIAMONDS EVERYWHERE
+   🎪 CIRCUS — CARNIVAL DIAMOND STRIPS
    ========================================================= */
 
 body.theme-circus {
   background-color: #0b0505;
 
+  /*
+    Two diagonal stripe systems crossing each other.
+    Together they create large diamond shapes.
+  */
   background-image:
-    /* large diamond pattern */
-    linear-gradient(
+    /* diagonal strips going / */
+    repeating-linear-gradient(
       45deg,
-      rgba(220, 38, 38, 0.12) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(220, 38, 38, 0.12) 75%
+      transparent 0px,
+      transparent 58px,
+      rgba(220, 38, 38, 0.18) 59px,
+      rgba(220, 38, 38, 0.18) 62px,
+      transparent 63px,
+      transparent 120px
     ),
-    linear-gradient(
-      45deg,
-      rgba(220, 38, 38, 0.12) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(220, 38, 38, 0.12) 75%
+
+    /* diagonal strips going \ */
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 58px,
+      rgba(245, 158, 11, 0.13) 59px,
+      rgba(245, 158, 11, 0.13) 62px,
+      transparent 63px,
+      transparent 120px
     ),
-    /* gold atmospheric glow */
+
+    /* deep red carnival glow */
     radial-gradient(
-      circle at 50% 0%,
-      rgba(245, 158, 11, 0.18),
-      transparent 45%
+      ellipse at 50% 0%,
+      rgba(220, 38, 38, 0.20),
+      transparent 55%
     ),
-    /* red atmospheric glow */
+
+    /* subtle gold glow */
     radial-gradient(
-      circle at 10% 80%,
-      rgba(220, 38, 38, 0.14),
+      ellipse at 85% 85%,
+      rgba(245, 158, 11, 0.12),
       transparent 40%
     );
-
-  background-size:
-    90px 90px,
-    90px 90px,
-    auto,
-    auto;
-
-  background-position:
-    0 0,
-    45px 45px,
-    center,
-    center;
 
   background-attachment: fixed;
 }
 
 
-/* Circus cards also contain diamonds */
+/* =========================================================
+   CIRCUS CARDS — SAME DIAMOND STRIP EFFECT
+   ========================================================= */
+
 body.theme-circus .card,
 body.theme-circus .panel,
 body.theme-circus .stat-card,
@@ -7675,42 +7678,108 @@ body.theme-circus .organization-card,
 body.theme-circus .case-card,
 body.theme-circus .lore-card,
 body.theme-circus .post-card {
-  background-color: rgba(22, 9, 9, 0.93);
+  background-color: rgba(22, 9, 9, 0.91);
 
   background-image:
-    linear-gradient(
+    /* red diagonal */
+    repeating-linear-gradient(
       45deg,
-      rgba(220, 38, 38, 0.10) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(220, 38, 38, 0.10) 75%
+      transparent 0px,
+      transparent 30px,
+      rgba(220, 38, 38, 0.13) 31px,
+      rgba(220, 38, 38, 0.13) 33px,
+      transparent 34px,
+      transparent 62px
     ),
-    linear-gradient(
-      45deg,
-      rgba(220, 38, 38, 0.10) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(220, 38, 38, 0.10) 75%
+
+    /* gold diagonal crossing it */
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 30px,
+      rgba(245, 158, 11, 0.10) 31px,
+      rgba(245, 158, 11, 0.10) 33px,
+      transparent 34px,
+      transparent 62px
     ),
-    linear-gradient(
-      135deg,
-      rgba(245, 158, 11, 0.08),
-      transparent 60%
+
+    /* subtle carnival lighting */
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(220, 38, 38, 0.12),
+      transparent 65%
     );
 
-  background-size:
-    44px 44px,
-    44px 44px,
-    100% 100%;
+  background-attachment: local;
 
-  background-position:
-    0 0,
-    22px 22px,
-    center;
+  border-color: rgba(220, 38, 38, 0.35);
+  border-radius: 16px;
 
-  border-color: rgba(220, 38, 38, 0.32);
+  box-shadow:
+    inset 0 0 30px rgba(220, 38, 38, 0.035);
 }
 
+
+/* =========================================================
+   CIRCUS SIDEBAR
+   ========================================================= */
+
+body.theme-circus .sidebar {
+  background-color: rgba(11, 5, 5, 0.97);
+
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 34px,
+      rgba(220, 38, 38, 0.10) 35px,
+      rgba(220, 38, 38, 0.10) 37px,
+      transparent 38px,
+      transparent 70px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 34px,
+      rgba(245, 158, 11, 0.07) 35px,
+      rgba(245, 158, 11, 0.07) 37px,
+      transparent 38px,
+      transparent 70px
+    );
+
+  border-right-color: rgba(220, 38, 38, 0.30);
+}
+
+
+/* =========================================================
+   CIRCUS TOPBAR
+   ========================================================= */
+
+body.theme-circus .topbar {
+  background-color: rgba(11, 5, 5, 0.92);
+
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(220, 38, 38, 0.08) 41px,
+      rgba(220, 38, 38, 0.08) 43px,
+      transparent 44px,
+      transparent 82px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(245, 158, 11, 0.06) 41px,
+      rgba(245, 158, 11, 0.06) 43px,
+      transparent 44px,
+      transparent 82px
+    );
+
+  border-bottom-color: rgba(220, 38, 38, 0.25);
+}
 
 /* =========================================================
    🌲 FOREST — ORGANIC FLOWING LINES / BRANCHES
