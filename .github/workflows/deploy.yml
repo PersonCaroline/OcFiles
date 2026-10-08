@@ -11,10 +11,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
   build:
     name: Build OcFiles
@@ -22,36 +18,20 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build Vite application
+      - name: Build Vite app
         run: npm run build
 
-      - name: Check built files
-        run: |
-          echo "======================================"
-          echo "        OCFILES BUILD OUTPUT"
-          echo "======================================"
-          echo ""
-          echo "Files inside dist:"
-          find dist -maxdepth 3 -type f -print
-          echo ""
-          echo "======================================"
-          echo "        GENERATED INDEX.HTML"
-          echo "======================================"
-          cat dist/index.html
-          echo ""
-          echo "======================================"
-
-      - name: Setup GitHub Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
