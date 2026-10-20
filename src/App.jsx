@@ -14,6 +14,7 @@ const emptyDatabase = {
   posts: [],
   cases: [],
   lore: [],
+  objects: [],
   settings: {
     theme: DEFAULT_THEME
   }
@@ -100,6 +101,8 @@ function emptyCharacter() {
     fears: [],
     sickness: "",
     addictions: [],
+    organizationMemberships: [],
+    branchMemberships: [],
 
     likes: [],
     dislikes: [],
@@ -246,6 +249,13 @@ function emptyLore() {
   };
 }
 
+function emptyObject() {
+  return {
+    id: uid("object"), name: "", type: "Cursed object", description: "",
+    appearance: "", whatItDoes: "", powers: "", curse: "", effects: "", limitations: "", activation: "", weaknesses: "", dangerLevel: "Unknown", status: "Active", origin: "", creator: "", discoveryYear: "", creationYear: "", destructionYear: "", currentLocation: "", currentOwner: "", previousOwners: [], relatedCharacters: [], relatedOrganizations: [], relatedBranches: [], relatedCases: [], relatedLore: [], notes: "", picture: "", moodboard: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+  };
+}
+
 /* =========================================================
    CONSTANTS
 ========================================================= */
@@ -311,6 +321,7 @@ const navItems = [
   ["relationships", "♡", "Relationships"],
   ["cases", "⚠", "Investigation"],
   ["lore", "◈", "Lore"],
+  ["objects", "◇", "Objects"],
   ["posts", "✦", "Posts"],
   ["settings", "⚙", "Settings"]
 ];
@@ -373,6 +384,8 @@ function normalizeCharacter(character) {
     },
     fears: character.fears || [],
     addictions: character.addictions || [],
+    organizationMemberships: character.organizationMemberships || [],
+    branchMemberships: character.branchMemberships || [],
     likes: character.likes || [],
     dislikes: character.dislikes || [],
     moodboard: character.moodboard || [],
@@ -405,6 +418,8 @@ export default function App() {
 
   const [selectedLore, setSelectedLore] = useState(null);
   const [loreEditor, setLoreEditor] = useState(null);
+  const [selectedObject, setSelectedObject] = useState(null);
+  const [objectEditor, setObjectEditor] = useState(null);
 
   const [postEditor, setPostEditor] = useState(null);
 
@@ -451,6 +466,7 @@ export default function App() {
     setSelectedOrganization(null);
     setSelectedCase(null);
     setSelectedLore(null);
+    setSelectedObject(null);
   }
 
   function addCharacter() {
@@ -512,24 +528,33 @@ export default function App() {
 
   function saveOrganization(organization) {
     setDatabase((current) => {
-      const exists = current.organizations.some(
-        (item) => item.id === organization.id
-      );
-
-      return {
-        ...current,
-        organizations: exists
-          ? current.organizations.map((item) =>
-              item.id === organization.id
-                ? organization
-                : item
-            )
-          : [...current.organizations, organization]
-      };
+      const normalized = { ...emptyOrganization(), ...organization, members: organization.members || [], branches: organization.branches || [] };
+      const exists = current.organizations.some(item => item.id === normalized.id);
+      const organizations = exists ? current.organizations.map(item => item.id === normalized.id ? normalized : item) : [...current.organizations, normalized];
+      const characters = current.characters.map(character => {
+        const memberships = new Set(character.organizationMemberships || []);
+        if (normalized.members.includes(character.id)) memberships.add(normalized.id); else memberships.delete(normalized.id);
+        return { ...character, organizationMemberships: [...memberships] };
+      });
+      return { ...current, organizations, characters };
     });
+    setOrganizationEditor(null); notify("Organization saved.");
+  }
 
-    setOrganizationEditor(null);
-    notify("Organization saved.");
+  function saveObject(object) {
+    const normalized = { ...emptyObject(), ...object, updatedAt: new Date().toISOString() };
+    setDatabase((current) => {
+      const exists = current.objects.some((item) => item.id === normalized.id);
+      return { ...current, objects: exists ? current.objects.map((item) => item.id === normalized.id ? normalized : item) : [...current.objects, normalized] };
+    });
+    setObjectEditor(null); notify("Object saved.");
+  }
+
+  function deleteObject(id) {
+    setConfirm({ title: "Delete object?", message: "This object will be permanently removed from OcFiles.", danger: true, action: () => {
+      setDatabase((current) => ({ ...current, objects: current.objects.filter((item) => item.id !== id) }));
+      setSelectedObject(null); setObjectEditor(null); notify("Object deleted.", "danger");
+    }});
   }
 
   function deleteOrganization(id) {
@@ -811,6 +836,9 @@ export default function App() {
   const selectedLoreObject = database.lore.find(
     (item) => item.id === selectedLore
   );
+  const selectedObjectObject = database.objects.find(
+    (item) => item.id === selectedObject
+  );
 
   return (
     <div className="app-shell">
@@ -910,6 +938,10 @@ export default function App() {
               onEdit={setLoreEditor}
               onDelete={deleteLore}
             />
+          )}
+
+          {page === "objects" && (
+            <ObjectsPage objects={database.objects} characters={database.characters} organizations={database.organizations} branches={database.branches} cases={database.cases} lore={database.lore} onAdd={() => setObjectEditor(emptyObject())} onSelect={setSelectedObject} onEdit={setObjectEditor} onDelete={deleteObject} />
           )}
 
           {page === "posts" && (
@@ -1039,6 +1071,14 @@ export default function App() {
           onClose={() => setLoreEditor(null)}
           onSave={saveLore}
         />
+      )}
+
+      {selectedObjectObject && (
+        <ObjectModal object={selectedObjectObject} characters={database.characters} organizations={database.organizations} branches={database.branches} cases={database.cases} lore={database.lore} onClose={() => setSelectedObject(null)} onEdit={() => setObjectEditor(selectedObjectObject)} onDelete={() => deleteObject(selectedObjectObject.id)} />
+      )}
+
+      {objectEditor && (
+        <ObjectEditor object={objectEditor} characters={database.characters} organizations={database.organizations} branches={database.branches} cases={database.cases} lore={database.lore} onClose={() => setObjectEditor(null)} onSave={saveObject} />
       )}
 
       {postEditor && (
@@ -4600,6 +4640,26 @@ function LoreEditor({
 }
 
 /* =========================================================
+   OBJECTS / ARTIFACTS
+   ========================================================= */
+function ObjectsPage({objects,onAdd,onSelect,onEdit,onDelete}) {
+  const [filter,setFilter]=useState("All"); const [query,setQuery]=useState("");
+  const visible=objects.filter(o=>{ const f=filter==="All" || (filter==="Cursed"&&String(o.type).toLowerCase().includes("curse")) || (filter==="Active"&&o.status==="Active") || (filter==="Destroyed"&&o.status==="Destroyed"); return f&&JSON.stringify(o).toLowerCase().includes(query.toLowerCase()); });
+  return <div className="page-stack"><section className="page-intro"><div><span className="eyebrow">ARCHIVE / ARTIFACTS</span><h2>Objects</h2><p>Archive cursed objects, relics, weapons and other important items.</p></div><button className="button primary" onClick={onAdd}>+ New object</button></section><div className="toolbar"><div className="filter-group">{["All","Cursed","Active","Destroyed"].map(x=><button key={x} className={`filter ${filter===x?"active":""}`} onClick={()=>setFilter(x)}>{x}</button>)}</div><label className="global-search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search objects..."/></label></div>{visible.length===0?<EmptyState icon="◇" title="No objects" text="Create an artifact or cursed object." button="Create object" onClick={onAdd}/>:<div className="object-grid">{visible.map(o=><article className="object-card card" key={o.id} onClick={()=>onSelect(o.id)}><div className="object-cover">{o.picture?<img src={o.picture} alt={o.name}/>:<span>◇</span>}</div><div className="object-body"><div className="object-topline"><span className="eyebrow">{o.type||"OBJECT"}</span><span className="object-status">{o.status}</span></div><h3>{o.name||"Unnamed object"}</h3><p>{o.description||"No description yet."}</p><div className="tag-row">{o.dangerLevel&&<span className="tag">⚠ {o.dangerLevel}</span>}{o.creationYear&&<span className="tag">⌛ {o.creationYear}</span>}{o.currentOwner&&<span className="tag">♙ {o.currentOwner}</span>}</div><div className="card-actions" onClick={e=>e.stopPropagation()}><button className="icon-button" onClick={()=>onEdit(o)}>✎</button><button className="icon-button danger" onClick={()=>onDelete(o.id)}>×</button></div></div></article>)}</div>}</div>;
+}
+
+function ObjectModal({object,characters,organizations,branches,cases,lore,onClose,onEdit,onDelete}) {
+ const names=(ids,list,getName)=>(ids||[]).map(id=>list.find(x=>x.id===id)).filter(Boolean).map(getName);
+ return <Modal title={object.name||"Object"} subtitle={object.type||"Artifact file"} onClose={onClose} wide actions={<><button className="button ghost" onClick={onEdit}>Edit</button><button className="button danger" onClick={onDelete}>Delete</button></>}><div className="object-profile"><div className="profile-header"><div className="profile-picture object-picture">{object.picture?<img src={object.picture} alt=""/>:"◇"}</div><div className="profile-title"><span className="eyebrow">{object.status}</span><h2>{object.name||"Unnamed object"}</h2><p>{object.type}</p></div></div><div className="detail-grid"><Info label="Creation year" value={object.creationYear}/><Info label="Discovery year" value={object.discoveryYear}/><Info label="Destruction year" value={object.destructionYear}/><Info label="Creator" value={object.creator}/><Info label="Current owner" value={object.currentOwner}/><Info label="Location" value={object.currentLocation}/><Info label="Activation" value={object.activation}/><Info label="Danger" value={object.dangerLevel}/></div><ProfileTextSection title="Description" text={object.description}/><ProfileTextSection title="Appearance" text={object.appearance}/><ProfileTextSection title="What it does" text={object.whatItDoes}/><ProfileTextSection title="Powers / abilities" text={object.powers}/><ProfileTextSection title="Curse" text={object.curse}/><ProfileTextSection title="Effects / side effects" text={object.effects}/><ProfileTextSection title="Limitations" text={object.limitations}/><ProfileTextSection title="Weaknesses" text={object.weaknesses}/><ListSection title="Previous owners" items={object.previousOwners}/><section className="profile-section"><SectionHeader title="Direct connections"/><div className="tag-row">{names(object.relatedCharacters,characters,displayName).map((x,i)=><span className="tag" key={i}>♟ {x}</span>)}{names(object.relatedOrganizations,organizations,x=>x.name).map((x,i)=><span className="tag" key={'o'+i}>♜ {x}</span>)}{names(object.relatedBranches,branches,x=>x.name).map((x,i)=><span className="tag" key={'b'+i}>⌘ {x}</span>)}{names(object.relatedCases,cases,x=>x.title).map((x,i)=><span className="tag" key={'c'+i}>⚠ {x}</span>)}{names(object.relatedLore,lore,x=>x.title).map((x,i)=><span className="tag" key={'l'+i}>◈ {x}</span>)}</div></section><ProfileTextSection title="Notes" text={object.notes}/></div></Modal>;
+}
+
+function ObjectEditor({object,characters,organizations,branches,cases,lore,onClose,onSave}) {
+ const [form,setForm]=useState({...emptyObject(),...object}); const [tab,setTab]=useState("basic"); const update=(f,v)=>setForm(x=>({...x,[f]:v})); const toggle=(f,id)=>setForm(x=>({...x,[f]:(x[f]||[]).includes(id)?x[f].filter(v=>v!==id):[...(x[f]||[]),id]}));
+ const links=[['relatedCharacters','Characters',characters,displayName],['relatedOrganizations','Organizations',organizations,x=>x.name],['relatedBranches','Branches',branches,x=>x.name],['relatedCases','Investigation cases',cases,x=>x.title],['relatedLore','Lore entries',lore,x=>x.title]];
+ return <Modal title={form.name||"New object"} subtitle="Object / artifact editor" onClose={onClose} wide extraClass="editor-modal" actions={<button className="button primary" onClick={()=>onSave(form)}>Save object</button>}><div className="editor-tabs">{[['basic','Basic'],['powers','Powers & Curse'],['history','History'],['connections','Connections'],['visual','Visual']].map(([id,label])=><button key={id} className={tab===id?'active':''} onClick={()=>setTab(id)}>{label}</button>)}</div>{tab==='basic'&&<div className="form-section"><FormSectionTitle title="Object identity"/><div className="form-grid"><TextField label="Name" value={form.name} onChange={v=>update('name',v)}/><TextField label="Type" value={form.type} onChange={v=>update('type',v)}/><SelectField label="Status" value={form.status} options={['Active','Dormant','Destroyed','Lost','Unknown']} onChange={v=>update('status',v)}/><SelectField label="Danger level" value={form.dangerLevel} options={['Unknown','Low','Moderate','High','Extreme','Catastrophic']} onChange={v=>update('dangerLevel',v)}/><TextField label="Origin" value={form.origin} onChange={v=>update('origin',v)}/><TextField label="Creator" value={form.creator} onChange={v=>update('creator',v)}/><TextField label="Current owner" value={form.currentOwner} onChange={v=>update('currentOwner',v)}/><TextField label="Current location" value={form.currentLocation} onChange={v=>update('currentLocation',v)}/></div><TextArea label="Description" value={form.description} rows={5} onChange={v=>update('description',v)}/><TextArea label="Appearance" value={form.appearance} rows={4} onChange={v=>update('appearance',v)}/></div>}{tab==='powers'&&<div className="form-section"><FormSectionTitle title="Powers, curse & effects"/><TextArea label="What does it do?" value={form.whatItDoes} rows={5} onChange={v=>update('whatItDoes',v)}/><TextArea label="Powers / abilities" value={form.powers} rows={5} onChange={v=>update('powers',v)}/><TextArea label="Curse" value={form.curse} rows={5} onChange={v=>update('curse',v)}/><TextArea label="Effects / side effects" value={form.effects} rows={5} onChange={v=>update('effects',v)}/><TextArea label="Activation conditions" value={form.activation} rows={4} onChange={v=>update('activation',v)}/><TextArea label="Limitations" value={form.limitations} rows={4} onChange={v=>update('limitations',v)}/><TextArea label="Weaknesses" value={form.weaknesses} rows={4} onChange={v=>update('weaknesses',v)}/></div>}{tab==='history'&&<div className="form-section"><FormSectionTitle title="History & ownership"/><div className="form-grid"><TextField label="Creation year" value={form.creationYear} onChange={v=>update('creationYear',v)}/><TextField label="Discovery year" value={form.discoveryYear} onChange={v=>update('discoveryYear',v)}/><TextField label="Destruction year" value={form.destructionYear} onChange={v=>update('destructionYear',v)}/></div><ListEditor label="Previous owners" values={form.previousOwners} onAdd={()=>update('previousOwners',[...form.previousOwners,''])} onChange={(i,v)=>update('previousOwners',form.previousOwners.map((x,j)=>j===i?v:x))} onRemove={i=>update('previousOwners',form.previousOwners.filter((_,j)=>j!==i))}/><TextArea label="Notes / history" value={form.notes} rows={8} onChange={v=>update('notes',v)}/></div>}{tab==='connections'&&<div className="form-section"><FormSectionTitle title="Direct connections"/>{links.map(([field,label,list,getName])=><div className="field" key={field}><label>{label}</label><div className="member-selector">{list.map(item=><label className={`member-select ${form[field].includes(item.id)?'selected':''}`} key={item.id}><input type="checkbox" checked={form[field].includes(item.id)} onChange={()=>toggle(field,item.id)}/><span>{getName(item)}</span></label>)}{list.length===0&&<span className="field-hint">Nothing available yet.</span>}</div></div>)}</div>}{tab==='visual'&&<div className="form-section"><FormSectionTitle title="Visual archive"/><ImageUpload label="Object picture" value={form.picture} onChange={v=>update('picture',v)}/><ImageListEditor label="Mood board" values={form.moodboard} onChange={v=>update('moodboard',v)}/></div>}</Modal>;
+}
+
+/* =========================================================
    POSTS
 ========================================================= */
 
@@ -4897,6 +4957,8 @@ function SettingsPage({
             label="Lore"
             value={database.lore.length}
           />
+
+          <Info label="Objects" value={database.objects.length} />
 
           <Info
             label="Posts"
